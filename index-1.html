@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Cyber Quantum Tap</title>
+<style>
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  html,body{
+    height:100%;
+  }
+
+  body{
+    background:
+      radial-gradient(ellipse at 50% -15%, #16213e 0%, rgba(11,12,16,0) 58%),
+      radial-gradient(ellipse at 50% 115%, #2a0845 0%, rgba(11,12,16,0) 58%),
+      #0b0c10;
+    color:#d8f6ff;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow:hidden;
+    overscroll-behavior:none;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+    touch-action:manipulation;
+    position:relative;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,240,255,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,.055) 1px, transparent 1px);
+    background-size:44px 44px;
+    -webkit-mask-image:radial-gradient(circle at 50% 38%, #000 0%, transparent 78%);
+    mask-image:radial-gradient(circle at 50% 38%, #000 0%, transparent 78%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  body::after{
+    content:"";
+    position:fixed;
+    left:0;right:0;top:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #00f0ff, #ff00e0, transparent);
+    box-shadow:0 0 18px rgba(0,240,255,.8);
+    opacity:.75;
+    pointer-events:none;
+    z-index:3;
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    max-width:520px;
+    margin:0 auto;
+    height:100vh;
+    height:100dvh;
+    padding:calc(env(safe-area-inset-top, 0px) + 10px) 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    gap:8px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+
+  .app::-webkit-scrollbar{
+    width:0;
+    height:0;
+  }
+
+  /* ================= HUD ================= */
+
+  .hud{
+    flex:0 0 auto;
+    text-align:center;
+    padding-top:2px;
+  }
+
+  .hud-label{
+    font-size:10px;
+    letter-spacing:.36em;
+    color:#5f7a99;
+    text-transform:uppercase;
+    margin-bottom:4px;
+    text-indent:.36em;
+  }
+
+  .balance{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    font-size:clamp(30px, 10vw, 44px);
+    font-weight:800;
+    line-height:1.1;
+    color:#ffffff;
+    font-variant-numeric:tabular-nums;
+    text-shadow:
+      0 0 12px rgba(0,240,255,.9),
+      0 0 34px rgba(0,240,255,.5),
+      0 0 60px rgba(140,0,255,.4);
+  }
+
+  .coin{
+    font-size:.72em;
+    line-height:1;
+    filter:drop-shadow(0 0 9px rgba(255,201,71,.9));
+  }
+
+  .income{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top:7px;
+    padding:4px 14px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:.02em;
+    color:#00f0ff;
+    background:rgba(0,240,255,.08);
+    border:1px solid rgba(0,240,255,.28);
+    text-shadow:0 0 10px rgba(0,240,255,.7);
+    box-shadow:0 0 16px rgba(0,240,255,.14), inset 0 0 14px rgba(0,240,255,.06);
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ================= CORE ================= */
+
+  .core-area{
+    flex:1 1 auto;
+    min-height:264px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    padding:10px 0;
+  }
+
+  .core-wrap{
+    position:relative;
+    display:grid;
+    place-items:center;
+    width:min(64vw, 236px);
+    aspect-ratio:1 / 1;
+    flex:0 0 auto;
+  }
+
+  .ring{
+    position:absolute;
+    border-radius:50%;
+    pointer-events:none;
+  }
+
+  .ring-1{
+    inset:-5%;
+    border:1px solid rgba(0,240,255,.22);
+    border-top-color:#00f0ff;
+    border-right-color:transparent;
+    box-shadow:0 0 18px rgba(0,240,255,.28);
+    animation:spin 8s linear infinite;
+  }
+
+  .ring-2{
+    inset:-13%;
+    border:1px solid rgba(255,0,224,.2);
+    border-bottom-color:#ff00e0;
+    border-left-color:transparent;
+    box-shadow:0 0 20px rgba(255,0,224,.22);
+    animation:spin 13s linear infinite reverse;
+  }
+
+  .ring-3{
+    inset:-21%;
+    border:1px dashed rgba(140,0,255,.38);
+    animation:spin 22s linear infinite;
+  }
+
+  @keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
+  }
+
+  .core{
+    position:relative;
+    width:78%;
+    aspect-ratio:1 / 1;
+    border:none;
+    padding:0;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    color:#02121a;
+    background:
+      radial-gradient(circle at 32% 26%, #c9fdff 0%, #2ad9f5 17%, #0ea5e9 38%, #6d28d9 69%, #1e0b3a 100%);
+    box-shadow:
+      0 0 24px rgba(0,240,255,.6),
+      0 0 58px rgba(0,240,255,.32),
+      0 0 108px rgba(140,0,255,.34),
+      inset 0 -14px 34px rgba(0,0,0,.55),
+      inset 0 10px 24px rgba(255,255,255,.26);
+    transition:transform .08s ease-out;
+    animation:corePulse 2.6s ease-in-out infinite;
+    outline:none;
+  }
+
+  .core.pressed{
+    transform:scale(.95);
+  }
+
+  @keyframes corePulse{
+    0%, 100%{
+      box-shadow:
+        0 0 22px rgba(0,240,255,.55),
+        0 0 54px rgba(0,240,255,.28),
+        0 0 100px rgba(140,0,255,.3),
+        inset 0 -14px 34px rgba(0,0,0,.55),
+        inset 0 10px 24px rgba(255,255,255,.24);
+    }
+    50%{
+      box-shadow:
+        0 0 38px rgba(0,240,255,.95),
+        0 0 92px rgba(0,240,255,.55),
+        0 0 156px rgba(140,0,255,.6),
+        inset 0 -14px 34px rgba(0,0,0,.55),
+        inset 0 10px 24px rgba(255,255,255,.32);
+    }
+  }
+
+  .core-inner{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    pointer-events:none;
+  }
+
+  .core-symbol{
+    font-size:clamp(34px, 12vw, 56px);
+    line-height:1;
+    color:#f2feff;
+    text-shadow:
+      0 0 16px rgba(255,255,255,.95),
+      0 0 38px rgba(0,240,255,.95);
+    animation:symbolPulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes symbolPulse{
+    0%, 100%{ transform:scale(1); opacity:.92; }
+    50%{ transform:scale(1.09); opacity:1; }
+  }
+
+  .core-power{
+    font-size:12.5px;
+    font-weight:900;
+    letter-spacing:.06em;
+    padding:3px 11px;
+    border-radius:999px;
+    color:#04131c;
+    background:rgba(255,255,255,.72);
+    box-shadow:0 0 12px rgba(255,255,255,.5);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .core-hint{
+    margin-top:20px;
+    font-size:10px;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:#4c6b8a;
+    text-indent:.32em;
+    text-align:center;
+  }
+
+  /* ================= FLOAT TEXT ================= */
+
+  .float-text{
+    position:fixed;
+    left:0;
+    top:0;
+    transform:translate(-50%, -50%);
+    font-size:20px;
+    font-weight:900;
+    color:#ffffff;
+    pointer-events:none;
+    z-index:60;
+    white-space:nowrap;
+    text-shadow:
+      0 0 12px rgba(0,240,255,.95),
+      0 0 26px rgba(0,240,255,.6);
+    animation:floatUp .9s ease-out forwards;
+  }
+
+  @keyframes floatUp{
+    0%{ opacity:0; transform:translate(-50%, -50%) scale(.55); }
+    22%{ opacity:1; transform:translate(-50%, -85%) scale(1.18); }
+    100%{ opacity:0; transform:translate(-50%, -215%) scale(1); }
+  }
+
+  /* ================= PANEL ================= */
+
+  .panel{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+  }
+
+  .ad-btn{
+    width:100%;
+    padding:15px 12px;
+    border-radius:17px;
+    border:1px solid rgba(255,0,224,.55);
+    background:linear-gradient(135deg, rgba(255,0,224,.22), rgba(140,0,255,.24));
+    color:#ffffff;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:.02em;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    text-shadow:0 0 10px rgba(255,0,224,.85);
+    box-shadow:
+      0 0 20px rgba(255,0,224,.34),
+      inset 0 0 20px rgba(255,0,224,.12);
+    transition:transform .08s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+
+  .ad-btn:active{
+    transform:scale(.97);
+  }
+
+  .ad-btn:disabled{
+    opacity:.62;
+    cursor:default;
+    box-shadow:0 0 8px rgba(255,0,224,.14);
+    transform:none;
+  }
+
+  .shop{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .shop-title{
+    font-size:10px;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color:#5f7a99;
+    padding-left:4px;
+    text-indent:.3em;
+  }
+
+  .upgrade{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    padding:12px 14px;
+    border-radius:17px;
+    border:1px solid rgba(0,240,255,.16);
+    background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
+    color:#cfeaff;
+    font-family:inherit;
+    text-align:left;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    transition:transform .08s ease, border-color .2s ease, box-shadow .2s ease;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+
+  .upgrade:active{
+    transform:scale(.98);
+  }
+
+  .upgrade.affordable{
+    border-color:rgba(0,240,255,.62);
+    box-shadow:
+      0 0 18px rgba(0,240,255,.24),
+      inset 0 0 22px rgba(0,240,255,.06);
+  }
+
+  .up-icon{
+    flex:0 0 auto;
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    font-size:17px;
+    line-height:1;
+    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.38), rgba(0,240,255,.05));
+    border:1px solid rgba(0,240,255,.38);
+    box-shadow:0 0 13px rgba(0,240,255,.28);
+  }
+
+  .up-icon.pink{
+    background:radial-gradient(circle at 30% 28%, rgba(255,0,224,.38), rgba(255,0,224,.05));
+    border-color:rgba(255,0,224,.38);
+    box-shadow:0 0 13px rgba(255,0,224,.28);
+  }
+
+  .up-left{
+    flex:1 1 auto;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+
+  .up-name{
+    font-size:14px;
+    font-weight:800;
+    color:#ffffff;
+    letter-spacing:.02em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .up-desc{
+    font-size:11px;
+    color:#6f8dab;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .up-right{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:3px;
+  }
+
+  .up-level{
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#8a7bff;
+  }
+
+  .up-price{
+    font-size:14px;
+    font-weight:900;
+    color:#ffd166;
+    font-variant-numeric:tabular-nums;
+    text-shadow:0 0 10px rgba(255,209,102,.5);
+    white-space:nowrap;
+  }
+
+  .upgrade.affordable .up-price{
+    color:#7dffb0;
+    text-shadow:0 0 10px rgba(125,255,176,.65);
+  }
+
+  @keyframes shakeX{
+    0%, 100%{ transform:translateX(0); }
+    25%{ transform:translateX(-6px); }
+    75%{ transform:translateX(6px); }
+  }
+
+  .shake{
+    animation:shakeX .3s ease;
+  }
+
+  .footer-note{
+    flex:0 0 auto;
+    text-align:center;
+    font-size:9.5px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:#33465c;
+    padding-bottom:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="hud">
+    <div class="hud-label">Cyber Quantum Tap</div>
+    <div class="balance">
+      <span class="coin">🪙</span>
+      <span id="coins">0</span>
+    </div>
+    <div class="income">⚡ <span id="ips">0</span> / сек</div>
+  </header>
+
+  <main class="core-area">
+    <div class="core-wrap">
+      <div class="ring ring-3"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-1"></div>
+      <button id="core" class="core" type="button" aria-label="Quantum Core">
+        <span class="core-inner">
+          <span class="core-symbol">◈</span>
+          <span class="core-power">+<span id="clickPower">1</span></span>
+        </span>
+      </button>
+    </div>
+    <div class="core-hint">Тапай по ядру</div>
+  </main>
+
+  <section class="panel">
+
+    <button id="adBtn" class="ad-btn" type="button">Смотреть рекламу (+5000 🪙)</button>
+
+    <div class="shop">
+      <div class="shop-title">Улучшения</div>
+
+      <button id="buyClick" class="upgrade" type="button">
+        <div class="up-icon">⚡</div>
+        <div class="up-left">
+          <div class="up-name">Power Click</div>
+          <div class="up-desc">+1 к силе клика</div>
+        </div>
+        <div class="up-right">
+          <div class="up-level">Ур. <span id="clickLevel">0</span></div>
+          <div class="up-price"><span id="clickCost">50</span> 🪙</div>
+        </div>
+      </button>
+
+      <button id="buyMiner" class="upgrade" type="button">
+        <div class="up-icon pink">🛰</div>
+        <div class="up-left">
+          <div class="up-name">Quantum Miner</div>
+          <div class="up-desc">+1 монета в секунду</div>
+        </div>
+        <div class="up-right">
+          <div class="up-level">Ур. <span id="minerLevel">0</span></div>
+          <div class="up-price"><span id="minerCost">100</span> 🪙</div>
+        </div>
+      </button>
+    </div>
+
+  </section>
+
+  <div class="footer-note">Автосохранение активно</div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     КОНСТАНТЫ
+     ============================================================ */
+
+  var SAVE_KEY = 'cyber_quantum_tap_save_v1';
+  var AD_REWARD = 5000;
+  var SAVE_INTERVAL = 3000;
+
+  var CLICK_BASE_COST = 50;
+  var CLICK_COST_GROWTH = 1.5;
+  var MINER_BASE_COST = 100;
+  var MINER_COST_GROWTH = 1.6;
+
+  /* ============================================================
+     СОСТОЯНИЕ
+     ============================================================ */
+
+  var state = {
+    coins: 0,
+    clickLevel: 0,
+    minerLevel: 0,
+    totalEarned: 0
+  };
+
+  /* ============================================================
+     DOM
+     ============================================================ */
+
+  var els = {
+    coins: document.getElementById('coins'),
+    ips: document.getElementById('ips'),
+    clickPower: document.getElementById('clickPower'),
+    core: document.getElementById('core'),
+    adBtn: document.getElementById('adBtn'),
+    buyClick: document.getElementById('buyClick'),
+    buyMiner: document.getElementById('buyMiner'),
+    clickLevel: document.getElementById('clickLevel'),
+    clickCost: document.getElementById('clickCost'),
+    minerLevel: document.getElementById('minerLevel'),
+    minerCost: document.getElementById('minerCost')
+  };
+
+  /* ============================================================
+     ФОРМАТИРОВАНИЕ ЧИСЕЛ
+     ============================================================ */
+
+  var UNITS = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp'];
+
+  function formatNumber(value) {
+    var n = Math.floor(Number(value) || 0);
+    if (n < 0) n = 0;
+    if (n < 1000) return String(n);
+
+    var idx = 0;
+    var v = n;
+    while (v >= 1000 && idx < UNITS.length - 1) {
+      v /= 1000;
+      idx++;
+    }
+
+    var str;
+    if (v >= 100) {
+      str = v.toFixed(0);
+    } else if (v >= 10) {
+      str = v.toFixed(1);
+    } else {
+      str = v.toFixed(2);
+    }
+
+    str = str.replace(/\.0+$/, '').replace(/(\.\d)0$/, '$1');
+    return str + UNITS[idx];
+  }
+
+  /* ============================================================
+     ПРОИЗВОДНЫЕ ВЕЛИЧИНЫ
+     ============================================================ */
+
+  function getClickPower() {
+    return 1 + state.clickLevel;
+  }
+
+  function getIncomePerSecond() {
+    return state.minerLevel;
+  }
+
+  function getClickCost() {
+    return Math.floor(CLICK_BASE_COST * Math.pow(CLICK_COST_GROWTH, state.clickLevel));
+  }
+
+  function getMinerCost() {
+    return Math.floor(MINER_BASE_COST * Math.pow(MINER_COST_GROWTH, state.minerLevel));
+  }
+
+  /* ============================================================
+     ОТРИСОВКА
+     ============================================================ */
+
+  function render() {
+    els.coins.textContent = formatNumber(state.coins);
+    els.ips.textContent = formatNumber(getIncomePerSecond());
+    els.clickPower.textContent = formatNumber(getClickPower());
+
+    els.clickLevel.textContent = state.clickLevel;
+    els.clickCost.textContent = formatNumber(getClickCost());
+
+    els.minerLevel.textContent = state.minerLevel;
+    els.minerCost.textContent = formatNumber(getMinerCost());
+
+    if (state.coins >= getClickCost()) {
+      els.buyClick.classList.add('affordable');
+    } else {
+      els.buyClick.classList.remove('affordable');
+    }
+
+    if (state.coins >= getMinerCost()) {
+      els.buyMiner.classList.add('affordable');
+    } else {
+      els.buyMiner.classList.remove('affordable');
+    }
+  }
+
+  /* ============================================================
+     СОХРАНЕНИЕ / ЗАГРУЗКА
+     ============================================================ */
+
+  function save() {
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify({
+        coins: state.coins,
+        clickLevel: state.clickLevel,
+        minerLevel: state.minerLevel,
+        totalEarned: state.totalEarned
+      }));
+    } catch (e) {
+      /* localStorage может быть недоступен — игнорируем */
+    }
+  }
+
+  function load() {
+    var raw = null;
+    try {
+      raw = localStorage.getItem(SAVE_KEY);
+    } catch (e) {
+      raw = null;
+    }
+
+    if (!raw) return;
+
+    var data = null;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      data = null;
+    }
+
+    if (!data || typeof data !== 'object') return;
+
+    var coins = Number(data.coins);
+    var clickLevel = Number(data.clickLevel);
+    var minerLevel = Number(data.minerLevel);
+    var totalEarned = Number(data.totalEarned);
+
+    state.coins = isFinite(coins) && coins > 0 ? Math.floor(coins) : 0;
+    state.clickLevel = isFinite(clickLevel) && clickLevel > 0 ? Math.floor(clickLevel) : 0;
+    state.minerLevel = isFinite(minerLevel) && minerLevel > 0 ? Math.floor(minerLevel) : 0;
+    state.totalEarned = isFinite(totalEarned) && totalEarned > 0 ? Math.floor(totalEarned) : 0;
+  }
+
+  /* ============================================================
+     ВИБРООТКЛИК
+     ============================================================ */
+
+  function haptic(type) {
+    try {
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+        var hf = window.Telegram.WebApp.HapticFeedback;
+        if (type === 'success') {
+          hf.notificationOccurred('success');
+        } else if (type === 'error') {
+          hf.notificationOccurred('error');
+        } else {
+          hf.impactOccurred('light');
+        }
+        return;
+      }
+    } catch (e) {
+      /* игнорируем */
+    }
+
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate(type === 'success' ? 24 : 10);
+      }
+    } catch (e) {
+      /* игнорируем */
+    }
+  }
+
+  /* ============================================================
+     ВСПЛЫВАЮЩИЕ ЧИСЛА
+     ============================================================ */
+
+  function spawnFloat(x, y, value) {
+    var el = document.createElement('div');
+    el.className = 'float-text';
+    el.textContent = '+' + formatNumber(value);
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.body.appendChild(el);
+
+    window.setTimeout(function () {
+      if (el && el.parentNode) {
+        el.parentNode.removeChild(el);
+      }
+    }, 900);
+  }
+
+  /* ============================================================
+     КЛИК ПО ЯДРУ
+     ============================================================ */
+
+  function handleCorePress(event) {
+    var gain = getClickPower();
+
+    state.coins += gain;
+    state.totalEarned += gain;
+
+    render();
+
+    var x = event.clientX;
+    var y = event.clientY;
+
+    if (typeof x !== 'number' || typeof y !== 'number' || (x === 0 && y === 0)) {
+      var rect = els.core.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+
+    spawnFloat(x, y, gain);
+    haptic('light');
+  }
+
+  els.core.addEventListener('pointerdown', function (event) {
+    event.preventDefault();
+    els.core.classList.add('pressed');
+    handleCorePress(event);
+  });
+
+  els.core.addEventListener('pointerup', function () {
+    els.core.classList.remove('pressed');
+  });
+
+  els.core.addEventListener('pointercancel', function () {
+    els.core.classList.remove('pressed');
+  });
+
+  els.core.addEventListener('pointerleave', function () {
+    els.core.classList.remove('pressed');
+  });
+
+  els.core.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+  });
+
+  /* ============================================================
+     ПОКУПКА УЛУЧШЕНИЙ
+     ============================================================ */
+
+  function shakeElement(el) {
+    el.classList.remove('shake');
+    /* принудительный reflow, чтобы анимация перезапустилась */
+    void el.offsetWidth;
+    el.classList.add('shake');
+    window.setTimeout(function () {
+      el.classList.remove('shake');
+    }, 320);
+  }
+
+  els.buyClick.addEventListener('click', function () {
+    var cost = getClickCost();
+
+    if (state.coins >= cost) {
+      state.coins -= cost;
+      state.clickLevel += 1;
+      save();
+      render();
+      haptic('success');
+    } else {
+      shakeElement(els.buyClick);
+      haptic('error');
+    }
+  });
+
+  els.buyMiner.addEventListener('click', function () {
+    var cost = getMinerCost();
+
+    if (state.coins >= cost) {
+      state.coins -= cost;
+      state.minerLevel += 1;
+      save();
+      render();
+      haptic('success');
+    } else {
+      shakeElement(els.buyMiner);
+      haptic('error');
+    }
+  });
+
+  /* ============================================================
+     РЕКЛАМА (ЗАГЛУШКА ПОД ADSGRAM / ЯНДЕКС)
+     ============================================================ */
+
+  var AD_DEFAULT_TEXT = 'Смотреть рекламу (+5000 🪙)';
+  var adBusy = false;
+  var adTimer = null;
+
+  function watchAd() {
+    if (adBusy) return;
+
+    adBusy = true;
+    els.adBtn.disabled = true;
+
+    var secondsLeft = 3;
+    els.adBtn.textContent = 'Загрузка видео... (' + secondsLeft + ')';
+
+    adTimer = window.setInterval(function () {
+      secondsLeft -= 1;
+
+      if (secondsLeft > 0) {
+        els.adBtn.textContent = 'Загрузка видео... (' + secondsLeft + ')';
+        return;
+      }
+
+      window.clearInterval(adTimer);
+      adTimer = null;
+
+      state.coins += AD_REWARD;
+      state.totalEarned += AD_REWARD;
+
+      save();
+      render();
+      haptic('success');
+
+      els.adBtn.textContent = '✅ Награда получена! +5000 🪙';
+
+      window.setTimeout(function () {
+        els.adBtn.textContent = AD_DEFAULT_TEXT;
+        els.adBtn.disabled = false;
+        adBusy = false;
+      }, 1300);
+
+    }, 1000);
+  }
+
+  els.adBtn.addEventListener('click', watchAd);
+
+  /* ============================================================
+     ПАССИВНЫЙ ДОХОД
+     ============================================================ */
+
+  window.setInterval(function () {
+    var income = getIncomePerSecond();
+    if (income > 0) {
+      state.coins += income;
+      state.totalEarned += income;
+      render();
+    }
+  }, 1000);
+
+  /* ============================================================
+     АВТОСОХРАНЕНИЕ
+     ============================================================ */
+
+  window.setInterval(save, SAVE_INTERVAL);
+
+  window.addEventListener('beforeunload', save);
+  window.addEventListener('pagehide', save);
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      save();
+    }
+  });
+
+  document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+  });
+
+  /* ============================================================
+     СТАРТ
+     ============================================================ */
+
+  load();
+  render();
+  save();
+
+})();
+</script>
+
+</body>
+</html>
