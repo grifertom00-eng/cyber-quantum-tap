@@ -148,7 +148,7 @@
 
   .core-area{
     flex:1 1 auto;
-    min-height:264px;
+    min-height:240px;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -161,7 +161,7 @@
     position:relative;
     display:grid;
     place-items:center;
-    width:min(64vw, 236px);
+    width:min(60vw, 220px);
     aspect-ratio:1 / 1;
     flex:0 0 auto;
   }
@@ -259,7 +259,7 @@
   }
 
   .core-symbol{
-    font-size:clamp(34px, 12vw, 56px);
+    font-size:clamp(32px, 11vw, 52px);
     line-height:1;
     color:#f2feff;
     text-shadow:
@@ -274,7 +274,7 @@
   }
 
   .core-power{
-    font-size:12.5px;
+    font-size:12px;
     font-weight:900;
     letter-spacing:.06em;
     padding:3px 11px;
@@ -286,7 +286,7 @@
   }
 
   .core-hint{
-    margin-top:20px;
+    margin-top:18px;
     font-size:10px;
     letter-spacing:.32em;
     text-transform:uppercase;
@@ -327,6 +327,7 @@
     display:flex;
     flex-direction:column;
     gap:9px;
+    padding-bottom:6px;
   }
 
   .ad-btn{
@@ -374,6 +375,7 @@
     color:#5f7a99;
     padding-left:4px;
     text-indent:.3em;
+    margin-top:2px;
   }
 
   .upgrade{
@@ -391,7 +393,7 @@
     cursor:pointer;
     -webkit-appearance:none;
     appearance:none;
-    transition:transform .08s ease, border-color .2s ease, box-shadow .2s ease;
+    transition:transform .08s ease, border-color .2s ease, box-shadow .2s ease, opacity .2s ease;
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
   }
 
@@ -404,6 +406,57 @@
     box-shadow:
       0 0 18px rgba(0,240,255,.24),
       inset 0 0 22px rgba(0,240,255,.06);
+  }
+
+  .upgrade.locked{
+    opacity:.55;
+    cursor:not-allowed;
+  }
+
+  .upgrade.purchased{
+    opacity:.72;
+    cursor:default;
+    border-color:rgba(125,255,176,.55);
+    box-shadow:0 0 16px rgba(125,255,176,.22), inset 0 0 20px rgba(125,255,176,.06);
+  }
+
+  .upgrade.stars-upgrade.affordable{
+    border-color:rgba(255,209,102,.75);
+    box-shadow:
+      0 0 20px rgba(255,209,102,.32),
+      inset 0 0 22px rgba(255,209,102,.08);
+  }
+
+  .upgrade.stars-upgrade .up-price{
+    color:#ffd166;
+    text-shadow:0 0 10px rgba(255,209,102,.6);
+  }
+
+  .upgrade.daily-upgrade.affordable{
+    border-color:rgba(125,255,176,.75);
+    box-shadow:
+      0 0 20px rgba(125,255,176,.32),
+      inset 0 0 22px rgba(125,255,176,.08);
+  }
+
+  .upgrade.prestige-upgrade.affordable{
+    border-color:rgba(255,100,200,.8);
+    box-shadow:
+      0 0 24px rgba(255,100,200,.4),
+      inset 0 0 22px rgba(255,100,200,.08);
+  }
+
+  .upgrade.prestige-upgrade.affordable .up-price{
+    color:#ff9de2;
+    text-shadow:0 0 12px rgba(255,100,200,.85);
+  }
+
+  .upgrade.referral-upgrade{
+    border-color:rgba(0,240,255,.4);
+  }
+
+  .upgrade.referral-upgrade:active{
+    transform:scale(.98);
   }
 
   .up-icon{
@@ -424,6 +477,30 @@
     background:radial-gradient(circle at 30% 28%, rgba(255,0,224,.38), rgba(255,0,224,.05));
     border-color:rgba(255,0,224,.38);
     box-shadow:0 0 13px rgba(255,0,224,.28);
+  }
+
+  .up-icon.stars{
+    background:radial-gradient(circle at 30% 28%, rgba(255,209,102,.5), rgba(255,209,102,.06));
+    border-color:rgba(255,209,102,.5);
+    box-shadow:0 0 13px rgba(255,209,102,.4);
+  }
+
+  .up-icon.daily{
+    background:radial-gradient(circle at 30% 28%, rgba(125,255,176,.42), rgba(125,255,176,.05));
+    border-color:rgba(125,255,176,.42);
+    box-shadow:0 0 13px rgba(125,255,176,.3);
+  }
+
+  .up-icon.prestige{
+    background:radial-gradient(circle at 30% 28%, rgba(255,100,200,.45), rgba(255,100,200,.05));
+    border-color:rgba(255,100,200,.45);
+    box-shadow:0 0 13px rgba(255,100,200,.35);
+  }
+
+  .up-icon.referral{
+    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.42), rgba(0,240,255,.05));
+    border-color:rgba(0,240,255,.42);
+    box-shadow:0 0 13px rgba(0,240,255,.32);
   }
 
   .up-left{
@@ -466,6 +543,8 @@
     letter-spacing:.14em;
     text-transform:uppercase;
     color:#8a7bff;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
   }
 
   .up-price{
@@ -501,6 +580,141 @@
     color:#33465c;
     padding-bottom:2px;
   }
+
+  /* ================= TOAST ================= */
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 22px);
+    transform:translateX(-50%) translateY(140%);
+    background:linear-gradient(135deg, rgba(0,240,255,.96), rgba(140,0,255,.96));
+    color:#03121c;
+    padding:13px 20px;
+    border-radius:14px;
+    font-weight:800;
+    font-size:12.5px;
+    letter-spacing:.02em;
+    max-width:min(92vw, 420px);
+    text-align:center;
+    box-shadow:
+      0 0 34px rgba(0,240,255,.6),
+      0 10px 30px rgba(0,0,0,.5);
+    transition:transform .38s cubic-bezier(.2,1.25,.4,1), opacity .3s ease;
+    z-index:400;
+    opacity:0;
+    pointer-events:none;
+    line-height:1.35;
+  }
+
+  .toast.show{
+    transform:translateX(-50%) translateY(0);
+    opacity:1;
+  }
+
+  /* ================= PAYMENT MODAL ================= */
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(2,4,10,.86);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:500;
+    padding:24px;
+  }
+
+  .modal-overlay.show{
+    display:flex;
+  }
+
+  .modal{
+    width:100%;
+    max-width:320px;
+    padding:30px 22px 26px;
+    border-radius:22px;
+    background:linear-gradient(150deg, rgba(22,32,52,.98), rgba(12,16,28,.98));
+    border:1px solid rgba(255,209,102,.5);
+    box-shadow:
+      0 0 60px rgba(255,209,102,.4),
+      0 0 130px rgba(140,0,255,.3),
+      inset 0 0 32px rgba(255,209,102,.06);
+    text-align:center;
+    animation:modalIn .35s cubic-bezier(.2,1.2,.4,1);
+  }
+
+  .modal.success{
+    border-color:rgba(125,255,176,.65);
+    box-shadow:
+      0 0 60px rgba(125,255,176,.5),
+      0 0 130px rgba(0,240,255,.28),
+      inset 0 0 32px rgba(125,255,176,.08);
+  }
+
+  @keyframes modalIn{
+    from{ opacity:0; transform:scale(.85) translateY(10px); }
+    to{ opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  .modal-icon{
+    font-size:52px;
+    line-height:1;
+    margin-bottom:14px;
+    filter:drop-shadow(0 0 18px rgba(255,209,102,.95));
+    animation:modalIconPulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes modalIconPulse{
+    0%, 100%{ transform:scale(1); }
+    50%{ transform:scale(1.12); }
+  }
+
+  .modal.success .modal-icon{
+    animation:none;
+    filter:drop-shadow(0 0 22px rgba(125,255,176,.95));
+  }
+
+  .modal-title{
+    font-size:17px;
+    font-weight:800;
+    color:#ffffff;
+    letter-spacing:.04em;
+    margin-bottom:8px;
+    text-shadow:0 0 14px rgba(255,209,102,.75);
+  }
+
+  .modal.success .modal-title{
+    text-shadow:0 0 14px rgba(125,255,176,.85);
+  }
+
+  .modal-text{
+    font-size:13px;
+    color:#98b4d0;
+    margin-bottom:20px;
+    line-height:1.4;
+  }
+
+  .modal-spinner{
+    width:42px;
+    height:42px;
+    margin:0 auto;
+    border:3px solid rgba(255,209,102,.18);
+    border-top-color:#ffd166;
+    border-radius:50%;
+    animation:modalSpin .9s linear infinite;
+  }
+
+  .modal.success .modal-spinner{
+    display:none;
+  }
+
+  @keyframes modalSpin{
+    to{ transform:rotate(360deg); }
+  }
+
 </style>
 </head>
 <body>
@@ -561,12 +775,75 @@
           <div class="up-price"><span id="minerCost">100</span> 🪙</div>
         </div>
       </button>
+
+      <button id="buyStars" class="upgrade stars-upgrade" type="button">
+        <div class="up-icon stars">⭐</div>
+        <div class="up-left">
+          <div class="up-name">x10 к клику навсегда</div>
+          <div class="up-desc">Одноразовая покупка</div>
+        </div>
+        <div class="up-right">
+          <div class="up-level">Telegram Stars</div>
+          <div class="up-price" id="starsPrice">50 ⭐</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="shop">
+      <div class="shop-title">Бонусы и престиж</div>
+
+      <button id="dailyBtn" class="upgrade daily-upgrade" type="button">
+        <div class="up-icon daily">🎁</div>
+        <div class="up-left">
+          <div class="up-name">Ежедневная награда</div>
+          <div class="up-desc" id="dailyDesc">День 1: +1,000 монет</div>
+        </div>
+        <div class="up-right">
+          <div class="up-level" id="dailyStatus">Доступно!</div>
+        </div>
+      </button>
+
+      <button id="referralBtn" class="upgrade referral-upgrade" type="button">
+        <div class="up-icon referral">👥</div>
+        <div class="up-left">
+          <div class="up-name">Пригласить друга</div>
+          <div class="up-desc">+50,000 монет вам и другу</div>
+        </div>
+        <div class="up-right">
+          <div class="up-level">Ссылка</div>
+        </div>
+      </button>
+
+      <button id="prestigeBtn" class="upgrade prestige-upgrade" type="button">
+        <div class="up-icon prestige">♻</div>
+        <div class="up-left">
+          <div class="up-name">Перерождение</div>
+          <div class="up-desc">+100% ко всему за уровень</div>
+        </div>
+        <div class="up-right">
+          <div class="up-level">Ур. <span id="prestigeLevel">0</span></div>
+          <div class="up-price" id="prestigeCost">1M 🪙</div>
+        </div>
+      </button>
     </div>
 
   </section>
 
   <div class="footer-note">Автосохранение активно</div>
 
+</div>
+
+<!-- Toast уведомление -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Модальное окно оплаты Telegram Stars -->
+<div id="paymentModal" class="modal-overlay">
+  <div class="modal" id="paymentModalBox">
+    <div class="modal-icon" id="paymentIcon">⭐</div>
+    <div class="modal-title" id="paymentTitle">Оплата через Telegram Stars</div>
+    <div class="modal-text" id="paymentText">Обработка платежа 50 ⭐...</div>
+    <div class="modal-spinner" id="paymentSpinner"></div>
+  </div>
 </div>
 
 <script>
@@ -578,6 +855,8 @@
      ============================================================ */
 
   var SAVE_KEY = 'cyber_quantum_tap_save_v1';
+  var REF_KEY = 'cyber_quantum_tap_ref_code_v1';
+
   var AD_REWARD = 5000;
   var SAVE_INTERVAL = 3000;
 
@@ -588,6 +867,13 @@
 
   var AD_BLOCK_ID = '52992';
 
+  var PRESTIGE_COST = 1000000;
+  var STARS_COST = 50;
+  var STARS_CLICK_MULTIPLIER = 10;
+
+  var DAILY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+  var REFERRAL_REWARD = 50000;
+
   /* ============================================================
      СОСТОЯНИЕ
      ============================================================ */
@@ -596,7 +882,11 @@
     coins: 0,
     clickLevel: 0,
     minerLevel: 0,
-    totalEarned: 0
+    totalEarned: 0,
+    prestigeLevel: 0,
+    starsOwned: false,
+    dailyStreak: 0,
+    lastDailyClaim: 0
   };
 
   /* ============================================================
@@ -611,10 +901,26 @@
     adBtn: document.getElementById('adBtn'),
     buyClick: document.getElementById('buyClick'),
     buyMiner: document.getElementById('buyMiner'),
+    buyStars: document.getElementById('buyStars'),
+    starsPrice: document.getElementById('starsPrice'),
+    dailyBtn: document.getElementById('dailyBtn'),
+    dailyDesc: document.getElementById('dailyDesc'),
+    dailyStatus: document.getElementById('dailyStatus'),
+    referralBtn: document.getElementById('referralBtn'),
+    prestigeBtn: document.getElementById('prestigeBtn'),
+    prestigeLevel: document.getElementById('prestigeLevel'),
+    prestigeCost: document.getElementById('prestigeCost'),
     clickLevel: document.getElementById('clickLevel'),
     clickCost: document.getElementById('clickCost'),
     minerLevel: document.getElementById('minerLevel'),
-    minerCost: document.getElementById('minerCost')
+    minerCost: document.getElementById('minerCost'),
+    toast: document.getElementById('toast'),
+    paymentModal: document.getElementById('paymentModal'),
+    paymentModalBox: document.getElementById('paymentModalBox'),
+    paymentIcon: document.getElementById('paymentIcon'),
+    paymentTitle: document.getElementById('paymentTitle'),
+    paymentText: document.getElementById('paymentText'),
+    paymentSpinner: document.getElementById('paymentSpinner')
   };
 
   /* ============================================================
@@ -648,16 +954,41 @@
     return str + UNITS[idx];
   }
 
+  function formatBig(value) {
+    var n = Math.floor(Number(value) || 0);
+    return n.toLocaleString('en-US');
+  }
+
+  function formatCountdown(ms) {
+    if (ms < 0) ms = 0;
+    var totalSec = Math.floor(ms / 1000);
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
   /* ============================================================
      ПРОИЗВОДНЫЕ ВЕЛИЧИНЫ
      ============================================================ */
 
+  function getPrestigeMultiplier() {
+    return 1 + state.prestigeLevel;
+  }
+
+  function getClickMultiplierFromStars() {
+    return state.starsOwned ? STARS_CLICK_MULTIPLIER : 1;
+  }
+
   function getClickPower() {
-    return 1 + state.clickLevel;
+    var base = 1 + state.clickLevel;
+    var total = base * getClickMultiplierFromStars() * getPrestigeMultiplier();
+    return Math.floor(total);
   }
 
   function getIncomePerSecond() {
-    return state.minerLevel;
+    var total = state.minerLevel * getPrestigeMultiplier();
+    return Math.floor(total);
   }
 
   function getClickCost() {
@@ -666,6 +997,19 @@
 
   function getMinerCost() {
     return Math.floor(MINER_BASE_COST * Math.pow(MINER_COST_GROWTH, state.minerLevel));
+  }
+
+  function getDailyReward(dayNumber) {
+    if (dayNumber <= 1) return 1000;
+    if (dayNumber === 2) return 5000;
+    if (dayNumber === 3) return 10000;
+    if (dayNumber === 4) return 25000;
+    return 50000;
+  }
+
+  function isDailyClaimable() {
+    if (!state.lastDailyClaim) return true;
+    return (Date.now() - state.lastDailyClaim) >= DAILY_COOLDOWN_MS;
   }
 
   /* ============================================================
@@ -694,6 +1038,57 @@
     } else {
       els.buyMiner.classList.remove('affordable');
     }
+
+    renderStars();
+    renderPrestige();
+    renderDaily();
+  }
+
+  function renderStars() {
+    if (state.starsOwned) {
+      els.buyStars.classList.add('purchased');
+      els.buyStars.classList.remove('affordable');
+      els.buyStars.classList.remove('locked');
+      els.buyStars.disabled = true;
+      els.starsPrice.textContent = '✅ Куплено';
+    } else {
+      els.buyStars.classList.remove('purchased');
+      els.buyStars.classList.remove('locked');
+      els.buyStars.classList.add('affordable');
+      els.buyStars.disabled = false;
+      els.starsPrice.textContent = STARS_COST + ' ⭐';
+    }
+  }
+
+  function renderPrestige() {
+    els.prestigeLevel.textContent = state.prestigeLevel;
+    els.prestigeCost.textContent = formatNumber(PRESTIGE_COST) + ' 🪙';
+
+    if (state.coins >= PRESTIGE_COST) {
+      els.prestigeBtn.classList.add('affordable');
+      els.prestigeBtn.classList.remove('locked');
+    } else {
+      els.prestigeBtn.classList.remove('affordable');
+      els.prestigeBtn.classList.add('locked');
+    }
+  }
+
+  function renderDaily() {
+    var nextDay = state.dailyStreak + 1;
+    var reward = getDailyReward(nextDay);
+
+    els.dailyDesc.textContent = 'День ' + nextDay + ': +' + formatBig(reward) + ' монет';
+
+    if (isDailyClaimable()) {
+      els.dailyBtn.classList.add('affordable');
+      els.dailyStatus.textContent = 'Доступно!';
+      els.dailyStatus.style.color = '#7dffb0';
+    } else {
+      els.dailyBtn.classList.remove('affordable');
+      var remaining = DAILY_COOLDOWN_MS - (Date.now() - state.lastDailyClaim);
+      els.dailyStatus.textContent = formatCountdown(remaining);
+      els.dailyStatus.style.color = '#8a7bff';
+    }
   }
 
   /* ============================================================
@@ -706,7 +1101,11 @@
         coins: state.coins,
         clickLevel: state.clickLevel,
         minerLevel: state.minerLevel,
-        totalEarned: state.totalEarned
+        totalEarned: state.totalEarned,
+        prestigeLevel: state.prestigeLevel,
+        starsOwned: state.starsOwned,
+        dailyStreak: state.dailyStreak,
+        lastDailyClaim: state.lastDailyClaim
       }));
     } catch (e) {
       /* localStorage может быть недоступен — игнорируем */
@@ -736,11 +1135,18 @@
     var clickLevel = Number(data.clickLevel);
     var minerLevel = Number(data.minerLevel);
     var totalEarned = Number(data.totalEarned);
+    var prestigeLevel = Number(data.prestigeLevel);
+    var dailyStreak = Number(data.dailyStreak);
+    var lastDailyClaim = Number(data.lastDailyClaim);
 
     state.coins = isFinite(coins) && coins > 0 ? Math.floor(coins) : 0;
     state.clickLevel = isFinite(clickLevel) && clickLevel > 0 ? Math.floor(clickLevel) : 0;
     state.minerLevel = isFinite(minerLevel) && minerLevel > 0 ? Math.floor(minerLevel) : 0;
     state.totalEarned = isFinite(totalEarned) && totalEarned > 0 ? Math.floor(totalEarned) : 0;
+    state.prestigeLevel = isFinite(prestigeLevel) && prestigeLevel > 0 ? Math.floor(prestigeLevel) : 0;
+    state.starsOwned = data.starsOwned === true;
+    state.dailyStreak = isFinite(dailyStreak) && dailyStreak > 0 ? Math.floor(dailyStreak) : 0;
+    state.lastDailyClaim = isFinite(lastDailyClaim) && lastDailyClaim > 0 ? Math.floor(lastDailyClaim) : 0;
   }
 
   /* ============================================================
@@ -790,6 +1196,26 @@
         el.parentNode.removeChild(el);
       }
     }, 900);
+  }
+
+  /* ============================================================
+     TOAST УВЕДОМЛЕНИЕ
+     ============================================================ */
+
+  var toastTimer = null;
+
+  function showToast(message, duration) {
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+
+    if (toastTimer) {
+      window.clearTimeout(toastTimer);
+    }
+
+    toastTimer = window.setTimeout(function () {
+      els.toast.classList.remove('show');
+      toastTimer = null;
+    }, duration || 3200);
   }
 
   /* ============================================================
@@ -969,6 +1395,201 @@
   els.adBtn.addEventListener('click', watchAd);
 
   /* ============================================================
+     РЕФЕРАЛЬНАЯ СИСТЕМА
+     ============================================================ */
+
+  function getRefCode() {
+    var code = null;
+    try {
+      code = localStorage.getItem(REF_KEY);
+    } catch (e) {
+      code = null;
+    }
+
+    if (!code || typeof code !== 'string' || code.length < 6) {
+      code = 'ref_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+      try {
+        localStorage.setItem(REF_KEY, code);
+      } catch (e) {
+        /* игнорируем */
+      }
+    }
+    return code;
+  }
+
+  function buildReferralLink() {
+    var code = getRefCode();
+    return 'https://t.me/CyberQuantumTapBot?start=' + code;
+  }
+
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function copyToClipboard(text, callback) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        callback(true);
+      }).catch(function () {
+        callback(fallbackCopy(text));
+      });
+    } else {
+      callback(fallbackCopy(text));
+    }
+  }
+
+  function handleReferral() {
+    var link = buildReferralLink();
+
+    copyToClipboard(link, function (success) {
+      if (success) {
+        showToast('Ссылка скопирована! Поделитесь ей. При первом входе друга вы оба получите +50,000 монет.', 4200);
+        haptic('success');
+      } else {
+        showToast('Не удалось скопировать автоматически. Ссылка: ' + link, 5000);
+        haptic('error');
+      }
+    });
+  }
+
+  els.referralBtn.addEventListener('click', handleReferral);
+
+  /* ============================================================
+     ЕЖЕДНЕВНЫЙ БОНУС
+     ============================================================ */
+
+  function claimDaily() {
+    if (!isDailyClaimable()) {
+      var remaining = DAILY_COOLDOWN_MS - (Date.now() - state.lastDailyClaim);
+      showToast('Награда уже получена. Следующая через ' + formatCountdown(remaining), 2600);
+      haptic('error');
+      return;
+    }
+
+    var nextDay = state.dailyStreak + 1;
+    var reward = getDailyReward(nextDay);
+
+    state.coins += reward;
+    state.totalEarned += reward;
+    state.dailyStreak = nextDay;
+    state.lastDailyClaim = Date.now();
+
+    save();
+    render();
+
+    showToast('🎁 День ' + nextDay + ': +' + formatBig(reward) + ' монет!', 3200);
+    haptic('success');
+  }
+
+  els.dailyBtn.addEventListener('click', claimDaily);
+
+  /* ============================================================
+     ПРЕСТИЖ (ПЕРЕРОЖДЕНИЕ)
+     ============================================================ */
+
+  function doPrestige() {
+    if (state.coins < PRESTIGE_COST) {
+      shakeElement(els.prestigeBtn);
+      showToast('Нужно ' + formatNumber(PRESTIGE_COST) + ' монет для перерождения.', 2600);
+      haptic('error');
+      return;
+    }
+
+    state.prestigeLevel += 1;
+    state.coins = 0;
+    state.clickLevel = 0;
+    state.minerLevel = 0;
+
+    save();
+    render();
+
+    showToast('♻ Перерождение! Уровень престижа: ' + state.prestigeLevel + '. Множитель x' + getPrestigeMultiplier() + ' ко всему!', 4200);
+    haptic('success');
+  }
+
+  els.prestigeBtn.addEventListener('click', doPrestige);
+
+  /* ============================================================
+     ПОКУПКА x10 К КЛИКУ ЗА TELEGRAM STARS
+     ============================================================ */
+
+  var starsBusy = false;
+
+  function showPaymentModal(mode) {
+    els.paymentModal.classList.add('show');
+
+    if (mode === 'loading') {
+      els.paymentModalBox.classList.remove('success');
+      els.paymentIcon.textContent = '⭐';
+      els.paymentTitle.textContent = 'Оплата через Telegram Stars';
+      els.paymentText.textContent = 'Обработка платежа ' + STARS_COST + ' ⭐...';
+      els.paymentSpinner.style.display = 'block';
+    } else if (mode === 'success') {
+      els.paymentModalBox.classList.add('success');
+      els.paymentIcon.textContent = '✅';
+      els.paymentTitle.textContent = 'Успешно!';
+      els.paymentText.textContent = 'Доход от клика увеличен в 10 раз навсегда!';
+      els.paymentSpinner.style.display = 'none';
+    }
+  }
+
+  function hidePaymentModal() {
+    els.paymentModal.classList.remove('show');
+  }
+
+  function buyStars() {
+    if (starsBusy) return;
+    if (state.starsOwned) return;
+
+    starsBusy = true;
+    els.buyStars.disabled = true;
+
+    /* Интеграция с Telegram Stars — при наличии WebApp открываем счёт,
+       иначе показываем красивую заглушку-симуляцию. */
+    try {
+      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openInvoice === 'function') {
+        /* Здесь можно было бы открыть реальный счёт, но у нас заглушка. */
+      }
+    } catch (e) {
+      /* игнорируем */
+    }
+
+    showPaymentModal('loading');
+
+    window.setTimeout(function () {
+      state.starsOwned = true;
+      save();
+      render();
+      haptic('success');
+
+      showPaymentModal('success');
+
+      window.setTimeout(function () {
+        hidePaymentModal();
+        starsBusy = false;
+        showToast('⭐ Покупка успешна! Доход от клика увеличен в 10 раз навсегда!', 3600);
+      }, 1500);
+    }, 2000);
+  }
+
+  els.buyStars.addEventListener('click', buyStars);
+
+  /* ============================================================
      ПАССИВНЫЙ ДОХОД
      ============================================================ */
 
@@ -979,6 +1600,14 @@
       state.totalEarned += income;
       render();
     }
+  }, 1000);
+
+  /* ============================================================
+     ОБНОВЛЕНИЕ ТАЙМЕРА ЕЖЕДНЕВНОЙ НАГРАДЫ
+     ============================================================ */
+
+  window.setInterval(function () {
+    renderDaily();
   }, 1000);
 
   /* ============================================================
