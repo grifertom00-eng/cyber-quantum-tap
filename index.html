@@ -5,10 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b0c10">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Cyber Quantum Tap</title>
+<title>Cyber Quantum Overlord</title>
 
-<!-- Adsgram SDK -->
-<script src="https://adsgram.ai"></script>
+<!-- ============================================================
+     YANDEX MOBILE ADS — интерфейс cordova-plugin-yandex-ads
+     Заглушка нужна для безопасного запуска в браузере.
+     В собранном APK плагин подменит её нативным API.
+     ============================================================ -->
+<script>
+(function(){
+  if (typeof window.YandexAds !== 'undefined') return;
+  window.YandexAds = {
+    events: {
+      rewarded: {
+        rewarded: 'yandex_rewarded',
+        failedToShow: 'yandex_rewarded_failed',
+        dismissed: 'yandex_rewarded_dismissed'
+      }
+    },
+    init: function(){},
+    loadRewardedVideo: function(opts){
+      window.setTimeout(function(){
+        if (opts && typeof opts.onSuccess === 'function') opts.onSuccess();
+      }, 400);
+    },
+    showRewardedVideo: function(){
+      window.setTimeout(function(){
+        document.dispatchEvent(new Event('yandex_rewarded'));
+      }, 1500);
+    },
+    loadBanner: function(){},
+    showBanner: function(){}
+  };
+})();
+</script>
 
 <style>
   *{
@@ -20,22 +50,34 @@
 
   html,body{
     height:100%;
+    width:100%;
+    overflow:hidden;
+  }
+
+  :root{
+    --neon:#00f0ff;
+    --neon2:#ff00e0;
+    --neon-glow:rgba(0,240,255,.55);
+    --neon-soft:rgba(0,240,255,.12);
+    --bg:#0b0c10;
+    --bg2:#141824;
+    --text:#d8f6ff;
+    --muted:#5f7a99;
   }
 
   body{
     background:
-      radial-gradient(ellipse at 50% -15%, #16213e 0%, rgba(11,12,16,0) 58%),
-      radial-gradient(ellipse at 50% 115%, #2a0845 0%, rgba(11,12,16,0) 58%),
+      radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--neon) 22%, transparent) 0%, rgba(11,12,16,0) 58%),
+      radial-gradient(ellipse at 50% 115%, rgba(140,0,255,.22) 0%, rgba(11,12,16,0) 58%),
       #0b0c10;
-    color:#d8f6ff;
+    color:var(--text);
     font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    overflow:hidden;
     overscroll-behavior:none;
     user-select:none;
     -webkit-user-select:none;
     -webkit-touch-callout:none;
     touch-action:manipulation;
-    position:relative;
+    transition:background .8s ease;
   }
 
   body::before{
@@ -43,13 +85,14 @@
     position:fixed;
     inset:0;
     background-image:
-      linear-gradient(rgba(0,240,255,.055) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,240,255,.055) 1px, transparent 1px);
-    background-size:44px 44px;
-    -webkit-mask-image:radial-gradient(circle at 50% 38%, #000 0%, transparent 78%);
-    mask-image:radial-gradient(circle at 50% 38%, #000 0%, transparent 78%);
+      linear-gradient(color-mix(in srgb, var(--neon) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--neon) 6%, transparent) 1px, transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(circle at 50% 34%, #000 0%, transparent 82%);
+    mask-image:radial-gradient(circle at 50% 34%, #000 0%, transparent 82%);
     pointer-events:none;
     z-index:0;
+    transition:background-image .8s ease;
   }
 
   body::after{
@@ -57,12 +100,15 @@
     position:fixed;
     left:0;right:0;top:0;
     height:2px;
-    background:linear-gradient(90deg, transparent, #00f0ff, #ff00e0, transparent);
-    box-shadow:0 0 18px rgba(0,240,255,.8);
+    background:linear-gradient(90deg, transparent, var(--neon), var(--neon2), transparent);
+    box-shadow:0 0 20px var(--neon-glow);
     opacity:.75;
     pointer-events:none;
     z-index:3;
+    transition:background .8s ease, box-shadow .8s ease;
   }
+
+  /* ================= APP LAYOUT ================= */
 
   .app{
     position:relative;
@@ -70,21 +116,12 @@
     display:flex;
     flex-direction:column;
     width:100%;
-    max-width:520px;
+    max-width:560px;
     margin:0 auto;
     height:100vh;
     height:100dvh;
-    padding:calc(env(safe-area-inset-top, 0px) + 10px) 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
-    gap:8px;
-    overflow-y:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-
-  .app::-webkit-scrollbar{
-    width:0;
-    height:0;
+    padding:calc(env(safe-area-inset-top, 0px) + 8px) 12px 0;
+    gap:6px;
   }
 
   /* ================= HUD ================= */
@@ -92,108 +129,100 @@
   .hud{
     flex:0 0 auto;
     text-align:center;
-    padding-top:2px;
+    padding:2px 0 0;
   }
 
-  .hud-label{
-    font-size:10px;
-    letter-spacing:.36em;
-    color:#5f7a99;
-    text-transform:uppercase;
-    margin-bottom:4px;
-    text-indent:.36em;
-  }
-
-  .balance{
+  .hud-brand{
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:9px;
-    font-size:clamp(30px, 10vw, 44px);
+    gap:8px;
+    margin-bottom:4px;
+  }
+
+  .brand-icon{
+    font-size:13px;
+    color:var(--neon);
+    text-shadow:0 0 12px var(--neon-glow);
+    transition:color .8s ease, text-shadow .8s ease;
+  }
+
+  .brand-name{
+    font-size:10.5px;
+    letter-spacing:.34em;
+    text-transform:uppercase;
+    font-weight:800;
+    color:var(--neon);
+    text-shadow:0 0 14px var(--neon-glow);
+    text-indent:.34em;
+    transition:color .8s ease, text-shadow .8s ease;
+  }
+
+  .hud-balances{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .balance-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:clamp(22px, 7vw, 30px);
     font-weight:800;
     line-height:1.1;
     color:#ffffff;
-    font-variant-numeric:tabular-nums;
     text-shadow:
-      0 0 12px rgba(0,240,255,.9),
-      0 0 34px rgba(0,240,255,.5),
-      0 0 60px rgba(140,0,255,.4);
+      0 0 12px var(--neon-glow),
+      0 0 34px color-mix(in srgb, var(--neon) 40%, transparent);
+    transition:text-shadow .8s ease;
   }
 
-  .coin{
+  .balance-icon{
     font-size:.72em;
     line-height:1;
     filter:drop-shadow(0 0 9px rgba(255,201,71,.9));
   }
 
-  .income-row{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:7px;
-  }
-
-  .income{
+  .hud-income{
     display:inline-flex;
     align-items:center;
     gap:6px;
-    padding:4px 14px;
-    border-radius:999px;
-    font-size:12.5px;
-    font-weight:700;
-    letter-spacing:.02em;
-    color:#00f0ff;
-    background:rgba(0,240,255,.08);
-    border:1px solid rgba(0,240,255,.28);
-    text-shadow:0 0 10px rgba(0,240,255,.7);
-    box-shadow:0 0 16px rgba(0,240,255,.14), inset 0 0 14px rgba(0,240,255,.06);
-    font-variant-numeric:tabular-nums;
-  }
-
-  .prestige-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    padding:4px 12px;
+    margin-top:6px;
+    padding:3px 13px;
     border-radius:999px;
     font-size:11.5px;
-    font-weight:800;
-    letter-spacing:.04em;
-    color:#ff9de2;
-    background:rgba(255,100,200,.08);
-    border:1px solid rgba(255,100,200,.35);
-    text-shadow:0 0 10px rgba(255,100,200,.7);
-    box-shadow:0 0 14px rgba(255,100,200,.18);
+    font-weight:700;
+    letter-spacing:.02em;
+    color:var(--neon);
+    background:color-mix(in srgb, var(--neon) 9%, transparent);
+    border:1px solid color-mix(in srgb, var(--neon) 30%, transparent);
+    text-shadow:0 0 10px var(--neon-glow);
+    box-shadow:0 0 16px color-mix(in srgb, var(--neon) 15%, transparent), inset 0 0 12px color-mix(in srgb, var(--neon) 7%, transparent);
     font-variant-numeric:tabular-nums;
-    display:none;
-  }
-
-  .prestige-badge.visible{
-    display:inline-flex;
+    transition:color .8s ease, background .8s ease, border-color .8s ease, box-shadow .8s ease, text-shadow .8s ease;
   }
 
   /* ================= CORE ================= */
 
   .core-area{
-    flex:1 1 auto;
-    min-height:236px;
+    flex:0 0 auto;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    position:relative;
-    padding:10px 0;
+    padding:8px 0 4px;
+    min-height:200px;
   }
 
   .core-wrap{
     position:relative;
     display:grid;
     place-items:center;
-    width:min(60vw, 214px);
+    width:min(48vw, 178px);
     aspect-ratio:1 / 1;
-    flex:0 0 auto;
   }
 
   .ring{
@@ -203,27 +232,30 @@
   }
 
   .ring-1{
-    inset:-5%;
-    border:1px solid rgba(0,240,255,.22);
-    border-top-color:#00f0ff;
+    inset:-6%;
+    border:1px solid color-mix(in srgb, var(--neon) 22%, transparent);
+    border-top-color:var(--neon);
     border-right-color:transparent;
-    box-shadow:0 0 18px rgba(0,240,255,.28);
+    box-shadow:0 0 18px color-mix(in srgb, var(--neon) 30%, transparent);
     animation:spin 8s linear infinite;
+    transition:border-color .8s ease, box-shadow .8s ease;
   }
 
   .ring-2{
-    inset:-13%;
-    border:1px solid rgba(255,0,224,.2);
-    border-bottom-color:#ff00e0;
+    inset:-14%;
+    border:1px solid color-mix(in srgb, var(--neon2) 22%, transparent);
+    border-bottom-color:var(--neon2);
     border-left-color:transparent;
-    box-shadow:0 0 20px rgba(255,0,224,.22);
+    box-shadow:0 0 20px color-mix(in srgb, var(--neon2) 25%, transparent);
     animation:spin 13s linear infinite reverse;
+    transition:border-color .8s ease, box-shadow .8s ease;
   }
 
   .ring-3{
-    inset:-21%;
-    border:1px dashed rgba(140,0,255,.38);
+    inset:-22%;
+    border:1px dashed color-mix(in srgb, var(--neon) 38%, transparent);
     animation:spin 22s linear infinite;
+    transition:border-color .8s ease;
   }
 
   @keyframes spin{
@@ -245,57 +277,41 @@
     appearance:none;
     color:#02121a;
     background:
-      radial-gradient(circle at 32% 26%, #c9fdff 0%, #2ad9f5 17%, #0ea5e9 38%, #6d28d9 69%, #1e0b3a 100%);
+      radial-gradient(circle at 32% 26%, #ffffff 0%, var(--neon) 15%, color-mix(in srgb, var(--neon) 60%, #0ea5e9) 38%, color-mix(in srgb, var(--neon2) 65%, #6d28d9) 69%, #150626 100%);
     box-shadow:
-      0 0 24px rgba(0,240,255,.6),
-      0 0 58px rgba(0,240,255,.32),
-      0 0 108px rgba(140,0,255,.34),
+      0 0 26px var(--neon-glow),
+      0 0 62px color-mix(in srgb, var(--neon) 35%, transparent),
+      0 0 118px color-mix(in srgb, var(--neon2) 38%, transparent),
       inset 0 -14px 34px rgba(0,0,0,.55),
       inset 0 10px 24px rgba(255,255,255,.26);
-    transition:transform .08s ease-out;
+    transition:transform .08s ease-out, background .8s ease, box-shadow .8s ease;
     animation:corePulse 2.6s ease-in-out infinite;
     outline:none;
   }
 
   .core.pressed{
-    transform:scale(.95);
+    transform:scale(.94);
   }
 
   @keyframes corePulse{
     0%, 100%{
-      box-shadow:
-        0 0 22px rgba(0,240,255,.55),
-        0 0 54px rgba(0,240,255,.28),
-        0 0 100px rgba(140,0,255,.3),
-        inset 0 -14px 34px rgba(0,0,0,.55),
-        inset 0 10px 24px rgba(255,255,255,.24);
+      filter:brightness(1);
     }
     50%{
-      box-shadow:
-        0 0 38px rgba(0,240,255,.95),
-        0 0 92px rgba(0,240,255,.55),
-        0 0 156px rgba(140,0,255,.6),
-        inset 0 -14px 34px rgba(0,0,0,.55),
-        inset 0 10px 24px rgba(255,255,255,.32);
+      filter:brightness(1.22);
     }
-  }
-
-  .core-inner{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:6px;
-    pointer-events:none;
   }
 
   .core-symbol{
-    font-size:clamp(30px, 11vw, 50px);
+    font-size:clamp(28px, 9vw, 44px);
     line-height:1;
     color:#f2feff;
     text-shadow:
       0 0 16px rgba(255,255,255,.95),
-      0 0 38px rgba(0,240,255,.95);
+      0 0 38px var(--neon-glow);
     animation:symbolPulse 2.2s ease-in-out infinite;
+    pointer-events:none;
+    transition:text-shadow .8s ease;
   }
 
   @keyframes symbolPulse{
@@ -304,23 +320,29 @@
   }
 
   .core-power{
-    font-size:12px;
+    position:absolute;
+    bottom:-6%;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:11.5px;
     font-weight:900;
     letter-spacing:.06em;
-    padding:3px 11px;
+    padding:3px 12px;
     border-radius:999px;
     color:#04131c;
-    background:rgba(255,255,255,.72);
-    box-shadow:0 0 12px rgba(255,255,255,.5);
+    background:rgba(255,255,255,.82);
+    box-shadow:0 0 14px rgba(255,255,255,.55);
     font-variant-numeric:tabular-nums;
+    pointer-events:none;
+    white-space:nowrap;
   }
 
   .core-hint{
-    margin-top:16px;
-    font-size:10px;
+    margin-top:14px;
+    font-size:9.5px;
     letter-spacing:.32em;
     text-transform:uppercase;
-    color:#4c6b8a;
+    color:var(--muted);
     text-indent:.32em;
     text-align:center;
   }
@@ -336,11 +358,11 @@
     font-weight:900;
     color:#ffffff;
     pointer-events:none;
-    z-index:60;
+    z-index:80;
     white-space:nowrap;
     text-shadow:
-      0 0 12px rgba(0,240,255,.95),
-      0 0 26px rgba(0,240,255,.6);
+      0 0 12px var(--neon-glow),
+      0 0 26px color-mix(in srgb, var(--neon) 60%, transparent);
     animation:floatUp .9s ease-out forwards;
   }
 
@@ -350,72 +372,142 @@
     100%{ opacity:0; transform:translate(-50%, -215%) scale(1); }
   }
 
-  /* ================= PANEL ================= */
+  /* ================= TABS ================= */
 
-  .panel{
+  .tabs{
     flex:0 0 auto;
     display:flex;
-    flex-direction:column;
-    gap:9px;
-    padding-bottom:4px;
+    gap:6px;
+    padding:6px;
+    border-radius:16px;
+    background:rgba(12,16,28,.72);
+    border:1px solid rgba(0,240,255,.1);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    box-shadow:inset 0 0 22px rgba(0,0,0,.4);
   }
 
-  .ad-btn{
-    width:100%;
-    padding:15px 12px;
-    border-radius:17px;
-    border:1px solid rgba(255,0,224,.55);
-    background:linear-gradient(135deg, rgba(255,0,224,.22), rgba(140,0,255,.24));
-    color:#ffffff;
+  .tab{
+    flex:1 1 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    padding:8px 4px 7px;
+    border-radius:11px;
+    border:none;
+    background:transparent;
+    color:var(--muted);
     font-family:inherit;
-    font-size:15px;
+    font-size:9px;
     font-weight:800;
-    letter-spacing:.02em;
+    letter-spacing:.06em;
+    text-transform:uppercase;
     cursor:pointer;
     -webkit-appearance:none;
     appearance:none;
-    text-shadow:0 0 10px rgba(255,0,224,.85);
+    transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+    position:relative;
+  }
+
+  .tab-icon{
+    font-size:16px;
+    line-height:1;
+    filter:grayscale(.55) brightness(.85);
+    transition:filter .25s ease, transform .2s ease;
+  }
+
+  .tab.active{
+    background:linear-gradient(135deg, color-mix(in srgb, var(--neon) 22%, transparent), color-mix(in srgb, var(--neon2) 18%, transparent));
+    color:#ffffff;
     box-shadow:
-      0 0 20px rgba(255,0,224,.34),
-      inset 0 0 20px rgba(255,0,224,.12);
-    transition:transform .08s ease, box-shadow .2s ease, opacity .2s ease;
+      0 0 16px color-mix(in srgb, var(--neon) 30%, transparent),
+      inset 0 0 14px color-mix(in srgb, var(--neon) 12%, transparent);
   }
 
-  .ad-btn:active{
-    transform:scale(.97);
+  .tab.active .tab-icon{
+    filter:grayscale(0) brightness(1.15) drop-shadow(0 0 8px var(--neon-glow));
+    transform:scale(1.08);
   }
 
-  .ad-btn:disabled{
-    opacity:.62;
-    cursor:default;
-    box-shadow:0 0 8px rgba(255,0,224,.14);
-    transform:none;
+  .tab-badge{
+    position:absolute;
+    top:2px;
+    right:6px;
+    min-width:16px;
+    height:16px;
+    padding:0 4px;
+    border-radius:999px;
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
+    color:#04131c;
+    font-size:9px;
+    font-weight:900;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 0 10px var(--neon-glow);
+    font-variant-numeric:tabular-nums;
   }
 
-  .shop{
+  .tab-badge.visible{
     display:flex;
+  }
+
+  /* ================= TAB CONTENT ================= */
+
+  .tab-content{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding-bottom:6px;
+    position:relative;
+  }
+
+  .tab-content::-webkit-scrollbar{
+    width:0;
+    height:0;
+  }
+
+  .tab-pane{
+    display:none;
     flex-direction:column;
     gap:8px;
-    margin-top:2px;
+    animation:fadeIn .28s ease;
   }
 
-  .shop-title{
-    font-size:10px;
+  .tab-pane.active{
+    display:flex;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  /* ================= CARDS / BUTTONS ================= */
+
+  .section-title{
+    font-size:9.5px;
     letter-spacing:.3em;
     text-transform:uppercase;
-    color:#5f7a99;
-    padding-left:4px;
+    color:var(--muted);
+    padding-left:6px;
     text-indent:.3em;
     margin-top:2px;
+    margin-bottom:-2px;
   }
 
-  .upgrade{
+  .card{
     display:flex;
     align-items:center;
     gap:12px;
     width:100%;
     padding:12px 14px;
-    border-radius:17px;
+    border-radius:16px;
     border:1px solid rgba(0,240,255,.16);
     background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
     color:#cfeaff;
@@ -428,114 +520,69 @@
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
   }
 
-  .upgrade:active{
+  .card:active:not(.disabled){
     transform:scale(.98);
   }
 
-  .upgrade.affordable{
-    border-color:rgba(0,240,255,.62);
+  .card.affordable{
+    border-color:color-mix(in srgb, var(--neon) 65%, transparent);
     box-shadow:
-      0 0 18px rgba(0,240,255,.24),
-      inset 0 0 22px rgba(0,240,255,.06);
+      0 0 18px color-mix(in srgb, var(--neon) 25%, transparent),
+      inset 0 0 22px color-mix(in srgb, var(--neon) 7%, transparent);
   }
 
-  .upgrade.locked{
+  .card.disabled{
     opacity:.55;
     cursor:not-allowed;
   }
 
-  .upgrade.purchased{
+  .card.claimed{
     opacity:.72;
-    cursor:default;
     border-color:rgba(125,255,176,.55);
     box-shadow:0 0 16px rgba(125,255,176,.22), inset 0 0 20px rgba(125,255,176,.06);
+    cursor:default;
   }
 
-  .upgrade.hidden{
-    display:none;
-  }
-
-  .upgrade.premium-upgrade.affordable{
-    border-color:rgba(0,240,255,.75);
-    background:linear-gradient(135deg, rgba(0,240,255,.18), rgba(140,0,255,.24));
-    box-shadow:
-      0 0 22px rgba(0,240,255,.4),
-      inset 0 0 24px rgba(0,240,255,.08);
-  }
-
-  .upgrade.premium-upgrade .up-price{
-    color:#00f0ff;
-    text-shadow:0 0 12px rgba(0,240,255,.85);
-  }
-
-  .upgrade.daily-upgrade.affordable{
-    border-color:rgba(125,255,176,.75);
-    box-shadow:
-      0 0 20px rgba(125,255,176,.32),
-      inset 0 0 22px rgba(125,255,176,.08);
-  }
-
-  .upgrade.prestige-upgrade.affordable{
-    border-color:rgba(255,100,200,.8);
-    box-shadow:
-      0 0 24px rgba(255,100,200,.4),
-      inset 0 0 22px rgba(255,100,200,.08);
-  }
-
-  .upgrade.prestige-upgrade.affordable .up-price{
-    color:#ff9de2;
-    text-shadow:0 0 12px rgba(255,100,200,.85);
-  }
-
-  .upgrade.referral-upgrade{
-    border-color:rgba(0,240,255,.4);
-  }
-
-  .up-icon{
+  .card-icon{
     flex:0 0 auto;
-    width:38px;
-    height:38px;
+    width:40px;
+    height:40px;
     display:grid;
     place-items:center;
-    border-radius:13px;
-    font-size:17px;
+    border-radius:12px;
+    font-size:18px;
     line-height:1;
-    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.38), rgba(0,240,255,.05));
-    border:1px solid rgba(0,240,255,.38);
-    box-shadow:0 0 13px rgba(0,240,255,.28);
+    background:radial-gradient(circle at 30% 28%, color-mix(in srgb, var(--neon) 40%, transparent), color-mix(in srgb, var(--neon) 6%, transparent));
+    border:1px solid color-mix(in srgb, var(--neon) 42%, transparent);
+    box-shadow:0 0 13px color-mix(in srgb, var(--neon) 30%, transparent);
+    transition:background .8s ease, border-color .8s ease, box-shadow .8s ease;
   }
 
-  .up-icon.pink{
-    background:radial-gradient(circle at 30% 28%, rgba(255,0,224,.38), rgba(255,0,224,.05));
-    border-color:rgba(255,0,224,.38);
-    box-shadow:0 0 13px rgba(255,0,224,.28);
+  .card-icon.pink{
+    background:radial-gradient(circle at 30% 28%, rgba(255,0,224,.4), rgba(255,0,224,.05));
+    border-color:rgba(255,0,224,.42);
+    box-shadow:0 0 13px rgba(255,0,224,.3);
   }
 
-  .up-icon.premium{
-    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.48), rgba(0,240,255,.06));
-    border-color:rgba(0,240,255,.55);
-    box-shadow:0 0 13px rgba(0,240,255,.42);
-  }
-
-  .up-icon.daily{
-    background:radial-gradient(circle at 30% 28%, rgba(125,255,176,.42), rgba(125,255,176,.05));
+  .card-icon.green{
+    background:radial-gradient(circle at 30% 28%, rgba(125,255,176,.4), rgba(125,255,176,.05));
     border-color:rgba(125,255,176,.42);
     box-shadow:0 0 13px rgba(125,255,176,.3);
   }
 
-  .up-icon.prestige{
-    background:radial-gradient(circle at 30% 28%, rgba(255,100,200,.45), rgba(255,100,200,.05));
-    border-color:rgba(255,100,200,.45);
-    box-shadow:0 0 13px rgba(255,100,200,.35);
+  .card-icon.gold{
+    background:radial-gradient(circle at 30% 28%, rgba(255,209,102,.5), rgba(255,209,102,.06));
+    border-color:rgba(255,209,102,.5);
+    box-shadow:0 0 13px rgba(255,209,102,.4);
   }
 
-  .up-icon.referral{
-    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.42), rgba(0,240,255,.05));
-    border-color:rgba(0,240,255,.42);
-    box-shadow:0 0 13px rgba(0,240,255,.32);
+  .card-icon.violet{
+    background:radial-gradient(circle at 30% 28%, rgba(140,0,255,.45), rgba(140,0,255,.06));
+    border-color:rgba(140,0,255,.48);
+    box-shadow:0 0 13px rgba(140,0,255,.35);
   }
 
-  .up-left{
+  .card-left{
     flex:1 1 auto;
     min-width:0;
     display:flex;
@@ -543,25 +590,25 @@
     gap:3px;
   }
 
-  .up-name{
-    font-size:14px;
+  .card-name{
+    font-size:13.5px;
     font-weight:800;
     color:#ffffff;
-    letter-spacing:.02em;
+    letter-spacing:.01em;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
-  .up-desc{
-    font-size:11px;
+  .card-desc{
+    font-size:10.5px;
     color:#6f8dab;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
-  .up-right{
+  .card-right{
     flex:0 0 auto;
     display:flex;
     flex-direction:column;
@@ -569,7 +616,7 @@
     gap:3px;
   }
 
-  .up-level{
+  .card-label{
     font-size:9.5px;
     font-weight:800;
     letter-spacing:.14em;
@@ -579,8 +626,8 @@
     white-space:nowrap;
   }
 
-  .up-price{
-    font-size:14px;
+  .card-price{
+    font-size:13.5px;
     font-weight:900;
     color:#ffd166;
     font-variant-numeric:tabular-nums;
@@ -588,22 +635,52 @@
     white-space:nowrap;
   }
 
-  .upgrade.affordable .up-price{
+  .card.affordable .card-price{
     color:#7dffb0;
     text-shadow:0 0 10px rgba(125,255,176,.65);
   }
 
-  @keyframes shakeX{
-    0%, 100%{ transform:translateX(0); }
-    25%{ transform:translateX(-6px); }
-    75%{ transform:translateX(6px); }
+  /* ================= PRIMARY BUTTON ================= */
+
+  .btn-primary{
+    width:100%;
+    padding:15px 12px;
+    border-radius:15px;
+    border:1px solid color-mix(in srgb, var(--neon2) 55%, transparent);
+    background:linear-gradient(135deg, color-mix(in srgb, var(--neon2) 22%, transparent), color-mix(in srgb, var(--neon) 22%, transparent));
+    color:#ffffff;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:.02em;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    text-shadow:0 0 10px color-mix(in srgb, var(--neon2) 85%, transparent);
+    box-shadow:
+      0 0 20px color-mix(in srgb, var(--neon2) 34%, transparent),
+      inset 0 0 20px color-mix(in srgb, var(--neon2) 14%, transparent);
+    transition:transform .08s ease, opacity .2s ease, box-shadow .2s ease;
   }
 
-  .shake{
-    animation:shakeX .3s ease;
+  .btn-primary:active:not(:disabled){
+    transform:scale(.97);
   }
 
-  /* ================= QUESTS ================= */
+  .btn-primary:disabled{
+    opacity:.55;
+    cursor:default;
+    box-shadow:0 0 8px color-mix(in srgb, var(--neon2) 15%, transparent);
+  }
+
+  .btn-primary.success{
+    border-color:rgba(125,255,176,.55);
+    background:linear-gradient(135deg, rgba(125,255,176,.22), rgba(0,240,255,.18));
+    text-shadow:0 0 10px rgba(125,255,176,.7);
+    box-shadow:0 0 20px rgba(125,255,176,.3);
+  }
+
+  /* ================= QUEST CARD ================= */
 
   .quest-card{
     display:flex;
@@ -611,10 +688,10 @@
     gap:12px;
     width:100%;
     padding:12px 14px;
-    border-radius:17px;
-    border:1px solid rgba(0,240,255,.18);
+    border-radius:16px;
+    border:1px solid rgba(0,240,255,.16);
     background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
-    transition:border-color .2s ease, box-shadow .2s ease;
+    transition:border-color .25s ease, box-shadow .25s ease;
   }
 
   .quest-card.done{
@@ -622,35 +699,7 @@
     box-shadow:0 0 18px rgba(125,255,176,.22), inset 0 0 22px rgba(125,255,176,.05);
   }
 
-  .quest-icon{
-    flex:0 0 auto;
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    border-radius:13px;
-    font-size:17px;
-    line-height:1;
-    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.38), rgba(0,240,255,.05));
-    border:1px solid rgba(0,240,255,.38);
-    box-shadow:0 0 13px rgba(0,240,255,.28);
-  }
-
-  .quest-icon.violet{
-    background:radial-gradient(circle at 30% 28%, rgba(140,0,255,.42), rgba(140,0,255,.06));
-    border-color:rgba(140,0,255,.45);
-    box-shadow:0 0 13px rgba(140,0,255,.35);
-  }
-
-  .quest-left{
-    flex:1 1 auto;
-    min-width:0;
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-
-  .quest-info{
+  .quest-body{
     flex:1 1 auto;
     min-width:0;
     display:flex;
@@ -659,16 +708,15 @@
   }
 
   .quest-name{
-    font-size:13px;
+    font-size:12.5px;
     font-weight:800;
     color:#ffffff;
-    letter-spacing:.01em;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
-  .quest-progress-bar{
+  .quest-bar{
     width:100%;
     height:6px;
     border-radius:999px;
@@ -677,25 +725,23 @@
     position:relative;
   }
 
-  .quest-progress-fill{
+  .quest-fill{
     position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
+    inset:0 auto 0 0;
     width:0%;
     border-radius:999px;
-    background:linear-gradient(90deg, #00f0ff, #ff00e0);
-    box-shadow:0 0 12px rgba(0,240,255,.65);
+    background:linear-gradient(90deg, var(--neon), var(--neon2));
+    box-shadow:0 0 12px var(--neon-glow);
     transition:width .35s ease;
   }
 
-  .quest-card.done .quest-progress-fill{
-    background:linear-gradient(90deg, #7dffb0, #00f0ff);
+  .quest-card.done .quest-fill{
+    background:linear-gradient(90deg, #7dffb0, var(--neon));
     box-shadow:0 0 12px rgba(125,255,176,.7);
   }
 
-  .quest-progress-text{
-    font-size:10.5px;
+  .quest-text{
+    font-size:10px;
     font-weight:800;
     color:#8ab4d8;
     letter-spacing:.08em;
@@ -705,12 +751,12 @@
   .quest-claim{
     flex:0 0 auto;
     padding:9px 12px;
-    border-radius:12px;
+    border-radius:11px;
     border:1px solid rgba(125,255,176,.4);
     background:linear-gradient(135deg, rgba(125,255,176,.22), rgba(0,240,255,.18));
     color:#ffffff;
     font-family:inherit;
-    font-size:11px;
+    font-size:10.5px;
     font-weight:800;
     letter-spacing:.04em;
     cursor:pointer;
@@ -722,7 +768,7 @@
     white-space:nowrap;
   }
 
-  .quest-claim:active{
+  .quest-claim:active:not(:disabled){
     transform:scale(.95);
   }
 
@@ -742,49 +788,37 @@
     cursor:default;
   }
 
-  /* ================= ACHIEVEMENTS ================= */
+  /* ================= CONTRACT CARD ================= */
 
-  .achievement{
+  .contract-card{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+    padding:14px;
+    border-radius:16px;
+    border:1px solid rgba(140,0,255,.28);
+    background:linear-gradient(135deg, rgba(30,20,60,.92), rgba(12,16,28,.92));
+    transition:border-color .25s ease, box-shadow .25s ease;
+  }
+
+  .contract-card.active{
+    border-color:rgba(0,240,255,.65);
+    box-shadow:0 0 20px rgba(0,240,255,.28), inset 0 0 22px rgba(0,240,255,.06);
+  }
+
+  .contract-card.ready{
+    border-color:rgba(125,255,176,.7);
+    box-shadow:0 0 22px rgba(125,255,176,.32), inset 0 0 22px rgba(125,255,176,.06);
+  }
+
+  .contract-head{
     display:flex;
     align-items:center;
     gap:12px;
-    width:100%;
-    padding:12px 14px;
-    border-radius:17px;
-    border:1px solid rgba(0,240,255,.14);
-    background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
-    transition:border-color .2s ease, box-shadow .2s ease;
   }
 
-  .achievement.unlocked{
-    border-color:rgba(255,209,102,.65);
-    box-shadow:0 0 18px rgba(255,209,102,.28), inset 0 0 20px rgba(255,209,102,.06);
-  }
-
-  .ach-icon{
-    flex:0 0 auto;
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    border-radius:13px;
-    font-size:17px;
-    line-height:1;
-    background:radial-gradient(circle at 30% 28%, rgba(120,130,150,.35), rgba(120,130,150,.05));
-    border:1px solid rgba(120,130,150,.35);
-    box-shadow:0 0 10px rgba(120,130,150,.2);
-    filter:grayscale(.75);
-    transition:filter .25s ease, box-shadow .25s ease;
-  }
-
-  .achievement.unlocked .ach-icon{
-    filter:grayscale(0);
-    background:radial-gradient(circle at 30% 28%, rgba(255,209,102,.5), rgba(255,209,102,.06));
-    border-color:rgba(255,209,102,.55);
-    box-shadow:0 0 15px rgba(255,209,102,.5);
-  }
-
-  .ach-info{
+  .contract-info{
     flex:1 1 auto;
     min-width:0;
     display:flex;
@@ -792,64 +826,188 @@
     gap:3px;
   }
 
-  .ach-name{
+  .contract-name{
     font-size:13.5px;
     font-weight:800;
     color:#ffffff;
-    letter-spacing:.01em;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
-  .ach-desc{
-    font-size:11px;
+  .contract-desc{
+    font-size:10.5px;
     color:#6f8dab;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
   }
 
-  .ach-status{
-    flex:0 0 auto;
-    font-size:16px;
-    line-height:1;
-    color:#4c6b8a;
-    transition:color .25s ease, text-shadow .25s ease;
-  }
-
-  .achievement.unlocked .ach-status{
+  .contract-rewards{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:11px;
+    font-weight:800;
     color:#ffd166;
-    text-shadow:0 0 14px rgba(255,209,102,.9);
+    font-variant-numeric:tabular-nums;
+    text-shadow:0 0 10px rgba(255,209,102,.5);
   }
 
-  .ach-progress{
-    font-size:10px;
+  .contract-timer{
+    font-size:12px;
+    font-weight:900;
+    color:var(--neon);
+    text-shadow:0 0 10px var(--neon-glow);
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.04em;
+  }
+
+  .contract-actions{
+    display:flex;
+    gap:8px;
+  }
+
+  .contract-actions .btn-primary{
+    flex:1 1 auto;
+    padding:11px 10px;
+    font-size:12px;
+  }
+
+  /* ================= PROMO INPUT ================= */
+
+  .promo-row{
+    display:flex;
+    gap:8px;
+  }
+
+  .promo-input{
+    flex:1 1 auto;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid color-mix(in srgb, var(--neon) 28%, transparent);
+    background:rgba(12,16,28,.85);
+    color:#ffffff;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+    min-width:0;
+  }
+
+  .promo-input::placeholder{
+    color:#3c5670;
+    letter-spacing:.08em;
+    text-transform:none;
+  }
+
+  .promo-input:focus{
+    border-color:color-mix(in srgb, var(--neon) 75%, transparent);
+    box-shadow:0 0 16px color-mix(in srgb, var(--neon) 30%, transparent);
+  }
+
+  .promo-apply{
+    flex:0 0 auto;
+    padding:12px 18px;
+    border-radius:14px;
+    border:1px solid color-mix(in srgb, var(--neon) 55%, transparent);
+    background:linear-gradient(135deg, color-mix(in srgb, var(--neon) 25%, transparent), color-mix(in srgb, var(--neon2) 20%, transparent));
+    color:#ffffff;
+    font-family:inherit;
+    font-size:12px;
     font-weight:800;
     letter-spacing:.08em;
-    color:#8ab4d8;
-    font-variant-numeric:tabular-nums;
-    margin-top:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    text-shadow:0 0 10px var(--neon-glow);
+    box-shadow:0 0 16px color-mix(in srgb, var(--neon) 30%, transparent);
+    transition:transform .08s ease;
   }
 
-  /* ================= YANDEX PLACEHOLDER ================= */
+  .promo-apply:active{
+    transform:scale(.95);
+  }
 
-  #yandex_rtb_placeholder{
-    width:100%;
-    height:50px;
+  /* ================= PROFILE STATS ================= */
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .stat-box{
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid rgba(0,240,255,.16);
+    background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:0;
+  }
+
+  .stat-label{
+    font-size:9.5px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .stat-value{
+    font-size:16px;
+    font-weight:900;
+    color:#ffffff;
+    font-variant-numeric:tabular-nums;
+    text-shadow:0 0 12px var(--neon-glow);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* ================= YANDEX BANNER ================= */
+
+  .ad-banner{
     flex:0 0 auto;
+    height:50px;
+    width:100%;
     margin-top:6px;
-    border-radius:12px;
-    border:1px dashed rgba(0,240,255,.14);
-    background:rgba(0,240,255,.02);
+    border-radius:12px 12px 0 0;
+    border-top:1px solid color-mix(in srgb, var(--neon) 30%, transparent);
+    background:linear-gradient(180deg, rgba(12,16,28,.95), rgba(8,10,18,.95));
     display:flex;
     align-items:center;
     justify-content:center;
     font-size:9px;
-    letter-spacing:.24em;
+    letter-spacing:.28em;
     text-transform:uppercase;
-    color:#2a3b50;
-    text-indent:.24em;
+    color:color-mix(in srgb, var(--neon) 55%, transparent);
+    text-indent:.28em;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 -8px 24px rgba(0,0,0,.55), inset 0 0 22px color-mix(in srgb, var(--neon) 6%, transparent);
+  }
+
+  .ad-banner::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;right:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--neon), var(--neon2), transparent);
+    opacity:.7;
+    animation:bannerScan 4s linear infinite;
+  }
+
+  @keyframes bannerScan{
+    0%{ transform:translateX(-100%); opacity:0; }
+    20%{ opacity:.7; }
+    100%{ transform:translateX(100%); opacity:0; }
   }
 
   /* ================= TOAST ================= */
@@ -857,11 +1015,11 @@
   .toast{
     position:fixed;
     left:50%;
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 22px);
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 68px);
     transform:translateX(-50%) translateY(140%);
-    background:linear-gradient(135deg, rgba(0,240,255,.96), rgba(140,0,255,.96));
+    background:linear-gradient(135deg, var(--neon), var(--neon2));
     color:#03121c;
-    padding:13px 20px;
+    padding:12px 20px;
     border-radius:14px;
     font-weight:800;
     font-size:12.5px;
@@ -869,10 +1027,10 @@
     max-width:min(92vw, 420px);
     text-align:center;
     box-shadow:
-      0 0 34px rgba(0,240,255,.6),
+      0 0 34px var(--neon-glow),
       0 10px 30px rgba(0,0,0,.5);
     transition:transform .38s cubic-bezier(.2,1.25,.4,1), opacity .3s ease;
-    z-index:400;
+    z-index:900;
     opacity:0;
     pointer-events:none;
     line-height:1.35;
@@ -883,7 +1041,7 @@
     opacity:1;
   }
 
-  /* ================= PREMIUM MODAL ================= */
+  /* ================= MODAL ================= */
 
   .modal-overlay{
     position:fixed;
@@ -894,58 +1052,29 @@
     display:none;
     align-items:center;
     justify-content:center;
-    z-index:500;
-    padding:24px;
+    z-index:1000;
+    padding:20px;
   }
 
   .modal-overlay.show{
     display:flex;
   }
 
-  .modal{
+  .modal-box{
     width:100%;
-    max-width:340px;
-    padding:32px 24px 28px;
-    border-radius:22px;
+    max-width:360px;
+    padding:24px 20px;
+    border-radius:20px;
     background:linear-gradient(150deg, rgba(22,32,52,.98), rgba(12,16,28,.98));
-    border:1px solid rgba(0,240,255,.55);
+    border:1px solid color-mix(in srgb, var(--neon) 55%, transparent);
     box-shadow:
-      0 0 60px rgba(0,240,255,.5),
-      0 0 140px rgba(140,0,255,.35),
-      inset 0 0 36px rgba(0,240,255,.06);
+      0 0 60px var(--neon-glow),
+      0 0 140px rgba(140,0,255,.3),
+      inset 0 0 36px color-mix(in srgb, var(--neon) 6%, transparent);
     text-align:center;
     animation:modalIn .35s cubic-bezier(.2,1.2,.4,1);
     position:relative;
     overflow:hidden;
-  }
-
-  .modal::before{
-    content:"";
-    position:absolute;
-    top:0;left:0;right:0;
-    height:2px;
-    background:linear-gradient(90deg, transparent, #00f0ff, #ff00e0, transparent);
-    box-shadow:0 0 22px rgba(0,240,255,.9);
-    animation:scanLine 2.4s linear infinite;
-  }
-
-  @keyframes scanLine{
-    0%{ transform:translateX(-100%); opacity:0; }
-    25%{ opacity:1; }
-    100%{ transform:translateX(100%); opacity:0; }
-  }
-
-  .modal.success{
-    border-color:rgba(125,255,176,.75);
-    box-shadow:
-      0 0 60px rgba(125,255,176,.55),
-      0 0 140px rgba(0,240,255,.32),
-      inset 0 0 36px rgba(125,255,176,.08);
-  }
-
-  .modal.success::before{
-    background:linear-gradient(90deg, transparent, #7dffb0, #00f0ff, transparent);
-    box-shadow:0 0 22px rgba(125,255,176,.95);
   }
 
   @keyframes modalIn{
@@ -953,88 +1082,196 @@
     to{ opacity:1; transform:scale(1) translateY(0); }
   }
 
-  .modal-icon{
-    font-size:56px;
-    line-height:1;
-    margin-bottom:16px;
-    filter:drop-shadow(0 0 20px rgba(0,240,255,.95));
-    animation:modalIconPulse 1.4s ease-in-out infinite;
-  }
-
-  @keyframes modalIconPulse{
-    0%, 100%{ transform:scale(1) rotate(0deg); }
-    50%{ transform:scale(1.1) rotate(-4deg); }
-  }
-
-  .modal.success .modal-icon{
-    animation:none;
-    filter:drop-shadow(0 0 22px rgba(125,255,176,.95));
-  }
-
   .modal-title{
-    font-size:16px;
-    font-weight:800;
-    color:#ffffff;
-    letter-spacing:.06em;
-    margin-bottom:10px;
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.22em;
     text-transform:uppercase;
-    text-shadow:0 0 14px rgba(0,240,255,.75);
+    color:var(--neon);
+    text-shadow:0 0 14px var(--neon-glow);
+    margin-bottom:16px;
+    text-indent:.22em;
   }
 
-  .modal.success .modal-title{
-    text-shadow:0 0 14px rgba(125,255,176,.85);
-  }
+  /* ================= CASE ROULETTE ================= */
 
-  .modal-text{
-    font-size:12.5px;
-    color:#98b4d0;
-    margin-bottom:22px;
-    line-height:1.5;
-  }
-
-  .modal-spinner{
-    width:44px;
-    height:44px;
-    margin:0 auto;
-    border:3px solid rgba(0,240,255,.18);
-    border-top-color:#00f0ff;
-    border-right-color:#ff00e0;
-    border-radius:50%;
-    animation:modalSpin .9s linear infinite;
-  }
-
-  .modal.success .modal-spinner{
-    display:none;
-  }
-
-  @keyframes modalSpin{
-    to{ transform:rotate(360deg); }
-  }
-
-  .modal-progress{
-    width:100%;
-    height:4px;
-    border-radius:999px;
-    background:rgba(0,240,255,.12);
-    overflow:hidden;
-    margin-top:16px;
+  .case-viewport{
     position:relative;
+    width:100%;
+    height:104px;
+    border-radius:14px;
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(8,10,18,.95), rgba(16,20,34,.95));
+    border:1px solid color-mix(in srgb, var(--neon) 25%, transparent);
+    box-shadow:inset 0 0 30px rgba(0,0,0,.7);
+    margin-bottom:14px;
   }
 
-  .modal-progress-fill{
+  .case-viewport::before,
+  .case-viewport::after{
+    content:"";
     position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:0%;
-    border-radius:999px;
-    background:linear-gradient(90deg, #00f0ff, #ff00e0);
-    box-shadow:0 0 14px rgba(0,240,255,.85);
-    transition:width 2s linear;
+    top:0;bottom:0;
+    width:56px;
+    pointer-events:none;
+    z-index:2;
   }
 
-  .modal.success .modal-progress{
-    display:none;
+  .case-viewport::before{
+    left:0;
+    background:linear-gradient(90deg, rgba(8,10,18,1) 0%, rgba(8,10,18,0) 100%);
+  }
+
+  .case-viewport::after{
+    right:0;
+    background:linear-gradient(-90deg, rgba(8,10,18,1) 0%, rgba(8,10,18,0) 100%);
+  }
+
+  .case-strip{
+    position:absolute;
+    top:0;
+    left:0;
+    height:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 0;
+    will-change:transform;
+  }
+
+  .case-item{
+    flex:0 0 auto;
+    width:96px;
+    height:88px;
+    border-radius:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.02em;
+    color:#ffffff;
+    text-align:center;
+    padding:6px;
+    background:rgba(20,28,44,.85);
+    border:1px solid rgba(0,240,255,.35);
+    box-shadow:inset 0 0 12px rgba(0,240,255,.1);
+  }
+
+  .case-item .ci-icon{
+    font-size:24px;
+    line-height:1;
+  }
+
+  .case-item.cyan{
+    border-color:color-mix(in srgb, var(--neon) 55%, transparent);
+    box-shadow:inset 0 0 14px color-mix(in srgb, var(--neon) 20%, transparent);
+  }
+  .case-item.blue{
+    border-color:rgba(90,160,255,.55);
+    box-shadow:inset 0 0 14px rgba(90,160,255,.2);
+  }
+  .case-item.purple{
+    border-color:rgba(140,0,255,.6);
+    box-shadow:inset 0 0 14px rgba(140,0,255,.22);
+  }
+  .case-item.pink{
+    border-color:rgba(255,0,224,.6);
+    box-shadow:inset 0 0 14px rgba(255,0,224,.22);
+  }
+  .case-item.gold{
+    border-color:rgba(255,209,102,.75);
+    box-shadow:inset 0 0 16px rgba(255,209,102,.28);
+  }
+
+  .case-pointer{
+    position:absolute;
+    top:6px;bottom:6px;
+    left:50%;
+    width:3px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, transparent, var(--neon), transparent);
+    box-shadow:
+      0 0 12px var(--neon-glow),
+      0 0 26px color-mix(in srgb, var(--neon) 55%, transparent);
+    z-index:3;
+    pointer-events:none;
+    border-radius:2px;
+  }
+
+  .case-pointer::before,
+  .case-pointer::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    width:0;
+    height:0;
+    border-left:7px solid transparent;
+    border-right:7px solid transparent;
+    transform:translateX(-50%);
+  }
+
+  .case-pointer::before{
+    top:-6px;
+    border-top:8px solid var(--neon);
+    filter:drop-shadow(0 0 6px var(--neon-glow));
+  }
+
+  .case-pointer::after{
+    bottom:-6px;
+    border-bottom:8px solid var(--neon);
+    filter:drop-shadow(0 0 6px var(--neon-glow));
+  }
+
+  .case-result{
+    min-height:52px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin-bottom:14px;
+  }
+
+  .case-result-icon{
+    font-size:38px;
+    line-height:1;
+    filter:drop-shadow(0 0 18px var(--neon-glow));
+    animation:resultPop .5s cubic-bezier(.2,1.4,.4,1);
+  }
+
+  .case-result-text{
+    font-size:14px;
+    font-weight:900;
+    color:#ffffff;
+    text-shadow:0 0 14px var(--neon-glow);
+    letter-spacing:.02em;
+    text-align:center;
+  }
+
+  .case-result-sub{
+    font-size:11px;
+    color:#8ab4d8;
+    text-align:center;
+  }
+
+  @keyframes resultPop{
+    from{ transform:scale(.4); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+  }
+
+  /* ================= SHAKE ================= */
+
+  @keyframes shakeX{
+    0%, 100%{ transform:translateX(0); }
+    25%{ transform:translateX(-6px); }
+    75%{ transform:translateX(6px); }
+  }
+
+  .shake{
+    animation:shakeX .3s ease;
   }
 </style>
 </head>
@@ -1043,14 +1280,24 @@
 <div class="app">
 
   <header class="hud">
-    <div class="hud-label">Cyber Quantum Tap</div>
-    <div class="balance">
-      <span class="coin">🪙</span>
-      <span id="coins">0</span>
+    <div class="hud-brand">
+      <span class="brand-icon">◈</span>
+      <span class="brand-name" id="rankName">НОВИЧОК</span>
     </div>
-    <div class="income-row">
-      <div class="income">⚡ <span id="ips">0</span> / сек</div>
-      <div class="prestige-badge" id="prestigeBadge">♻ Престиж <span id="prestigeBadgeLevel">0</span></div>
+    <div class="hud-balances">
+      <div class="balance-item">
+        <span class="balance-icon">🪙</span>
+        <span id="coins">0</span>
+      </div>
+      <div class="balance-item">
+        <span class="balance-icon">💎</span>
+        <span id="crystals">0</span>
+      </div>
+    </div>
+    <div class="hud-income">
+      <span>⚡</span>
+      <span id="ips">0</span>
+      <span>/ сек</span>
     </div>
   </header>
 
@@ -1060,181 +1307,264 @@
       <div class="ring ring-2"></div>
       <div class="ring ring-1"></div>
       <button id="core" class="core" type="button" aria-label="Quantum Core">
-        <span class="core-inner">
-          <span class="core-symbol">◈</span>
-          <span class="core-power">+<span id="clickPower">1</span></span>
-        </span>
+        <span class="core-symbol">◈</span>
+        <span class="core-power">+<span id="clickPower">1</span></span>
       </button>
     </div>
-    <div class="core-hint">Тапай по ядру</div>
+    <div class="core-hint">ТАПАЙ ПО ЯДРУ</div>
   </main>
 
-  <section class="panel">
+  <nav class="tabs">
+    <button class="tab active" data-tab="shop" type="button">
+      <span class="tab-icon">🛒</span>
+      <span class="tab-label">Магазин</span>
+    </button>
+    <button class="tab" data-tab="cases" type="button">
+      <span class="tab-icon">🎁</span>
+      <span class="tab-label">Кейсы</span>
+      <span class="tab-badge" id="caseBadge">0</span>
+    </button>
+    <button class="tab" data-tab="missions" type="button">
+      <span class="tab-icon">🎯</span>
+      <span class="tab-label">Миссии</span>
+      <span class="tab-badge" id="missionBadge">0</span>
+    </button>
+    <button class="tab" data-tab="profile" type="button">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">Профиль</span>
+    </button>
+  </nav>
 
-    <button id="adBtn" class="ad-btn" type="button">Смотреть рекламу (+5000 🪙)</button>
+  <div class="tab-content">
 
-    <!-- ========== УЛУЧШЕНИЯ ========== -->
-    <div class="shop">
-      <div class="shop-title">Улучшения</div>
+    <!-- ================= SHOP ================= -->
+    <div class="tab-pane active" data-pane="shop">
 
-      <button id="buyClick" class="upgrade" type="button">
-        <div class="up-icon">⚡</div>
-        <div class="up-left">
-          <div class="up-name">Power Click</div>
-          <div class="up-desc">+1 к силе клика</div>
+      <button id="adBtn" class="btn-primary" type="button">📺 Смотреть видео (+5000 🪙)</button>
+
+      <div class="section-title">Улучшения</div>
+
+      <button id="buyClick" class="card" type="button">
+        <div class="card-icon">⚡</div>
+        <div class="card-left">
+          <div class="card-name">Сила клика</div>
+          <div class="card-desc">+1 монета за тап</div>
         </div>
-        <div class="up-right">
-          <div class="up-level">Ур. <span id="clickLevel">0</span></div>
-          <div class="up-price"><span id="clickCost">50</span> 🪙</div>
+        <div class="card-right">
+          <div class="card-label">Ур. <span id="clickLevel">0</span></div>
+          <div class="card-price"><span id="clickCost">50</span> 🪙</div>
         </div>
       </button>
 
-      <button id="buyMiner" class="upgrade" type="button">
-        <div class="up-icon pink">🛰</div>
-        <div class="up-left">
-          <div class="up-name">Quantum Miner</div>
-          <div class="up-desc">+1 монета в секунду</div>
+      <button id="buyMiner" class="card" type="button">
+        <div class="card-icon pink">🛰</div>
+        <div class="card-left">
+          <div class="card-name">Авто-майнинг</div>
+          <div class="card-desc">+1 монета в секунду</div>
         </div>
-        <div class="up-right">
-          <div class="up-level">Ур. <span id="minerLevel">0</span></div>
-          <div class="up-price"><span id="minerCost">100</span> 🪙</div>
+        <div class="card-right">
+          <div class="card-label">Ур. <span id="minerLevel">0</span></div>
+          <div class="card-price"><span id="minerCost">100</span> 🪙</div>
         </div>
       </button>
 
-      <button id="buyPremium" class="upgrade premium-upgrade" type="button">
-        <div class="up-icon premium">💎</div>
-        <div class="up-left">
-          <div class="up-name">Премиум-Хакер аккаунт</div>
-          <div class="up-desc">×10 к силе клика навсегда</div>
+      <div class="section-title">Ежедневный бонус</div>
+
+      <button id="dailyBtn" class="card" type="button">
+        <div class="card-icon gold">🎁</div>
+        <div class="card-left">
+          <div class="card-name">Награда за вход</div>
+          <div class="card-desc" id="dailyDesc">День 1 · награда</div>
         </div>
-        <div class="up-right">
-          <div class="up-level">Одноразово</div>
-          <div class="up-price" id="premiumPrice">Активировать</div>
+        <div class="card-right">
+          <div class="card-label" id="dailyStatus">Доступно</div>
         </div>
       </button>
+
     </div>
 
-    <!-- ========== ЕЖЕДНЕВНЫЙ БОНУС / РЕФЕРАЛ / ПРЕСТИЖ ========== -->
-    <div class="shop">
-      <div class="shop-title">Бонусы и престиж</div>
+    <!-- ================= CASES ================= -->
+    <div class="tab-pane" data-pane="cases">
 
-      <button id="dailyBtn" class="upgrade daily-upgrade" type="button">
-        <div class="up-icon daily">🎁</div>
-        <div class="up-left">
-          <div class="up-name">Ежедневная награда</div>
-          <div class="up-desc" id="dailyDesc">День 1: +1,000 монет</div>
-        </div>
-        <div class="up-right">
-          <div class="up-level" id="dailyStatus">Доступно!</div>
-        </div>
-      </button>
+      <div class="section-title">Квантовые кейсы</div>
 
-      <button id="referralBtn" class="upgrade referral-upgrade" type="button">
-        <div class="up-icon referral">👥</div>
-        <div class="up-left">
-          <div class="up-name">Пригласить друга</div>
-          <div class="up-desc">Скопировать ссылку на игру</div>
-        </div>
-        <div class="up-right">
-          <div class="up-level">Ссылка</div>
-        </div>
-      </button>
+      <button id="openCaseBtn" class="btn-primary" type="button">🎁 Открыть кейс</button>
 
-      <button id="prestigeBtn" class="upgrade prestige-upgrade" type="button">
-        <div class="up-icon prestige">♻</div>
-        <div class="up-left">
-          <div class="up-name">Перерождение</div>
-          <div class="up-desc">+100% ко всему за уровень</div>
+      <div class="card" style="cursor:default">
+        <div class="card-icon gold">📦</div>
+        <div class="card-left">
+          <div class="card-name">Кейсов в наличии</div>
+          <div class="card-desc">Каждые 150 кликов выпадает новый кейс</div>
         </div>
-        <div class="up-right">
-          <div class="up-level">Ур. <span id="prestigeLevel">0</span></div>
-          <div class="up-price" id="prestigeCost">1M 🪙</div>
+        <div class="card-right">
+          <div class="card-label">В инвентаре</div>
+          <div class="card-price" id="caseCount">0</div>
         </div>
-      </button>
+      </div>
+
+      <div class="card" style="cursor:default">
+        <div class="card-icon cyan">🎯</div>
+        <div class="card-left">
+          <div class="card-name">До следующего кейса</div>
+          <div class="card-desc">Прогресс по кликам</div>
+        </div>
+        <div class="card-right">
+          <div class="card-price" id="caseProgress">0 / 150</div>
+        </div>
+      </div>
+
+      <div class="section-title">Возможные награды</div>
+
+      <div class="card" style="cursor:default">
+        <div class="card-icon">💰</div>
+        <div class="card-left">
+          <div class="card-name">Монеты</div>
+          <div class="card-desc">от 10,000 до 50,000</div>
+        </div>
+      </div>
+
+      <div class="card" style="cursor:default">
+        <div class="card-icon pink">💎</div>
+        <div class="card-left">
+          <div class="card-name">Кристаллы</div>
+          <div class="card-desc">до 50 кристаллов</div>
+        </div>
+      </div>
+
+      <div class="card" style="cursor:default">
+        <div class="card-icon gold">⚡</div>
+        <div class="card-left">
+          <div class="card-name">Буст ×5 к клику</div>
+          <div class="card-desc">на 60 секунд</div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- ========== ЕЖЕДНЕВНЫЕ КВЕСТЫ ========== -->
-    <div class="shop">
-      <div class="shop-title">Задания на сегодня</div>
+    <!-- ================= MISSIONS ================= -->
+    <div class="tab-pane" data-pane="missions">
+
+      <div class="section-title">Хакерские контракты</div>
+
+      <div id="contractsList"></div>
+
+      <div class="section-title">Задания на сегодня</div>
 
       <div class="quest-card" id="questClickCard">
-        <div class="quest-left">
-          <div class="quest-icon">👆</div>
-          <div class="quest-info">
-            <div class="quest-name">Сделать 200 кликов по ядру</div>
-            <div class="quest-progress-bar">
-              <div class="quest-progress-fill" id="questClickFill"></div>
-            </div>
-            <div class="quest-progress-text" id="questClickText">0 / 200</div>
-          </div>
+        <div class="card-icon">👆</div>
+        <div class="quest-body">
+          <div class="quest-name">Сделать 300 кликов</div>
+          <div class="quest-bar"><div class="quest-fill" id="questClickFill"></div></div>
+          <div class="quest-text" id="questClickText">0 / 300</div>
         </div>
-        <button class="quest-claim" id="questClickClaim" disabled>Забрать</button>
+        <button class="quest-claim" id="questClickClaim" type="button" disabled>50 💎</button>
       </div>
 
-      <div class="quest-card" id="questAdCard">
-        <div class="quest-left">
-          <div class="quest-icon violet">📺</div>
-          <div class="quest-info">
-            <div class="quest-name">Посмотреть 2 видео-рекламы</div>
-            <div class="quest-progress-bar">
-              <div class="quest-progress-fill" id="questAdFill"></div>
-            </div>
-            <div class="quest-progress-text" id="questAdText">0 / 2</div>
-          </div>
+      <div class="quest-card" id="questContractCard">
+        <div class="card-icon violet">📜</div>
+        <div class="quest-body">
+          <div class="quest-name">Завершить 1 контракт</div>
+          <div class="quest-bar"><div class="quest-fill" id="questContractFill"></div></div>
+          <div class="quest-text" id="questContractText">0 / 1</div>
         </div>
-        <button class="quest-claim" id="questAdClaim" disabled>Забрать</button>
+        <button class="quest-claim" id="questContractClaim" type="button" disabled>30 💎</button>
       </div>
+
     </div>
 
-    <!-- ========== ДОСТИЖЕНИЯ ========== -->
-    <div class="shop">
-      <div class="shop-title">Достижения</div>
+    <!-- ================= PROFILE ================= -->
+    <div class="tab-pane" data-pane="profile">
 
-      <div class="achievement" id="achMillionaire">
-        <div class="ach-icon">💰</div>
-        <div class="ach-info">
-          <div class="ach-name">Первый миллион</div>
-          <div class="ach-desc">Накопить 1,000,000 монет за всё время</div>
-          <div class="ach-progress" id="achMillionaireProgress">0 / 1,000,000</div>
+      <div class="section-title">Статистика</div>
+
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-label">Всего заработано</div>
+          <div class="stat-value" id="statEarned">0</div>
         </div>
-        <div class="ach-status" id="achMillionaireStatus">🔒</div>
+        <div class="stat-box">
+          <div class="stat-label">Всего кликов</div>
+          <div class="stat-value" id="statClicks">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Престиж</div>
+          <div class="stat-value" id="statPrestige">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Контракты</div>
+          <div class="stat-value" id="statContracts">0</div>
+        </div>
       </div>
 
-      <div class="achievement" id="achClickMaster">
-        <div class="ach-icon">⚡</div>
-        <div class="ach-info">
-          <div class="ach-name">Клик-Мастер</div>
-          <div class="ach-desc">Сделать 1,000 кликов всего</div>
-          <div class="ach-progress" id="achClickMasterProgress">0 / 1,000</div>
+      <div class="section-title">Перерождение</div>
+
+      <button id="prestigeBtn" class="card" type="button">
+        <div class="card-icon gold">♻</div>
+        <div class="card-left">
+          <div class="card-name">Кибер-Перерождение</div>
+          <div class="card-desc">+100% ко всему за уровень</div>
         </div>
-        <div class="ach-status" id="achClickMasterStatus">🔒</div>
+        <div class="card-right">
+          <div class="card-label">Ур. <span id="prestigeLevel">0</span></div>
+          <div class="card-price" id="prestigeCost">1M 🪙</div>
+        </div>
+      </button>
+
+      <div class="section-title">Чит-коды</div>
+
+      <div class="promo-row">
+        <input type="text" id="promoInput" class="promo-input" placeholder="Введите чит-код" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" maxlength="24">
+        <button id="promoApply" class="promo-apply" type="button">Взлом</button>
       </div>
+
+      <div class="card" style="cursor:default; margin-top:2px;">
+        <div class="card-icon violet">🔓</div>
+        <div class="card-left">
+          <div class="card-name">Активировано кодов</div>
+          <div class="card-desc" id="promoUsedList">Нет активных</div>
+        </div>
+        <div class="card-right">
+          <div class="card-price" id="promoUsedCount">0 / 2</div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="footer-note" id="footerNote">Автосохранение активно</div>
+  </div>
 
-    <!-- ========== МЕСТО ПОД ЯНДЕКС РСЯ ========== -->
-    <div id="yandex_rtb_placeholder">Реклама</div>
-
-  </section>
+  <div id="yandex_banner" class="ad-banner">
+    <span>◈ РЕКЛАМА ЯНДЕКС ◈</span>
+  </div>
 
 </div>
 
-<!-- Toast уведомление -->
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<!-- ================= MODAL: CASE ================= -->
+<div class="modal-overlay" id="caseModal">
+  <div class="modal-box">
+    <div class="modal-title">Квантовый кейс</div>
 
-<!-- Модальное окно Премиум-Хакер -->
-<div id="premiumModal" class="modal-overlay">
-  <div class="modal" id="premiumModalBox">
-    <div class="modal-icon" id="premiumIcon">💎</div>
-    <div class="modal-title" id="premiumTitle">Защищённый шлюз</div>
-    <div class="modal-text" id="premiumText">Инициализация защищенного шлюза оплаты картой...</div>
-    <div class="modal-spinner" id="premiumSpinner"></div>
-    <div class="modal-progress" id="premiumProgressWrap">
-      <div class="modal-progress-fill" id="premiumProgressFill"></div>
+    <div class="case-viewport" id="caseViewport">
+      <div class="case-strip" id="caseStrip"></div>
+      <div class="case-pointer"></div>
     </div>
+
+    <div class="case-result" id="caseResult"></div>
+
+    <button class="btn-primary" id="caseCloseBtn" type="button" style="display:none;">Забрать</button>
   </div>
 </div>
+
+<!-- ================= MODAL: AD ERROR ================= -->
+<div class="modal-overlay" id="adErrorModal">
+  <div class="modal-box" style="border-color:rgba(255,0,100,.55); box-shadow:0 0 60px rgba(255,0,100,.45), 0 0 140px rgba(140,0,255,.3), inset 0 0 36px rgba(255,0,100,.06);">
+    <div class="modal-title" style="color:#ff5c8a; text-shadow:0 0 14px rgba(255,0,100,.85);">Видео прервано</div>
+    <div style="font-size:12.5px; color:#98b4d0; line-height:1.5; margin-bottom:18px;">Вы пропустили рекламу или произошла ошибка. Попробуйте ещё раз!</div>
+    <button class="btn-primary" id="adErrorClose" type="button">ОК</button>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function () {
@@ -1244,55 +1574,92 @@
      КОНСТАНТЫ
      ============================================================ */
 
-  var SAVE_KEY = 'cyber_quantum_tap_save_v2';
+  var SAVE_KEY = 'cyber_quantum_overlord_v1';
 
   var AD_REWARD = 5000;
-  var SAVE_INTERVAL = 3000;
 
   var CLICK_BASE_COST = 50;
   var CLICK_COST_GROWTH = 1.5;
-  var MINER_BASE_COST = 100;
-  var MINER_COST_GROWTH = 1.6;
 
-  var AD_BLOCK_ID = '52992';
+  var MINER_BASE_COST = 100;
+  var MINER_COST_GROWTH = 1.5;
 
   var PRESTIGE_COST = 1000000;
-  var PREMIUM_CLICK_MULTIPLIER = 10;
+
+  var CASES_PER_CLICKS = 150;
 
   var DAILY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
-  var QUEST_CLICK_GOAL = 200;
-  var QUEST_AD_GOAL = 2;
-  var QUEST_REWARD = 20000;
+  var QUEST_CLICK_GOAL = 300;
+  var QUEST_CLICK_REWARD_CRYSTALS = 50;
 
-  var ACH_MILLIONAIRE_GOAL = 1000000;
-  var ACH_CLICKMASTER_GOAL = 1000;
-  var ACH_MINER_BONUS = 0.15;
+  var QUEST_CONTRACT_GOAL = 1;
+  var QUEST_CONTRACT_REWARD_CRYSTALS = 30;
 
-  var REFERRAL_REWARD = 50000;
+  var CONTRACT_DURATION_MS = 3 * 60 * 1000;
+
+  var BOOST_MULTIPLIER = 5;
+  var BOOST_DURATION_MS = 60 * 1000;
+
+  var YANDEX_REWARDED_ID = 'R-M-DEMO-rewarded-client';
+  var YANDEX_BANNER_ID   = 'R-M-DEMO-sticky-client';
+
+  var RANKS = [
+    { name: 'НОВИЧОК',       color: '#00f0ff', color2: '#ff00e0' },
+    { name: 'ХАКЕР',         color: '#7b61ff', color2: '#00f0ff' },
+    { name: 'КИБЕР-АГЕНТ',   color: '#ff00e0', color2: '#00f0ff' },
+    { name: 'НЕЙРО-МАСТЕР',  color: '#ff6600', color2: '#ff00e0' },
+    { name: 'КВАНТОВЫЙ ЛОРД',color: '#ff0055', color2: '#ff00e0' },
+    { name: 'КИБЕР-БОГ',     color: '#ffd700', color2: '#ff0055' }
+  ];
+
+  var PROMO_CODES = {
+    'CYBER2026': { type: 'coins', amount: 100000, label: '100,000 монет' },
+    'RUSTORE':   { type: 'crystals', amount: 100,  label: '100 кристаллов' }
+  };
+
+  var CASE_REWARDS = [
+    { type: 'coins',    amount: 10000, icon: '💰', label: '10,000 🪙',   color: 'cyan',   weight: 35 },
+    { type: 'coins',    amount: 25000, icon: '💰', label: '25,000 🪙',   color: 'blue',   weight: 25 },
+    { type: 'coins',    amount: 50000, icon: '💵', label: '50,000 🪙',   color: 'purple', weight: 15 },
+    { type: 'crystals', amount: 50,    icon: '💎', label: '50 💎',       color: 'pink',   weight: 10 },
+    { type: 'boost',    amount: 60,    icon: '⚡', label: 'БУСТ ×5 60с', color: 'gold',   weight: 15 }
+  ];
+
+  var CONTRACTS = [
+    { id: 'hack_corp',    name: 'Взлом корпорации',      desc: 'Проникновение в защищённую сеть',  rewardCoins: 50000,  rewardCrystals: 5,  duration: CONTRACT_DURATION_MS, icon: '💻' },
+    { id: 'steal_data',   name: 'Кража данных',          desc: 'Похищение секретных файлов',       rewardCoins: 30000,  rewardCrystals: 10, duration: CONTRACT_DURATION_MS, icon: '🗂' },
+    { id: 'sabotage_srv', name: 'Саботаж серверов',      desc: 'Отключение вражеских узлов',       rewardCoins: 100000, rewardCrystals: 0,  duration: CONTRACT_DURATION_MS, icon: '🔥' }
+  ];
 
   /* ============================================================
      СОСТОЯНИЕ
      ============================================================ */
 
-  var state = {
+  var defaultState = {
     coins: 0,
+    crystals: 0,
     clickLevel: 0,
     minerLevel: 0,
     totalEarned: 0,
     totalClicks: 0,
     prestigeLevel: 0,
-    premiumOwned: false,
+    clicksSinceLastCase: 0,
+    casesAvailable: 0,
+    activeContract: null,
+    contractsCompleted: 0,
     dailyStreak: 0,
     lastDailyClaim: 0,
     questDate: '',
     questClicks: 0,
-    questAds: 0,
+    questContracts: 0,
     questClicksClaimed: false,
-    questAdsClaimed: false,
-    achMillionaire: false,
-    achClickMaster: false
+    questContractClaimed: false,
+    usedPromos: {},
+    clickBoostUntil: 0
   };
+
+  var state = Object.assign({}, defaultState);
 
   /* ============================================================
      DOM
@@ -1300,63 +1667,67 @@
 
   var els = {
     coins: document.getElementById('coins'),
+    crystals: document.getElementById('crystals'),
     ips: document.getElementById('ips'),
     clickPower: document.getElementById('clickPower'),
+    rankName: document.getElementById('rankName'),
+
     core: document.getElementById('core'),
     adBtn: document.getElementById('adBtn'),
 
     buyClick: document.getElementById('buyClick'),
     buyMiner: document.getElementById('buyMiner'),
-    buyPremium: document.getElementById('buyPremium'),
-    premiumPrice: document.getElementById('premiumPrice'),
+    clickLevel: document.getElementById('clickLevel'),
+    clickCost: document.getElementById('clickCost'),
+    minerLevel: document.getElementById('minerLevel'),
+    minerCost: document.getElementById('minerCost'),
 
     dailyBtn: document.getElementById('dailyBtn'),
     dailyDesc: document.getElementById('dailyDesc'),
     dailyStatus: document.getElementById('dailyStatus'),
 
-    referralBtn: document.getElementById('referralBtn'),
+    caseBadge: document.getElementById('caseBadge'),
+    missionBadge: document.getElementById('missionBadge'),
+    openCaseBtn: document.getElementById('openCaseBtn'),
+    caseCount: document.getElementById('caseCount'),
+    caseProgress: document.getElementById('caseProgress'),
 
-    prestigeBtn: document.getElementById('prestigeBtn'),
-    prestigeLevel: document.getElementById('prestigeLevel'),
-    prestigeCost: document.getElementById('prestigeCost'),
-    prestigeBadge: document.getElementById('prestigeBadge'),
-    prestigeBadgeLevel: document.getElementById('prestigeBadgeLevel'),
-
-    clickLevel: document.getElementById('clickLevel'),
-    clickCost: document.getElementById('clickCost'),
-    minerLevel: document.getElementById('minerLevel'),
-    minerCost: document.getElementById('minerCost'),
+    contractsList: document.getElementById('contractsList'),
 
     questClickCard: document.getElementById('questClickCard'),
     questClickFill: document.getElementById('questClickFill'),
     questClickText: document.getElementById('questClickText'),
     questClickClaim: document.getElementById('questClickClaim'),
 
-    questAdCard: document.getElementById('questAdCard'),
-    questAdFill: document.getElementById('questAdFill'),
-    questAdText: document.getElementById('questAdText'),
-    questAdClaim: document.getElementById('questAdClaim'),
+    questContractCard: document.getElementById('questContractCard'),
+    questContractFill: document.getElementById('questContractFill'),
+    questContractText: document.getElementById('questContractText'),
+    questContractClaim: document.getElementById('questContractClaim'),
 
-    achMillionaire: document.getElementById('achMillionaire'),
-    achMillionaireProgress: document.getElementById('achMillionaireProgress'),
-    achMillionaireStatus: document.getElementById('achMillionaireStatus'),
+    statEarned: document.getElementById('statEarned'),
+    statClicks: document.getElementById('statClicks'),
+    statPrestige: document.getElementById('statPrestige'),
+    statContracts: document.getElementById('statContracts'),
 
-    achClickMaster: document.getElementById('achClickMaster'),
-    achClickMasterProgress: document.getElementById('achClickMasterProgress'),
-    achClickMasterStatus: document.getElementById('achClickMasterStatus'),
+    prestigeBtn: document.getElementById('prestigeBtn'),
+    prestigeLevel: document.getElementById('prestigeLevel'),
+    prestigeCost: document.getElementById('prestigeCost'),
 
-    footerNote: document.getElementById('footerNote'),
+    promoInput: document.getElementById('promoInput'),
+    promoApply: document.getElementById('promoApply'),
+    promoUsedList: document.getElementById('promoUsedList'),
+    promoUsedCount: document.getElementById('promoUsedCount'),
 
     toast: document.getElementById('toast'),
 
-    premiumModal: document.getElementById('premiumModal'),
-    premiumModalBox: document.getElementById('premiumModalBox'),
-    premiumIcon: document.getElementById('premiumIcon'),
-    premiumTitle: document.getElementById('premiumTitle'),
-    premiumText: document.getElementById('premiumText'),
-    premiumSpinner: document.getElementById('premiumSpinner'),
-    premiumProgressWrap: document.getElementById('premiumProgressWrap'),
-    premiumProgressFill: document.getElementById('premiumProgressFill')
+    caseModal: document.getElementById('caseModal'),
+    caseStrip: document.getElementById('caseStrip'),
+    caseViewport: document.getElementById('caseViewport'),
+    caseResult: document.getElementById('caseResult'),
+    caseCloseBtn: document.getElementById('caseCloseBtn'),
+
+    adErrorModal: document.getElementById('adErrorModal'),
+    adErrorClose: document.getElementById('adErrorClose')
   };
 
   /* ============================================================
@@ -1378,13 +1749,9 @@
     }
 
     var str;
-    if (v >= 100) {
-      str = v.toFixed(0);
-    } else if (v >= 10) {
-      str = v.toFixed(1);
-    } else {
-      str = v.toFixed(2);
-    }
+    if (v >= 100) str = v.toFixed(0);
+    else if (v >= 10) str = v.toFixed(1);
+    else str = v.toFixed(2);
 
     str = str.replace(/\.0+$/, '').replace(/(\.\d)0$/, '$1');
     return str + UNITS[idx];
@@ -1397,32 +1764,25 @@
 
   function formatCountdown(ms) {
     if (ms < 0) ms = 0;
-    var totalSec = Math.floor(ms / 1000);
-    var h = Math.floor(totalSec / 3600);
-    var m = Math.floor((totalSec % 3600) / 60);
-    var s = totalSec % 60;
-    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    var total = Math.floor(ms / 1000);
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }
 
   function todayStr() {
     var d = new Date();
-    var m = d.getMonth() + 1;
-    var day = d.getDate();
-    return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+    var mm = d.getMonth() + 1;
+    var dd = d.getDate();
+    return d.getFullYear() + '-' + (mm < 10 ? '0' : '') + mm + '-' + (dd < 10 ? '0' : '') + dd;
   }
-
-  /* ============================================================
-     ВИБРООТКЛИК
-     ============================================================ */
 
   function haptic(type) {
     try {
       if (navigator.vibrate) {
-        navigator.vibrate(type === 'success' ? 24 : (type === 'error' ? 40 : 10));
+        navigator.vibrate(type === 'success' ? 26 : (type === 'error' ? 45 : 10));
       }
-    } catch (e) {
-      /* игнорируем */
-    }
+    } catch (e) {}
   }
 
   /* ============================================================
@@ -1433,30 +1793,17 @@
     return 1 + state.prestigeLevel;
   }
 
-  function getPremiumMultiplier() {
-    return state.premiumOwned ? PREMIUM_CLICK_MULTIPLIER : 1;
-  }
-
-  function getUnlockedAchievementsCount() {
-    var count = 0;
-    if (state.achMillionaire) count++;
-    if (state.achClickMaster) count++;
-    return count;
-  }
-
-  function getMinerAchievementBonus() {
-    return 1 + ACH_MINER_BONUS * getUnlockedAchievementsCount();
+  function getBoostMultiplier() {
+    return Date.now() < state.clickBoostUntil ? BOOST_MULTIPLIER : 1;
   }
 
   function getClickPower() {
     var base = 1 + state.clickLevel;
-    var total = base * getPremiumMultiplier() * getPrestigeMultiplier();
-    return Math.max(1, Math.floor(total));
+    return Math.max(1, Math.floor(base * getPrestigeMultiplier() * getBoostMultiplier()));
   }
 
   function getIncomePerSecond() {
-    var total = state.minerLevel * getPrestigeMultiplier() * getMinerAchievementBonus();
-    return Math.max(0, Math.floor(total));
+    return Math.max(0, Math.floor(state.minerLevel * getPrestigeMultiplier()));
   }
 
   function getClickCost() {
@@ -1467,12 +1814,12 @@
     return Math.floor(MINER_BASE_COST * Math.pow(MINER_COST_GROWTH, state.minerLevel));
   }
 
-  function getDailyReward(dayNumber) {
-    if (dayNumber <= 1) return 1000;
-    if (dayNumber === 2) return 5000;
-    if (dayNumber === 3) return 10000;
-    if (dayNumber === 4) return 25000;
-    return 50000;
+  function getDailyReward(day) {
+    if (day <= 1) return { coins: 5000,   crystals: 0 };
+    if (day === 2) return { coins: 15000, crystals: 0 };
+    if (day === 3) return { coins: 50000, crystals: 10 };
+    if (day === 4) return { coins: 100000, crystals: 25 };
+    return { coins: 250000, crystals: 50 };
   }
 
   function isDailyClaimable() {
@@ -1480,95 +1827,81 @@
     return (Date.now() - state.lastDailyClaim) >= DAILY_COOLDOWN_MS;
   }
 
-  /* ============================================================
-     ЕЖЕДНЕВНЫЕ КВЕСТЫ — СБРОС ПО ДАТЕ
-     ============================================================ */
-
   function ensureQuestDate() {
     var today = todayStr();
     if (state.questDate !== today) {
       state.questDate = today;
       state.questClicks = 0;
-      state.questAds = 0;
+      state.questContracts = 0;
       state.questClicksClaimed = false;
-      state.questAdsClaimed = false;
+      state.questContractClaimed = false;
       save();
     }
   }
 
+  function getRankIndex() {
+    return Math.min(state.prestigeLevel, RANKS.length - 1);
+  }
+
+  function applyRankTheme() {
+    var rank = RANKS[getRankIndex()];
+    document.documentElement.style.setProperty('--neon', rank.color);
+    document.documentElement.style.setProperty('--neon2', rank.color2);
+    document.documentElement.style.setProperty('--neon-glow', hexToRgba(rank.color, .55));
+    document.documentElement.style.setProperty('--neon-soft', hexToRgba(rank.color, .12));
+    if (els.rankName) els.rankName.textContent = rank.name;
+  }
+
+  function hexToRgba(hex, alpha) {
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    var r = parseInt(h.substring(0, 2), 16);
+    var g = parseInt(h.substring(2, 4), 16);
+    var b = parseInt(h.substring(4, 6), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
   /* ============================================================
-     ОТРИСОВКА
+     РЕНДЕР
      ============================================================ */
 
   function render() {
     els.coins.textContent = formatNumber(state.coins);
+    els.crystals.textContent = formatNumber(state.crystals);
     els.ips.textContent = formatNumber(getIncomePerSecond());
     els.clickPower.textContent = formatNumber(getClickPower());
 
     els.clickLevel.textContent = state.clickLevel;
     els.clickCost.textContent = formatNumber(getClickCost());
-
     els.minerLevel.textContent = state.minerLevel;
     els.minerCost.textContent = formatNumber(getMinerCost());
 
-    if (state.coins >= getClickCost()) {
-      els.buyClick.classList.add('affordable');
-    } else {
-      els.buyClick.classList.remove('affordable');
-    }
+    toggleAffordable(els.buyClick, state.coins >= getClickCost());
+    toggleAffordable(els.buyMiner, state.coins >= getMinerCost());
 
-    if (state.coins >= getMinerCost()) {
-      els.buyMiner.classList.add('affordable');
-    } else {
-      els.buyMiner.classList.remove('affordable');
-    }
-
-    if (state.prestigeLevel > 0) {
-      els.prestigeBadge.classList.add('visible');
-      els.prestigeBadgeLevel.textContent = state.prestigeLevel;
-    } else {
-      els.prestigeBadge.classList.remove('visible');
-    }
-
-    renderPremium();
-    renderPrestige();
     renderDaily();
-    renderQuests();
-    renderAchievements();
+    renderCases();
+    renderMissions();
+    renderProfile();
+    renderBadges();
   }
 
-  function renderPremium() {
-    if (state.premiumOwned) {
-      els.buyPremium.classList.add('hidden');
-    } else {
-      els.buyPremium.classList.remove('hidden');
-      els.buyPremium.classList.add('affordable');
-      els.premiumPrice.textContent = 'Активировать';
-    }
-  }
-
-  function renderPrestige() {
-    els.prestigeLevel.textContent = state.prestigeLevel;
-    els.prestigeCost.textContent = formatNumber(PRESTIGE_COST) + ' 🪙';
-
-    if (state.coins >= PRESTIGE_COST) {
-      els.prestigeBtn.classList.add('affordable');
-      els.prestigeBtn.classList.remove('locked');
-    } else {
-      els.prestigeBtn.classList.remove('affordable');
-      els.prestigeBtn.classList.add('locked');
-    }
+  function toggleAffordable(el, isAffordable) {
+    if (isAffordable) el.classList.add('affordable');
+    else el.classList.remove('affordable');
   }
 
   function renderDaily() {
     var nextDay = state.dailyStreak + 1;
     var reward = getDailyReward(nextDay);
+    var rewardText = formatBig(reward.coins) + ' 🪙';
+    if (reward.crystals > 0) rewardText += ' + ' + reward.crystals + ' 💎';
 
-    els.dailyDesc.textContent = 'День ' + nextDay + ': +' + formatBig(reward) + ' монет';
+    els.dailyDesc.textContent = 'День ' + nextDay + ' · ' + rewardText;
 
     if (isDailyClaimable()) {
       els.dailyBtn.classList.add('affordable');
-      els.dailyStatus.textContent = 'Доступно!';
+      els.dailyStatus.textContent = 'Доступно';
       els.dailyStatus.style.color = '#7dffb0';
     } else {
       els.dailyBtn.classList.remove('affordable');
@@ -1578,109 +1911,213 @@
     }
   }
 
-  function renderQuests() {
-    /* Клики */
-    var clickProgress = Math.min(state.questClicks, QUEST_CLICK_GOAL);
-    var clickPercent = (clickProgress / QUEST_CLICK_GOAL) * 100;
-    els.questClickFill.style.width = clickPercent + '%';
-    els.questClickText.textContent = clickProgress + ' / ' + QUEST_CLICK_GOAL;
+  function renderCases() {
+    els.caseCount.textContent = state.casesAvailable;
+    var progress = Math.min(state.clicksSinceLastCase, CASES_PER_CLICKS);
+    els.caseProgress.textContent = progress + ' / ' + CASES_PER_CLICKS;
 
-    var clickDone = state.questClicks >= QUEST_CLICK_GOAL;
+    if (state.casesAvailable > 0) {
+      els.openCaseBtn.classList.add('affordable');
+      els.openCaseBtn.disabled = false;
+      els.openCaseBtn.textContent = '🎁 Открыть кейс (' + state.casesAvailable + ')';
+    } else {
+      els.openCaseBtn.classList.remove('affordable');
+      els.openCaseBtn.disabled = true;
+      els.openCaseBtn.textContent = '🎁 Открыть кейс';
+    }
+  }
+
+  function renderMissions() {
+    renderContracts();
+    renderQuests();
+  }
+
+  function renderContracts() {
+    var list = els.contractsList;
+    list.innerHTML = '';
+
+    CONTRACTS.forEach(function (contract) {
+      var isActive = state.activeContract && state.activeContract.id === contract.id;
+      var isReady = isActive && Date.now() >= state.activeContract.endsAt;
+
+      var card = document.createElement('div');
+      card.className = 'contract-card';
+      if (isActive && !isReady) card.classList.add('active');
+      if (isReady) card.classList.add('ready');
+
+      var head = document.createElement('div');
+      head.className = 'contract-head';
+
+      var icon = document.createElement('div');
+      icon.className = 'card-icon violet';
+      icon.textContent = contract.icon;
+
+      var info = document.createElement('div');
+      info.className = 'contract-info';
+
+      var name = document.createElement('div');
+      name.className = 'contract-name';
+      name.textContent = contract.name;
+
+      var desc = document.createElement('div');
+      desc.className = 'contract-desc';
+      desc.textContent = contract.desc;
+
+      var rewards = document.createElement('div');
+      rewards.className = 'contract-rewards';
+      rewards.textContent = '+' + formatBig(contract.rewardCoins) + ' 🪙' +
+        (contract.rewardCrystals > 0 ? '  +' + contract.rewardCrystals + ' 💎' : '');
+
+      info.appendChild(name);
+      info.appendChild(desc);
+      info.appendChild(rewards);
+
+      var timer = document.createElement('div');
+      timer.className = 'contract-timer';
+      if (isActive) {
+        if (isReady) {
+          timer.textContent = 'ГОТОВО';
+          timer.style.color = '#7dffb0';
+        } else {
+          timer.textContent = formatCountdown(state.activeContract.endsAt - Date.now());
+        }
+      } else {
+        timer.textContent = '03:00';
+        timer.style.color = '#4c6b8a';
+      }
+
+      head.appendChild(icon);
+      head.appendChild(info);
+      head.appendChild(timer);
+
+      var actions = document.createElement('div');
+      actions.className = 'contract-actions';
+
+      if (!state.activeContract) {
+        var startBtn = document.createElement('button');
+        startBtn.className = 'btn-primary';
+        startBtn.type = 'button';
+        startBtn.textContent = '▶ Запустить контракт';
+        startBtn.addEventListener('click', function () { startContract(contract.id); });
+        actions.appendChild(startBtn);
+      } else if (isActive && !isReady) {
+        var hurryBtn = document.createElement('button');
+        hurryBtn.className = 'btn-primary';
+        hurryBtn.type = 'button';
+        hurryBtn.textContent = '📺 Завершить мгновенно';
+        hurryBtn.addEventListener('click', function () { instantCompleteContract(contract.id); });
+        actions.appendChild(hurryBtn);
+      } else if (isReady) {
+        var claimBtn = document.createElement('button');
+        claimBtn.className = 'btn-primary success';
+        claimBtn.type = 'button';
+        claimBtn.textContent = '✅ Забрать награду';
+        claimBtn.addEventListener('click', function () { finalizeContract(contract.id); });
+        actions.appendChild(claimBtn);
+      }
+
+      card.appendChild(head);
+      if (actions.children.length > 0) card.appendChild(actions);
+      list.appendChild(card);
+    });
+  }
+
+  function renderQuests() {
+    var qcProgress = Math.min(state.questClicks, QUEST_CLICK_GOAL);
+    var qcPercent = (qcProgress / QUEST_CLICK_GOAL) * 100;
+    els.questClickFill.style.width = qcPercent + '%';
+    els.questClickText.textContent = qcProgress + ' / ' + QUEST_CLICK_GOAL;
+
+    var qcDone = state.questClicks >= QUEST_CLICK_GOAL;
 
     if (state.questClicksClaimed) {
       els.questClickCard.classList.add('done');
       els.questClickClaim.textContent = 'Получено';
       els.questClickClaim.disabled = true;
       els.questClickClaim.classList.add('claimed');
-      els.questClickClaim.classList.remove('quest-claim');
-      els.questClickClaim.classList.add('quest-claim');
-    } else if (clickDone) {
+    } else if (qcDone) {
       els.questClickCard.classList.add('done');
-      els.questClickClaim.textContent = 'Забрать +20K';
+      els.questClickClaim.textContent = QUEST_CLICK_REWARD_CRYSTALS + ' 💎';
       els.questClickClaim.disabled = false;
       els.questClickClaim.classList.remove('claimed');
     } else {
       els.questClickCard.classList.remove('done');
-      els.questClickClaim.textContent = 'Забрать';
+      els.questClickClaim.textContent = QUEST_CLICK_REWARD_CRYSTALS + ' 💎';
       els.questClickClaim.disabled = true;
       els.questClickClaim.classList.remove('claimed');
     }
 
-    /* Рекламы */
-    var adProgress = Math.min(state.questAds, QUEST_AD_GOAL);
-    var adPercent = (adProgress / QUEST_AD_GOAL) * 100;
-    els.questAdFill.style.width = adPercent + '%';
-    els.questAdText.textContent = adProgress + ' / ' + QUEST_AD_GOAL;
+    var qnProgress = Math.min(state.questContracts, QUEST_CONTRACT_GOAL);
+    var qnPercent = (qnProgress / QUEST_CONTRACT_GOAL) * 100;
+    els.questContractFill.style.width = qnPercent + '%';
+    els.questContractText.textContent = qnProgress + ' / ' + QUEST_CONTRACT_GOAL;
 
-    var adDone = state.questAds >= QUEST_AD_GOAL;
+    var qnDone = state.questContracts >= QUEST_CONTRACT_GOAL;
 
-    if (state.questAdsClaimed) {
-      els.questAdCard.classList.add('done');
-      els.questAdClaim.textContent = 'Получено';
-      els.questAdClaim.disabled = true;
-      els.questAdClaim.classList.add('claimed');
-    } else if (adDone) {
-      els.questAdCard.classList.add('done');
-      els.questAdClaim.textContent = 'Забрать +20K';
-      els.questAdClaim.disabled = false;
-      els.questAdClaim.classList.remove('claimed');
+    if (state.questContractClaimed) {
+      els.questContractCard.classList.add('done');
+      els.questContractClaim.textContent = 'Получено';
+      els.questContractClaim.disabled = true;
+      els.questContractClaim.classList.add('claimed');
+    } else if (qnDone) {
+      els.questContractCard.classList.add('done');
+      els.questContractClaim.textContent = QUEST_CONTRACT_REWARD_CRYSTALS + ' 💎';
+      els.questContractClaim.disabled = false;
+      els.questContractClaim.classList.remove('claimed');
     } else {
-      els.questAdCard.classList.remove('done');
-      els.questAdClaim.textContent = 'Забрать';
-      els.questAdClaim.disabled = true;
-      els.questAdClaim.classList.remove('claimed');
+      els.questContractCard.classList.remove('done');
+      els.questContractClaim.textContent = QUEST_CONTRACT_REWARD_CRYSTALS + ' 💎';
+      els.questContractClaim.disabled = true;
+      els.questContractClaim.classList.remove('claimed');
     }
   }
 
-  function renderAchievements() {
-    /* Первый миллион */
-    var mProgress = Math.min(state.totalEarned, ACH_MILLIONAIRE_GOAL);
-    els.achMillionaireProgress.textContent = formatBig(mProgress) + ' / ' + formatBig(ACH_MILLIONAIRE_GOAL);
+  function renderProfile() {
+    els.statEarned.textContent = formatNumber(state.totalEarned);
+    els.statClicks.textContent = formatNumber(state.totalClicks);
+    els.statPrestige.textContent = state.prestigeLevel;
+    els.statContracts.textContent = state.contractsCompleted;
 
-    if (state.achMillionaire) {
-      els.achMillionaire.classList.add('unlocked');
-      els.achMillionaireStatus.textContent = '✅';
+    els.prestigeLevel.textContent = state.prestigeLevel;
+    els.prestigeCost.textContent = formatNumber(PRESTIGE_COST) + ' 🪙';
+
+    if (state.coins >= PRESTIGE_COST) {
+      els.prestigeBtn.classList.add('affordable');
     } else {
-      els.achMillionaire.classList.remove('unlocked');
-      els.achMillionaireStatus.textContent = '🔒';
+      els.prestigeBtn.classList.remove('affordable');
     }
 
-    /* Клик-Мастер */
-    var cProgress = Math.min(state.totalClicks, ACH_CLICKMASTER_GOAL);
-    els.achClickMasterProgress.textContent = formatBig(cProgress) + ' / ' + formatBig(ACH_CLICKMASTER_GOAL);
-
-    if (state.achClickMaster) {
-      els.achClickMaster.classList.add('unlocked');
-      els.achClickMasterStatus.textContent = '✅';
+    var usedKeys = Object.keys(state.usedPromos || {});
+    var total = Object.keys(PROMO_CODES).length;
+    els.promoUsedCount.textContent = usedKeys.length + ' / ' + total;
+    if (usedKeys.length === 0) {
+      els.promoUsedList.textContent = 'Нет активных';
     } else {
-      els.achClickMaster.classList.remove('unlocked');
-      els.achClickMasterStatus.textContent = '🔒';
+      els.promoUsedList.textContent = usedKeys.map(function (k) {
+        return k + ' · ' + (PROMO_CODES[k] ? PROMO_CODES[k].label : '');
+      }).join(' · ');
     }
   }
 
-  /* ============================================================
-     ПРОВЕРКА И РАЗБЛОКИРОВКА ДОСТИЖЕНИЙ
-     ============================================================ */
-
-  function checkAchievements() {
-    var changed = false;
-
-    if (!state.achMillionaire && state.totalEarned >= ACH_MILLIONAIRE_GOAL) {
-      state.achMillionaire = true;
-      changed = true;
-      showToast('🏆 Достижение: «Первый миллион»! Автомайнинг +15% навсегда.', 3600);
-      haptic('success');
+  function renderBadges() {
+    if (state.casesAvailable > 0) {
+      els.caseBadge.classList.add('visible');
+      els.caseBadge.textContent = state.casesAvailable;
+    } else {
+      els.caseBadge.classList.remove('visible');
     }
 
-    if (!state.achClickMaster && state.totalClicks >= ACH_CLICKMASTER_GOAL) {
-      state.achClickMaster = true;
-      changed = true;
-      showToast('⚡ Достижение: «Клик-Мастер»! Автомайнинг +15% навсегда.', 3600);
-      haptic('success');
-    }
+    var missionCount = 0;
+    if (isDailyClaimable()) missionCount++;
+    if (state.activeContract && Date.now() >= state.activeContract.endsAt) missionCount++;
+    if (state.questClicks >= QUEST_CLICK_GOAL && !state.questClicksClaimed) missionCount++;
+    if (state.questContracts >= QUEST_CONTRACT_GOAL && !state.questContractClaimed) missionCount++;
 
-    if (changed) {
-      save();
+    if (missionCount > 0) {
+      els.missionBadge.classList.add('visible');
+      els.missionBadge.textContent = missionCount;
+    } else {
+      els.missionBadge.classList.remove('visible');
     }
   }
 
@@ -1690,69 +2127,35 @@
 
   function save() {
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify({
-        coins: state.coins,
-        clickLevel: state.clickLevel,
-        minerLevel: state.minerLevel,
-        totalEarned: state.totalEarned,
-        totalClicks: state.totalClicks,
-        prestigeLevel: state.prestigeLevel,
-        premiumOwned: state.premiumOwned,
-        dailyStreak: state.dailyStreak,
-        lastDailyClaim: state.lastDailyClaim,
-        questDate: state.questDate,
-        questClicks: state.questClicks,
-        questAds: state.questAds,
-        questClicksClaimed: state.questClicksClaimed,
-        questAdsClaimed: state.questAdsClaimed,
-        achMillionaire: state.achMillionaire,
-        achClickMaster: state.achClickMaster
-      }));
-    } catch (e) {
-      /* localStorage может быть недоступен — игнорируем */
-    }
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    } catch (e) {}
   }
 
   function load() {
     var raw = null;
-    try {
-      raw = localStorage.getItem(SAVE_KEY);
-    } catch (e) {
-      raw = null;
-    }
-
+    try { raw = localStorage.getItem(SAVE_KEY); } catch (e) { raw = null; }
     if (!raw) return;
 
     var data = null;
-    try {
-      data = JSON.parse(raw);
-    } catch (e) {
-      data = null;
-    }
-
+    try { data = JSON.parse(raw); } catch (e) { data = null; }
     if (!data || typeof data !== 'object') return;
 
-    function num(v, def) {
-      var n = Number(v);
-      return isFinite(n) && n >= 0 ? Math.floor(n) : (def || 0);
-    }
-
-    state.coins = num(data.coins, 0);
-    state.clickLevel = num(data.clickLevel, 0);
-    state.minerLevel = num(data.minerLevel, 0);
-    state.totalEarned = num(data.totalEarned, 0);
-    state.totalClicks = num(data.totalClicks, 0);
-    state.prestigeLevel = num(data.prestigeLevel, 0);
-    state.premiumOwned = data.premiumOwned === true;
-    state.dailyStreak = num(data.dailyStreak, 0);
-    state.lastDailyClaim = num(data.lastDailyClaim, 0);
-    state.questDate = typeof data.questDate === 'string' ? data.questDate : '';
-    state.questClicks = num(data.questClicks, 0);
-    state.questAds = num(data.questAds, 0);
-    state.questClicksClaimed = data.questClicksClaimed === true;
-    state.questAdsClaimed = data.questAdsClaimed === true;
-    state.achMillionaire = data.achMillionaire === true;
-    state.achClickMaster = data.achClickMaster === true;
+    Object.keys(defaultState).forEach(function (key) {
+      if (typeof data[key] !== 'undefined') {
+        if (typeof defaultState[key] === 'number') {
+          var n = Number(data[key]);
+          state[key] = isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+        } else if (typeof defaultState[key] === 'boolean') {
+          state[key] = data[key] === true;
+        } else if (typeof defaultState[key] === 'string') {
+          state[key] = typeof data[key] === 'string' ? data[key] : '';
+        } else if (defaultState[key] === null) {
+          state[key] = data[key] || null;
+        } else if (typeof defaultState[key] === 'object') {
+          state[key] = data[key] && typeof data[key] === 'object' ? data[key] : {};
+        }
+      }
+    });
   }
 
   /* ============================================================
@@ -1760,23 +2163,18 @@
      ============================================================ */
 
   var toastTimer = null;
-
   function showToast(message, duration) {
     els.toast.textContent = message;
     els.toast.classList.add('show');
-
-    if (toastTimer) {
-      window.clearTimeout(toastTimer);
-    }
-
+    if (toastTimer) window.clearTimeout(toastTimer);
     toastTimer = window.setTimeout(function () {
       els.toast.classList.remove('show');
       toastTimer = null;
-    }, duration || 3200);
+    }, duration || 2800);
   }
 
   /* ============================================================
-     ВСПЛЫВАЮЩИЕ ЧИСЛА
+     FLOAT TEXT
      ============================================================ */
 
   function spawnFloat(x, y, value) {
@@ -1786,11 +2184,8 @@
     el.style.left = x + 'px';
     el.style.top = y + 'px';
     document.body.appendChild(el);
-
     window.setTimeout(function () {
-      if (el && el.parentNode) {
-        el.parentNode.removeChild(el);
-      }
+      if (el.parentNode) el.parentNode.removeChild(el);
     }, 900);
   }
 
@@ -1804,65 +2199,53 @@
     state.coins += gain;
     state.totalEarned += gain;
     state.totalClicks += 1;
+    state.clicksSinceLastCase += 1;
 
-    if (state.questClicks < QUEST_CLICK_GOAL) {
-      state.questClicks += 1;
+    if (state.questClicks < QUEST_CLICK_GOAL) state.questClicks += 1;
+
+    if (state.clicksSinceLastCase >= CASES_PER_CLICKS) {
+      state.clicksSinceLastCase = 0;
+      state.casesAvailable += 1;
+      showToast('🎁 Квантовый кейс получен! Открой вкладку «Кейсы».', 2600);
+      haptic('success');
     }
 
-    checkAchievements();
     render();
 
     var x = event.clientX;
     var y = event.clientY;
-
     if (typeof x !== 'number' || typeof y !== 'number' || (x === 0 && y === 0)) {
       var rect = els.core.getBoundingClientRect();
       x = rect.left + rect.width / 2;
       y = rect.top + rect.height / 2;
     }
-
     spawnFloat(x, y, gain);
     haptic('light');
   }
 
-  els.core.addEventListener('pointerdown', function (event) {
-    event.preventDefault();
+  els.core.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
     els.core.classList.add('pressed');
-    handleCorePress(event);
+    handleCorePress(e);
   });
-
-  els.core.addEventListener('pointerup', function () {
-    els.core.classList.remove('pressed');
-  });
-
-  els.core.addEventListener('pointercancel', function () {
-    els.core.classList.remove('pressed');
-  });
-
-  els.core.addEventListener('pointerleave', function () {
-    els.core.classList.remove('pressed');
-  });
-
-  els.core.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-  });
+  els.core.addEventListener('pointerup', function () { els.core.classList.remove('pressed'); });
+  els.core.addEventListener('pointercancel', function () { els.core.classList.remove('pressed'); });
+  els.core.addEventListener('pointerleave', function () { els.core.classList.remove('pressed'); });
+  els.core.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
   /* ============================================================
-     ПОКУПКА УЛУЧШЕНИЙ
+     ПОКУПКИ
      ============================================================ */
 
-  function shakeElement(el) {
+  function shake(el) {
     el.classList.remove('shake');
     void el.offsetWidth;
     el.classList.add('shake');
-    window.setTimeout(function () {
-      el.classList.remove('shake');
-    }, 320);
+    window.setTimeout(function () { el.classList.remove('shake'); }, 320);
   }
 
   els.buyClick.addEventListener('click', function () {
     var cost = getClickCost();
-
     if (state.coins >= cost) {
       state.coins -= cost;
       state.clickLevel += 1;
@@ -1870,14 +2253,13 @@
       render();
       haptic('success');
     } else {
-      shakeElement(els.buyClick);
+      shake(els.buyClick);
       haptic('error');
     }
   });
 
   els.buyMiner.addEventListener('click', function () {
     var cost = getMinerCost();
-
     if (state.coins >= cost) {
       state.coins -= cost;
       state.minerLevel += 1;
@@ -1885,222 +2267,19 @@
       render();
       haptic('success');
     } else {
-      shakeElement(els.buyMiner);
+      shake(els.buyMiner);
       haptic('error');
     }
   });
 
   /* ============================================================
-     ADSGRAM — REWARDED VIDEO
-     ============================================================ */
-
-  var AD_DEFAULT_TEXT = 'Смотреть рекламу (+5000 🪙)';
-  var adBusy = false;
-  var adController = null;
-
-  function initAdsgram() {
-    if (!window.Adsgram || typeof window.Adsgram.init !== 'function') {
-      console.warn('Adsgram SDK не загружен.');
-      return false;
-    }
-
-    try {
-      adController = window.Adsgram.init({ blockId: AD_BLOCK_ID });
-
-      adController.addEventListener('onReward', function () {
-        state.coins += AD_REWARD;
-        state.totalEarned += AD_REWARD;
-
-        if (state.questAds < QUEST_AD_GOAL) {
-          state.questAds += 1;
-        }
-
-        checkAchievements();
-        save();
-        render();
-        haptic('success');
-        els.adBtn.textContent = '✅ Награда получена! +5000 🪙';
-        window.setTimeout(function () {
-          els.adBtn.textContent = AD_DEFAULT_TEXT;
-          els.adBtn.disabled = false;
-          adBusy = false;
-        }, 1300);
-      });
-
-      adController.addEventListener('onSkip', function () {
-        alert('Вы пропустили рекламу или произошла ошибка. Попробуйте еще раз!');
-        els.adBtn.textContent = AD_DEFAULT_TEXT;
-        els.adBtn.disabled = false;
-        adBusy = false;
-        haptic('error');
-      });
-
-      adController.addEventListener('onError', function () {
-        alert('Вы пропустили рекламу или произошла ошибка. Попробуйте еще раз!');
-        els.adBtn.textContent = AD_DEFAULT_TEXT;
-        els.adBtn.disabled = false;
-        adBusy = false;
-        haptic('error');
-      });
-
-      return true;
-    } catch (e) {
-      console.error('Ошибка инициализации Adsgram:', e);
-      return false;
-    }
-  }
-
-  function watchAd() {
-    if (adBusy) return;
-
-    if (!adController) {
-      var ok = initAdsgram();
-      if (!ok) {
-        alert('Реклама временно недоступна. Попробуйте позже.');
-        return;
-      }
-    }
-
-    adBusy = true;
-    els.adBtn.disabled = true;
-    els.adBtn.textContent = 'Загрузка видео...';
-
-    try {
-      adController.show().catch(function (result) {
-        console.warn('Adsgram show() rejected:', result);
-      });
-    } catch (e) {
-      console.error('Ошибка показа рекламы:', e);
-      alert('Вы пропустили рекламу или произошла ошибка. Попробуйте еще раз!');
-      els.adBtn.textContent = AD_DEFAULT_TEXT;
-      els.adBtn.disabled = false;
-      adBusy = false;
-      haptic('error');
-    }
-  }
-
-  els.adBtn.addEventListener('click', watchAd);
-
-  /* ============================================================
-     РЕФЕРАЛЬНАЯ СИСТЕМА (БЕЗ TELEGRAM)
-     ============================================================ */
-
-  function getRefCode() {
-    var code = null;
-    try {
-      code = localStorage.getItem('cq_ref_code');
-    } catch (e) {
-      code = null;
-    }
-
-    if (!code || typeof code !== 'string' || code.length < 6) {
-      code = 'r' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-      try {
-        localStorage.setItem('cq_ref_code', code);
-      } catch (e) {
-        /* игнорируем */
-      }
-    }
-    return code;
-  }
-
-  function buildReferralLink() {
-    var code = getRefCode();
-    var base = window.location.href.split('#')[0].split('?')[0];
-    return base + '?ref=' + encodeURIComponent(code);
-  }
-
-  function fallbackCopy(text) {
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.top = '0';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      ta.setSelectionRange(0, text.length);
-      var ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function copyToClipboard(text, callback) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () {
-        callback(true);
-      }).catch(function () {
-        callback(fallbackCopy(text));
-      });
-    } else {
-      callback(fallbackCopy(text));
-    }
-  }
-
-  function handleReferral() {
-    var link = buildReferralLink();
-
-    copyToClipboard(link, function (success) {
-      if (success) {
-        showToast('Ссылка скопирована! Поделитесь ей — за каждого друга вы получите +50,000 🪙.', 4200);
-        haptic('success');
-      } else {
-        showToast('Не удалось скопировать. Ссылка: ' + link, 5000);
-        haptic('error');
-      }
-    });
-  }
-
-  els.referralBtn.addEventListener('click', handleReferral);
-
-  function applyReferralOnLoad() {
-    var params = null;
-    try {
-      params = new URLSearchParams(window.location.search);
-    } catch (e) {
-      params = null;
-    }
-    if (!params) return;
-
-    var ref = params.get('ref');
-    if (!ref || ref.length < 6) return;
-
-    var applied = null;
-    try {
-      applied = localStorage.getItem('cq_ref_applied');
-    } catch (e) {
-      applied = null;
-    }
-
-    if (applied === ref) return;
-
-    try {
-      localStorage.setItem('cq_ref_applied', ref);
-    } catch (e) {
-      /* игнорируем */
-    }
-
-    state.coins += REFERRAL_REWARD;
-    state.totalEarned += REFERRAL_REWARD;
-    save();
-
-    window.setTimeout(function () {
-      showToast('🎉 Добро пожаловать! Вам начислено +50,000 🪙 за приглашение.', 4200);
-    }, 800);
-  }
-
-  /* ============================================================
      ЕЖЕДНЕВНЫЙ БОНУС
      ============================================================ */
 
-  function claimDaily() {
+  els.dailyBtn.addEventListener('click', function () {
     if (!isDailyClaimable()) {
       var remaining = DAILY_COOLDOWN_MS - (Date.now() - state.lastDailyClaim);
-      showToast('Награда уже получена. Следующая через ' + formatCountdown(remaining), 2600);
+      showToast('Награда уже получена. Следующая через ' + formatCountdown(remaining), 2400);
       haptic('error');
       return;
     }
@@ -2108,29 +2287,354 @@
     var nextDay = state.dailyStreak + 1;
     var reward = getDailyReward(nextDay);
 
-    state.coins += reward;
-    state.totalEarned += reward;
+    state.coins += reward.coins;
+    state.totalEarned += reward.coins;
+    state.crystals += reward.crystals;
     state.dailyStreak = nextDay;
     state.lastDailyClaim = Date.now();
 
-    checkAchievements();
     save();
     render();
 
-    showToast('🎁 День ' + nextDay + ': +' + formatBig(reward) + ' монет!', 3200);
+    var msg = '🎁 День ' + nextDay + ': +' + formatBig(reward.coins) + ' 🪙';
+    if (reward.crystals > 0) msg += ' и +' + reward.crystals + ' 💎';
+    showToast(msg, 3200);
+    haptic('success');
+  });
+
+  /* ============================================================
+     КЕЙСЫ — РУЛЕТКА
+     ============================================================ */
+
+  var caseOpening = false;
+
+  function pickWeightedReward() {
+    var total = 0;
+    CASE_REWARDS.forEach(function (r) { total += r.weight; });
+    var roll = Math.random() * total;
+    var acc = 0;
+    for (var i = 0; i < CASE_REWARDS.length; i++) {
+      acc += CASE_REWARDS[i].weight;
+      if (roll <= acc) return CASE_REWARDS[i];
+    }
+    return CASE_REWARDS[0];
+  }
+
+  function openCase() {
+    if (caseOpening) return;
+    if (state.casesAvailable <= 0) {
+      showToast('Нет доступных кейсов. Кликай по ядру!', 2400);
+      haptic('error');
+      return;
+    }
+
+    caseOpening = true;
+    state.casesAvailable -= 1;
+    save();
+    render();
+
+    var winning = pickWeightedReward();
+
+    var STRIP_LENGTH = 52;
+    var WINNER_INDEX = 44;
+
+    var items = [];
+    for (var i = 0; i < STRIP_LENGTH; i++) {
+      if (i === WINNER_INDEX) items.push(winning);
+      else items.push(CASE_REWARDS[Math.floor(Math.random() * CASE_REWARDS.length)]);
+    }
+
+    els.caseStrip.innerHTML = '';
+    els.caseStrip.style.transition = 'none';
+    els.caseStrip.style.transform = 'translateX(0)';
+    els.caseResult.innerHTML = '';
+    els.caseCloseBtn.style.display = 'none';
+
+    items.forEach(function (reward) {
+      var el = document.createElement('div');
+      el.className = 'case-item ' + reward.color;
+      var ic = document.createElement('div');
+      ic.className = 'ci-icon';
+      ic.textContent = reward.icon;
+      var tx = document.createElement('div');
+      tx.textContent = reward.label;
+      el.appendChild(ic);
+      el.appendChild(tx);
+      els.caseStrip.appendChild(el);
+    });
+
+    els.caseModal.classList.add('show');
+
+    void els.caseStrip.offsetWidth;
+
+    var itemW = 96 + 8;
+    var viewportW = els.caseViewport.offsetWidth;
+    var targetX = -(WINNER_INDEX * itemW) + (viewportW / 2) - (96 / 2);
+    var jitter = (Math.random() * 24) - 12;
+    targetX += jitter;
+
+    els.caseStrip.style.transition = 'transform 3.6s cubic-bezier(0.15, 0.85, 0.15, 1)';
+    els.caseStrip.style.transform = 'translateX(' + targetX + 'px)';
+
+    window.setTimeout(function () {
+      applyCaseReward(winning);
+      var res = document.createElement('div');
+      res.className = 'case-result-icon';
+      res.textContent = winning.icon;
+      var txt = document.createElement('div');
+      txt.className = 'case-result-text';
+      txt.textContent = 'Вы получили: ' + winning.label;
+      var sub = document.createElement('div');
+      sub.className = 'case-result-sub';
+      sub.textContent = 'Награда зачислена на счёт';
+      els.caseResult.appendChild(res);
+      els.caseResult.appendChild(txt);
+      els.caseResult.appendChild(sub);
+      els.caseCloseBtn.style.display = 'block';
+      haptic('success');
+      save();
+      render();
+    }, 3700);
+  }
+
+  function applyCaseReward(reward) {
+    if (reward.type === 'coins') {
+      state.coins += reward.amount;
+      state.totalEarned += reward.amount;
+    } else if (reward.type === 'crystals') {
+      state.crystals += reward.amount;
+    } else if (reward.type === 'boost') {
+      state.clickBoostUntil = Date.now() + BOOST_DURATION_MS;
+    }
+  }
+
+  els.openCaseBtn.addEventListener('click', openCase);
+
+  els.caseCloseBtn.addEventListener('click', function () {
+    els.caseModal.classList.remove('show');
+    caseOpening = false;
+  });
+
+  els.caseModal.addEventListener('click', function (e) {
+    if (e.target === els.caseModal && els.caseCloseBtn.style.display !== 'none') {
+      els.caseModal.classList.remove('show');
+      caseOpening = false;
+    }
+  });
+
+  /* ============================================================
+     РЕКЛАМА ЯНДЕКСА (REWARDED VIDEO)
+     ============================================================ */
+
+  var adBusy = false;
+  var pendingAdCallback = null;
+  var AD_DEFAULT_TEXT = '📺 Смотреть видео (+5000 🪙)';
+
+  function yandexRewardedReady() {
+    return typeof window.YandexAds !== 'undefined' && typeof window.YandexAds.loadRewardedVideo === 'function';
+  }
+
+  function showRewardedAd(onSuccess, onFail) {
+    if (adBusy) return;
+    adBusy = true;
+    pendingAdCallback = onSuccess;
+
+    function fail() {
+      adBusy = false;
+      pendingAdCallback = null;
+      if (typeof onFail === 'function') onFail();
+    }
+
+    if (!yandexRewardedReady()) {
+      window.setTimeout(function () {
+        if (typeof onSuccess === 'function') onSuccess();
+        adBusy = false;
+        pendingAdCallback = null;
+      }, 800);
+      return;
+    }
+
+    try {
+      window.YandexAds.loadRewardedVideo({
+        onSuccess: function () {
+          try {
+            window.YandexAds.showRewardedVideo();
+          } catch (e) {
+            fail();
+          }
+        },
+        onFailure: function () {
+          fail();
+        }
+      });
+    } catch (e) {
+      fail();
+    }
+  }
+
+  function initRewardedListeners() {
+    document.addEventListener('yandex_rewarded', function () {
+      var cb = pendingAdCallback;
+      pendingAdCallback = null;
+      adBusy = false;
+      if (typeof cb === 'function') cb();
+    });
+
+    document.addEventListener('yandex_rewarded_failed', function () {
+      pendingAdCallback = null;
+      adBusy = false;
+      showAdError();
+    });
+
+    document.addEventListener('yandex_rewarded_dismissed', function () {
+      if (pendingAdCallback) {
+        pendingAdCallback = null;
+        adBusy = false;
+        showAdError();
+      }
+    });
+  }
+
+  function showAdError() {
+    els.adErrorModal.classList.add('show');
+    haptic('error');
+    window.setTimeout(function () {
+      els.adErrorModal.classList.remove('show');
+    }, 2600);
+  }
+
+  els.adErrorClose.addEventListener('click', function () {
+    els.adErrorModal.classList.remove('show');
+  });
+
+  els.adBtn.addEventListener('click', function () {
+    if (adBusy) return;
+    els.adBtn.disabled = true;
+    els.adBtn.textContent = 'Загрузка видео...';
+
+    showRewardedAd(
+      function () {
+        state.coins += AD_REWARD;
+        state.totalEarned += AD_REWARD;
+        save();
+        render();
+        els.adBtn.classList.add('success');
+        els.adBtn.textContent = '✅ +5000 🪙 получено!';
+        haptic('success');
+        window.setTimeout(function () {
+          els.adBtn.classList.remove('success');
+          els.adBtn.textContent = AD_DEFAULT_TEXT;
+          els.adBtn.disabled = false;
+        }, 1400);
+      },
+      function () {
+        els.adBtn.textContent = AD_DEFAULT_TEXT;
+        els.adBtn.disabled = false;
+        showAdError();
+      }
+    );
+  });
+
+  /* ============================================================
+     КОНТРАКТЫ
+     ============================================================ */
+
+  function startContract(contractId) {
+    if (state.activeContract) return;
+
+    var contract = CONTRACTS.find(function (c) { return c.id === contractId; });
+    if (!contract) return;
+
+    state.activeContract = {
+      id: contractId,
+      startedAt: Date.now(),
+      endsAt: Date.now() + contract.duration
+    };
+
+    save();
+    render();
+    showToast('📜 Контракт запущен: ' + contract.name, 2600);
     haptic('success');
   }
 
-  els.dailyBtn.addEventListener('click', claimDaily);
+  function instantCompleteContract(contractId) {
+    if (!state.activeContract || state.activeContract.id !== contractId) return;
+    if (Date.now() >= state.activeContract.endsAt) {
+      finalizeContract(contractId);
+      return;
+    }
+
+    showRewardedAd(
+      function () {
+        if (state.activeContract && state.activeContract.id === contractId) {
+          state.activeContract.endsAt = Date.now();
+          finalizeContract(contractId);
+        }
+      },
+      function () {
+        showAdError();
+      }
+    );
+  }
+
+  function finalizeContract(contractId) {
+    var contract = CONTRACTS.find(function (c) { return c.id === contractId; });
+    if (!contract) return;
+
+    state.coins += contract.rewardCoins;
+    state.totalEarned += contract.rewardCoins;
+    state.crystals += contract.rewardCrystals;
+    state.contractsCompleted += 1;
+
+    if (state.questContracts < QUEST_CONTRACT_GOAL) state.questContracts += 1;
+
+    state.activeContract = null;
+
+    save();
+    render();
+
+    var msg = '📜 Контракт выполнен! +' + formatBig(contract.rewardCoins) + ' 🪙';
+    if (contract.rewardCrystals > 0) msg += ' и +' + contract.rewardCrystals + ' 💎';
+    showToast(msg, 3400);
+    haptic('success');
+  }
 
   /* ============================================================
-     ПРЕСТИЖ (ПЕРЕРОЖДЕНИЕ)
+     КВЕСТЫ — ЗАБРАТЬ НАГРАДУ
      ============================================================ */
 
-  function doPrestige() {
+  els.questClickClaim.addEventListener('click', function () {
+    if (state.questClicksClaimed) return;
+    if (state.questClicks < QUEST_CLICK_GOAL) return;
+
+    state.crystals += QUEST_CLICK_REWARD_CRYSTALS;
+    state.questClicksClaimed = true;
+    save();
+    render();
+    showToast('👆 Квест выполнен! +' + QUEST_CLICK_REWARD_CRYSTALS + ' 💎', 2800);
+    haptic('success');
+  });
+
+  els.questContractClaim.addEventListener('click', function () {
+    if (state.questContractClaimed) return;
+    if (state.questContracts < QUEST_CONTRACT_GOAL) return;
+
+    state.crystals += QUEST_CONTRACT_REWARD_CRYSTALS;
+    state.questContractClaimed = true;
+    save();
+    render();
+    showToast('📜 Квест выполнен! +' + QUEST_CONTRACT_REWARD_CRYSTALS + ' 💎', 2800);
+    haptic('success');
+  });
+
+  /* ============================================================
+     ПРЕСТИЖ
+     ============================================================ */
+
+  els.prestigeBtn.addEventListener('click', function () {
     if (state.coins < PRESTIGE_COST) {
-      shakeElement(els.prestigeBtn);
-      showToast('Нужно ' + formatNumber(PRESTIGE_COST) + ' монет для перерождения.', 2600);
+      shake(els.prestigeBtn);
+      showToast('Нужно ' + formatNumber(PRESTIGE_COST) + ' монет для перерождения.', 2400);
       haptic('error');
       return;
     }
@@ -2139,129 +2643,90 @@
     state.coins = 0;
     state.clickLevel = 0;
     state.minerLevel = 0;
+    state.clicksSinceLastCase = 0;
 
+    applyRankTheme();
     save();
     render();
 
-    showToast('♻ Перерождение! Уровень престижа: ' + state.prestigeLevel + '. Множитель ×' + getPrestigeMultiplier() + ' ко всему!', 4200);
-    haptic('success');
-  }
-
-  els.prestigeBtn.addEventListener('click', doPrestige);
-
-  /* ============================================================
-     ПРЕМИУМ-ХАКЕР АККАУНТ (СИМУЛЯЦИЯ ОПЛАТЫ КАРТОЙ)
-     ============================================================ */
-
-  var premiumBusy = false;
-  var premiumTimers = [];
-
-  function clearPremiumTimers() {
-    for (var i = 0; i < premiumTimers.length; i++) {
-      window.clearTimeout(premiumTimers[i]);
-    }
-    premiumTimers = [];
-  }
-
-  function showPremiumModal(mode) {
-    els.premiumModal.classList.add('show');
-
-    if (mode === 'loading') {
-      els.premiumModalBox.classList.remove('success');
-      els.premiumIcon.textContent = '💎';
-      els.premiumTitle.textContent = 'Защищённый шлюз';
-      els.premiumText.textContent = 'Инициализация защищенного шлюза оплаты картой...';
-      els.premiumSpinner.style.display = 'block';
-      els.premiumProgressWrap.style.display = 'block';
-      els.premiumProgressFill.style.width = '0%';
-
-      /* Запуск прогресс-бара */
-      window.setTimeout(function () {
-        els.premiumProgressFill.style.width = '100%';
-      }, 60);
-    } else if (mode === 'success') {
-      els.premiumModalBox.classList.add('success');
-      els.premiumIcon.textContent = '🛡';
-      els.premiumTitle.textContent = 'Доступ разрешён';
-      els.premiumText.textContent = 'Премиум-Хакер аккаунт активирован! ×10 к силе клика навсегда.';
-      els.premiumSpinner.style.display = 'none';
-      els.premiumProgressWrap.style.display = 'none';
-    }
-  }
-
-  function hidePremiumModal() {
-    els.premiumModal.classList.remove('show');
-  }
-
-  function buyPremium() {
-    if (premiumBusy) return;
-    if (state.premiumOwned) return;
-
-    premiumBusy = true;
-    els.buyPremium.disabled = true;
-
-    showPremiumModal('loading');
-
-    var t1 = window.setTimeout(function () {
-      state.premiumOwned = true;
-      save();
-      render();
-      haptic('success');
-
-      showPremiumModal('success');
-
-      var t2 = window.setTimeout(function () {
-        hidePremiumModal();
-        premiumBusy = false;
-        showToast('💎 Премиум-Хакер аккаунт активирован! Доход от клика увеличен в 10 раз навсегда.', 4000);
-      }, 1700);
-
-      premiumTimers.push(t2);
-    }, 2200);
-
-    premiumTimers.push(t1);
-  }
-
-  els.buyPremium.addEventListener('click', buyPremium);
-
-  /* ============================================================
-     ЕЖЕДНЕВНЫЕ КВЕСТЫ — ЗАБРАТЬ НАГРАДУ
-     ============================================================ */
-
-  els.questClickClaim.addEventListener('click', function () {
-    if (state.questClicksClaimed) return;
-    if (state.questClicks < QUEST_CLICK_GOAL) return;
-
-    state.coins += QUEST_REWARD;
-    state.totalEarned += QUEST_REWARD;
-    state.questClicksClaimed = true;
-
-    checkAchievements();
-    save();
-    render();
-
-    showToast('👆 Квест выполнен! +' + formatBig(QUEST_REWARD) + ' монет.', 3200);
-    haptic('success');
-  });
-
-  els.questAdClaim.addEventListener('click', function () {
-    if (state.questAdsClaimed) return;
-    if (state.questAds < QUEST_AD_GOAL) return;
-
-    state.coins += QUEST_REWARD;
-    state.totalEarned += QUEST_REWARD;
-    state.questAdsClaimed = true;
-
-    checkAchievements();
-    save();
-    render();
-
-    showToast('📺 Квест выполнен! +' + formatBig(QUEST_REWARD) + ' монет.', 3200);
+    var rank = RANKS[getRankIndex()];
+    showToast('♻ Перерождение! Ранг: ' + rank.name + ' · Множитель ×' + getPrestigeMultiplier(), 3800);
     haptic('success');
   });
 
   /* ============================================================
-     ПАССИВНЫЙ ДОХОД
+     ЧИТ-КОДЫ
+     ============================================================ */
+
+  els.promoApply.addEventListener('click', function () {
+    var code = (els.promoInput.value || '').trim().toUpperCase();
+    if (!code) {
+      showToast('Введите чит-код', 2000);
+      return;
+    }
+
+    if (!PROMO_CODES[code]) {
+      showToast('❌ Неверный чит-код', 2200);
+      haptic('error');
+      return;
+    }
+
+    if (state.usedPromos && state.usedPromos[code]) {
+      showToast('Этот код уже активирован', 2200);
+      haptic('error');
+      return;
+    }
+
+    if (!state.usedPromos) state.usedPromos = {};
+
+    var reward = PROMO_CODES[code];
+    if (reward.type === 'coins') {
+      state.coins += reward.amount;
+      state.totalEarned += reward.amount;
+    } else if (reward.type === 'crystals') {
+      state.crystals += reward.amount;
+    }
+
+    state.usedPromos[code] = true;
+    save();
+    render();
+
+    els.promoInput.value = '';
+    showToast('✅ Код «' + code + '» активирован! +' + reward.label, 3200);
+    haptic('success');
+  });
+
+  els.promoInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      els.promoApply.click();
+    }
+  });
+
+  /* ============================================================
+     TABS
+     ============================================================ */
+
+  var tabButtons = document.querySelectorAll('.tab');
+  var tabPanes = document.querySelectorAll('.tab-pane');
+
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var tab = btn.getAttribute('data-tab');
+
+      tabButtons.forEach(function (b) { b.classList.remove('active'); });
+      tabPanes.forEach(function (p) { p.classList.remove('active'); });
+
+      btn.classList.add('active');
+      var pane = document.querySelector('.tab-pane[data-pane="' + tab + '"]');
+      if (pane) pane.classList.add('active');
+
+      haptic('light');
+    });
+  });
+
+  /* ============================================================
+     ПАССИВНЫЙ ДОХОД + ТАЙМЕРЫ
      ============================================================ */
 
   window.setInterval(function () {
@@ -2269,43 +2734,56 @@
     if (income > 0) {
       state.coins += income;
       state.totalEarned += income;
-      checkAchievements();
       render();
     }
   }, 1000);
-
-  /* ============================================================
-     ОБНОВЛЕНИЕ ТАЙМЕРА И КВЕСТОВ
-     ============================================================ */
 
   window.setInterval(function () {
     ensureQuestDate();
     renderDaily();
     renderQuests();
-    renderAchievements();
+    renderBadges();
+    renderContracts();
+
+    if (state.activeContract) {
+      if (Date.now() >= state.activeContract.endsAt) {
+        renderContracts();
+      }
+    }
   }, 1000);
 
   /* ============================================================
      АВТОСОХРАНЕНИЕ
      ============================================================ */
 
-  window.setInterval(save, SAVE_INTERVAL);
-
+  window.setInterval(save, 3000);
   window.addEventListener('beforeunload', save);
   window.addEventListener('pagehide', save);
-
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-      save();
-    } else {
-      ensureQuestDate();
-      render();
-    }
+    if (document.hidden) save();
+    else { ensureQuestDate(); render(); }
   });
 
-  document.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-  });
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  /* ============================================================
+     YANDEX BANNER
+     ============================================================ */
+
+  function initBanner() {
+    if (typeof window.YandexAds === 'undefined') return;
+    try {
+      window.YandexAds.init({
+        bannerBlockId: YANDEX_BANNER_ID,
+        rewardedBlockId: YANDEX_REWARDED_ID,
+        options: { bannerAtTop: false }
+      });
+      window.YandexAds.loadBanner();
+      window.YandexAds.showBanner();
+    } catch (e) {
+      /* игнорируем */
+    }
+  }
 
   /* ============================================================
      СТАРТ
@@ -2313,16 +2791,19 @@
 
   load();
   ensureQuestDate();
-  applyReferralOnLoad();
+  applyRankTheme();
+  initRewardedListeners();
   render();
   save();
 
-  /* Инициализация Adsgram */
-  if (window.Adsgram) {
-    initAdsgram();
-  } else {
-    window.addEventListener('load', initAdsgram);
+  function boot() {
+    initBanner();
   }
+
+  if (document.readyState === 'complete') boot();
+  else window.addEventListener('load', boot);
+
+  window.setTimeout(boot, 1200);
 
 })();
 </script>
