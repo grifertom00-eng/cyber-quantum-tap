@@ -7,33 +7,20 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Cyber Quantum Overlord</title>
 
-<!-- Adsgram SDK -->
-<script>
-    const AdController = window.Adsgram.init({ blockId: "52992" });
-</script>
+<!-- ============================================================
+     ADSGRAM SDK — официальный скрипт rewarded video
+     ============================================================ -->
+<script src="https://adsgram.ai"></script>
 
+<!-- ============================================================
+     Заглушка YandexAds — оставлена ТОЛЬКО для декоративного
+     нижнего баннера. Rewarded video теперь идёт через Adsgram.
+     ============================================================ -->
 <script>
 (function(){
   if (typeof window.YandexAds !== 'undefined') return;
   window.YandexAds = {
-    events: {
-      rewarded: {
-        rewarded: 'yandex_rewarded',
-        failedToShow: 'yandex_rewarded_failed',
-        dismissed: 'yandex_rewarded_dismissed'
-      }
-    },
     init: function(){},
-    loadRewardedVideo: function(opts){
-      window.setTimeout(function(){
-        if (opts && typeof opts.onSuccess === 'function') opts.onSuccess();
-      }, 400);
-    },
-    showRewardedVideo: function(){
-      window.setTimeout(function(){
-        document.dispatchEvent(new Event('yandex_rewarded'));
-      }, 1500);
-    },
     loadBanner: function(){},
     showBanner: function(){}
   };
@@ -678,6 +665,13 @@
     background:linear-gradient(135deg, rgba(125,255,176,.22), rgba(0,240,255,.18));
     text-shadow:0 0 10px rgba(125,255,176,.7);
     box-shadow:0 0 20px rgba(125,255,176,.3);
+  }
+
+  .btn-primary.error{
+    border-color:rgba(255,0,100,.55);
+    background:linear-gradient(135deg, rgba(255,0,100,.22), rgba(140,0,255,.2));
+    text-shadow:0 0 10px rgba(255,0,100,.8);
+    box-shadow:0 0 20px rgba(255,0,100,.3);
   }
 
   /* ================= QUEST CARD ================= */
@@ -1558,7 +1552,7 @@
 <div class="modal-overlay" id="adErrorModal">
   <div class="modal-box" style="border-color:rgba(255,0,100,.55); box-shadow:0 0 60px rgba(255,0,100,.45), 0 0 140px rgba(140,0,255,.3), inset 0 0 36px rgba(255,0,100,.06);">
     <div class="modal-title" style="color:#ff5c8a; text-shadow:0 0 14px rgba(255,0,100,.85);">Видео прервано</div>
-    <div style="font-size:12.5px; color:#98b4d0; line-height:1.5; margin-bottom:18px;">Вы пропустили рекламу или произошла ошибка. Попробуйте ещё раз!</div>
+    <div id="adErrorText" style="font-size:12.5px; color:#98b4d0; line-height:1.5; margin-bottom:18px;">Вы пропустили рекламу или произошла ошибка. Попробуйте ещё раз!</div>
     <button class="btn-primary" id="adErrorClose" type="button">ОК</button>
   </div>
 </div>
@@ -1601,8 +1595,7 @@
   var BOOST_MULTIPLIER = 5;
   var BOOST_DURATION_MS = 60 * 1000;
 
-  var YANDEX_REWARDED_ID = 'R-M-DEMO-rewarded-client';
-  var YANDEX_BANNER_ID   = 'R-M-DEMO-sticky-client';
+  var ADSGRAM_BLOCK_ID = '52992';
 
   var RANKS = [
     { name: 'НОВИЧОК',       color: '#00f0ff', color2: '#ff00e0' },
@@ -1627,9 +1620,9 @@
   ];
 
   var CONTRACTS = [
-    { id: 'hack_corp',    name: 'Взлом корпорации',      desc: 'Проникновение в защищённую сеть',  rewardCoins: 50000,  rewardCrystals: 5,  duration: CONTRACT_DURATION_MS, icon: '💻' },
-    { id: 'steal_data',   name: 'Кража данных',          desc: 'Похищение секретных файлов',       rewardCoins: 30000,  rewardCrystals: 10, duration: CONTRACT_DURATION_MS, icon: '🗂' },
-    { id: 'sabotage_srv', name: 'Саботаж серверов',      desc: 'Отключение вражеских узлов',       rewardCoins: 100000, rewardCrystals: 0,  duration: CONTRACT_DURATION_MS, icon: '🔥' }
+    { id: 'hack_corp',    name: 'Взлом корпорации', desc: 'Проникновение в защищённую сеть', rewardCoins: 50000,  rewardCrystals: 5,  duration: CONTRACT_DURATION_MS, icon: '💻' },
+    { id: 'steal_data',   name: 'Кража данных',     desc: 'Похищение секретных файлов',      rewardCoins: 30000,  rewardCrystals: 10, duration: CONTRACT_DURATION_MS, icon: '🗂' },
+    { id: 'sabotage_srv', name: 'Саботаж серверов', desc: 'Отключение вражеских узлов',      rewardCoins: 100000, rewardCrystals: 0,  duration: CONTRACT_DURATION_MS, icon: '🔥' }
   ];
 
   /* ============================================================
@@ -1660,6 +1653,28 @@
   };
 
   var state = Object.assign({}, defaultState);
+
+  /* ============================================================
+     ADSGRAM — инициализация контроллера
+     ============================================================ */
+
+  var AdController = null;
+
+  function initAdsgram() {
+    if (typeof window.Adsgram === 'undefined' || typeof window.Adsgram.init !== 'function') {
+      console.warn('Adsgram SDK не загружен. Rewarded video недоступен.');
+      return false;
+    }
+    try {
+      AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+      console.log('Adsgram инициализирован, blockId=' + ADSGRAM_BLOCK_ID);
+      return true;
+    } catch (e) {
+      console.error('Ошибка инициализации Adsgram:', e);
+      AdController = null;
+      return false;
+    }
+  }
 
   /* ============================================================
      DOM
@@ -1727,6 +1742,7 @@
     caseCloseBtn: document.getElementById('caseCloseBtn'),
 
     adErrorModal: document.getElementById('adErrorModal'),
+    adErrorText: document.getElementById('adErrorText'),
     adErrorClose: document.getElementById('adErrorClose')
   };
 
@@ -2423,114 +2439,138 @@
   });
 
   /* ============================================================
-     РЕКЛАМА ЯНДЕКСА (REWARDED VIDEO)
+     ADSGRAM — REWARDED VIDEO (СТРОГИЙ КОНТРОЛЬ НАГРАДЫ)
      ============================================================ */
 
   var adBusy = false;
-  var pendingAdCallback = null;
   var AD_DEFAULT_TEXT = '📺 Смотреть видео (+5000 🪙)';
 
-  function yandexRewardedReady() {
-    return typeof window.YandexAds !== 'undefined' && typeof window.YandexAds.loadRewardedVideo === 'function';
-  }
-
-  function showRewardedAd(onSuccess, onFail) {
-    if (adBusy) return;
-    adBusy = true;
-    pendingAdCallback = onSuccess;
-
-    function fail() {
-      adBusy = false;
-      pendingAdCallback = null;
-      if (typeof onFail === 'function') onFail();
+  function showAdError(message) {
+    if (els.adErrorText) {
+      els.adErrorText.textContent = message || 'Вы пропустили рекламу или произошла ошибка. Попробуйте ещё раз!';
     }
-
-    if (!yandexRewardedReady()) {
-      window.setTimeout(function () {
-        if (typeof onSuccess === 'function') onSuccess();
-        adBusy = false;
-        pendingAdCallback = null;
-      }, 800);
-      return;
-    }
-
-    try {
-      window.YandexAds.loadRewardedVideo({
-        onSuccess: function () {
-          try {
-            window.YandexAds.showRewardedVideo();
-          } catch (e) {
-            fail();
-          }
-        },
-        onFailure: function () {
-          fail();
-        }
-      });
-    } catch (e) {
-      fail();
-    }
-  }
-
-  function initRewardedListeners() {
-    document.addEventListener('yandex_rewarded', function () {
-      var cb = pendingAdCallback;
-      pendingAdCallback = null;
-      adBusy = false;
-      if (typeof cb === 'function') cb();
-    });
-
-    document.addEventListener('yandex_rewarded_failed', function () {
-      pendingAdCallback = null;
-      adBusy = false;
-      showAdError();
-    });
-
-    document.addEventListener('yandex_rewarded_dismissed', function () {
-      if (pendingAdCallback) {
-        pendingAdCallback = null;
-        adBusy = false;
-        showAdError();
-      }
-    });
-  }
-
-  function showAdError() {
     els.adErrorModal.classList.add('show');
     haptic('error');
     window.setTimeout(function () {
       els.adErrorModal.classList.remove('show');
-    }, 2600);
+    }, 2800);
   }
 
   els.adErrorClose.addEventListener('click', function () {
     els.adErrorModal.classList.remove('show');
   });
 
+  /**
+   * Универсальный запуск rewarded video через Adsgram.
+   * onSuccess вызывается ТОЛЬКО если промис AdController.show()
+   * успешно разрешился (пользователь досмотрел видео).
+   * onFail вызывается при любом отказе / ошибке / пропуске.
+   */
+  function showAdsgramRewarded(onSuccess, onFail) {
+    if (adBusy) return;
+    adBusy = true;
+
+    if (!AdController) {
+      adBusy = false;
+      if (typeof onFail === 'function') onFail('ADSGRAM_NOT_READY');
+      return;
+    }
+
+    var resolved = false;
+
+    try {
+      AdController.show()
+        .then(function (result) {
+          resolved = true;
+          adBusy = false;
+          if (typeof onSuccess === 'function') onSuccess(result);
+        })
+        .catch(function (err) {
+          resolved = true;
+          adBusy = false;
+          console.warn('Adsgram show() rejected:', err);
+          if (typeof onFail === 'function') onFail(err);
+        });
+    } catch (e) {
+      resolved = true;
+      adBusy = false;
+      console.error('Adsgram show() threw:', e);
+      if (typeof onFail === 'function') onFail(e);
+    }
+
+    /* Страховка: если SDK по какой-то причине не вызвал ни then, ни catch
+       в течение 30 секунд — разблокируем кнопку без начисления награды. */
+    window.setTimeout(function () {
+      if (!resolved && adBusy) {
+        adBusy = false;
+        if (typeof onFail === 'function') onFail('TIMEOUT');
+      }
+    }, 30000);
+  }
+
+  function detectAdErrorReason(err) {
+    if (!err) return 'Вы пропустили рекламу или произошла ошибка. Попробуйте ещё раз!';
+
+    var code = '';
+    if (typeof err === 'string') code = err;
+    else if (err.error) code = String(err.error);
+    else if (err.code) code = String(err.code);
+    else if (err.message) code = String(err.message);
+
+    var upper = code.toUpperCase();
+
+    if (upper.indexOf('BANNER_NOT_FOUND') !== -1 || upper.indexOf('NO_FILL') !== -1) {
+      return 'Реклама временно недоступна. Попробуйте позже.';
+    }
+    if (upper.indexOf('TIMEOUT') !== -1) {
+      return 'Не удалось загрузить рекламу. Проверьте соединение и попробуйте снова.';
+    }
+    if (upper.indexOf('ADSGRAM_NOT_READY') !== -1) {
+      return 'Реклама ещё не готова. Попробуйте через пару секунд.';
+    }
+    if (upper.indexOf('SKIP') !== -1 || upper.indexOf('DISMISS') !== -1 || upper.indexOf('CLOSE') !== -1) {
+      return 'Вы пропустили рекламу. Награда не начислена.';
+    }
+    return 'Вы пропустили рекламу или произошла ошибка. Попробуйте ещё раз!';
+  }
+
   els.adBtn.addEventListener('click', function () {
     if (adBusy) return;
+
     els.adBtn.disabled = true;
     els.adBtn.textContent = 'Загрузка видео...';
+    els.adBtn.classList.remove('success', 'error');
 
-    showRewardedAd(
+    showAdsgramRewarded(
       function () {
+        /* === УСПЕХ: пользователь досмотрел видео до конца === */
         state.coins += AD_REWARD;
         state.totalEarned += AD_REWARD;
         save();
         render();
+
         els.adBtn.classList.add('success');
         els.adBtn.textContent = '✅ +5000 🪙 получено!';
         haptic('success');
+        showToast('📺 Реклама просмотрена! +' + formatBig(AD_REWARD) + ' 🪙', 2600);
+
         window.setTimeout(function () {
           els.adBtn.classList.remove('success');
           els.adBtn.textContent = AD_DEFAULT_TEXT;
           els.adBtn.disabled = false;
         }, 1400);
       },
-      function () {
-        els.adBtn.textContent = AD_DEFAULT_TEXT;
-        els.adBtn.disabled = false;
-        showAdError();
+      function (err) {
+        /* === ОТКАЗ: награда НЕ начисляется === */
+        els.adBtn.classList.add('error');
+        els.adBtn.textContent = '❌ Реклама не просмотрена';
+        showAdError(detectAdErrorReason(err));
+
+        window.setTimeout(function () {
+          els.adBtn.classList.remove('error');
+          els.adBtn.textContent = AD_DEFAULT_TEXT;
+          els.adBtn.disabled = false;
+        }, 1600);
       }
     );
   });
@@ -2564,15 +2604,16 @@
       return;
     }
 
-    showRewardedAd(
+    showAdsgramRewarded(
       function () {
+        /* Награда только после успешного просмотра */
         if (state.activeContract && state.activeContract.id === contractId) {
           state.activeContract.endsAt = Date.now();
           finalizeContract(contractId);
         }
       },
-      function () {
-        showAdError();
+      function (err) {
+        showAdError(detectAdErrorReason(err));
       }
     );
   }
@@ -2767,15 +2808,14 @@
   document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
   /* ============================================================
-     YANDEX BANNER
+     YANDEX BANNER (декоративный)
      ============================================================ */
 
   function initBanner() {
     if (typeof window.YandexAds === 'undefined') return;
     try {
       window.YandexAds.init({
-        bannerBlockId: YANDEX_BANNER_ID,
-        rewardedBlockId: YANDEX_REWARDED_ID,
+        bannerBlockId: 'R-M-DEMO-sticky-client',
         options: { bannerAtTop: false }
       });
       window.YandexAds.loadBanner();
@@ -2792,18 +2832,21 @@
   load();
   ensureQuestDate();
   applyRankTheme();
-  initRewardedListeners();
   render();
   save();
 
   function boot() {
+    initAdsgram();
     initBanner();
   }
 
   if (document.readyState === 'complete') boot();
   else window.addEventListener('load', boot);
 
-  window.setTimeout(boot, 1200);
+  /* Страховка: если SDK загрузился с задержкой — пробуем ещё раз */
+  window.setTimeout(function () {
+    if (!AdController) boot();
+  }, 1500);
 
 })();
 </script>
