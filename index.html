@@ -126,11 +126,19 @@
     filter:drop-shadow(0 0 9px rgba(255,201,71,.9));
   }
 
+  .income-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:7px;
+  }
+
   .income{
     display:inline-flex;
     align-items:center;
     gap:6px;
-    margin-top:7px;
     padding:4px 14px;
     border-radius:999px;
     font-size:12.5px;
@@ -144,11 +152,33 @@
     font-variant-numeric:tabular-nums;
   }
 
+  .prestige-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:4px 12px;
+    border-radius:999px;
+    font-size:11.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    color:#ff9de2;
+    background:rgba(255,100,200,.08);
+    border:1px solid rgba(255,100,200,.35);
+    text-shadow:0 0 10px rgba(255,100,200,.7);
+    box-shadow:0 0 14px rgba(255,100,200,.18);
+    font-variant-numeric:tabular-nums;
+    display:none;
+  }
+
+  .prestige-badge.visible{
+    display:inline-flex;
+  }
+
   /* ================= CORE ================= */
 
   .core-area{
     flex:1 1 auto;
-    min-height:240px;
+    min-height:236px;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -161,7 +191,7 @@
     position:relative;
     display:grid;
     place-items:center;
-    width:min(60vw, 220px);
+    width:min(60vw, 214px);
     aspect-ratio:1 / 1;
     flex:0 0 auto;
   }
@@ -259,7 +289,7 @@
   }
 
   .core-symbol{
-    font-size:clamp(32px, 11vw, 52px);
+    font-size:clamp(30px, 11vw, 50px);
     line-height:1;
     color:#f2feff;
     text-shadow:
@@ -286,7 +316,7 @@
   }
 
   .core-hint{
-    margin-top:18px;
+    margin-top:16px;
     font-size:10px;
     letter-spacing:.32em;
     text-transform:uppercase;
@@ -327,7 +357,7 @@
     display:flex;
     flex-direction:column;
     gap:9px;
-    padding-bottom:6px;
+    padding-bottom:4px;
   }
 
   .ad-btn{
@@ -366,6 +396,7 @@
     display:flex;
     flex-direction:column;
     gap:8px;
+    margin-top:2px;
   }
 
   .shop-title{
@@ -420,16 +451,21 @@
     box-shadow:0 0 16px rgba(125,255,176,.22), inset 0 0 20px rgba(125,255,176,.06);
   }
 
-  .upgrade.stars-upgrade.affordable{
-    border-color:rgba(255,209,102,.75);
-    box-shadow:
-      0 0 20px rgba(255,209,102,.32),
-      inset 0 0 22px rgba(255,209,102,.08);
+  .upgrade.hidden{
+    display:none;
   }
 
-  .upgrade.stars-upgrade .up-price{
-    color:#ffd166;
-    text-shadow:0 0 10px rgba(255,209,102,.6);
+  .upgrade.premium-upgrade.affordable{
+    border-color:rgba(0,240,255,.75);
+    background:linear-gradient(135deg, rgba(0,240,255,.18), rgba(140,0,255,.24));
+    box-shadow:
+      0 0 22px rgba(0,240,255,.4),
+      inset 0 0 24px rgba(0,240,255,.08);
+  }
+
+  .upgrade.premium-upgrade .up-price{
+    color:#00f0ff;
+    text-shadow:0 0 12px rgba(0,240,255,.85);
   }
 
   .upgrade.daily-upgrade.affordable{
@@ -455,10 +491,6 @@
     border-color:rgba(0,240,255,.4);
   }
 
-  .upgrade.referral-upgrade:active{
-    transform:scale(.98);
-  }
-
   .up-icon{
     flex:0 0 auto;
     width:38px;
@@ -479,10 +511,10 @@
     box-shadow:0 0 13px rgba(255,0,224,.28);
   }
 
-  .up-icon.stars{
-    background:radial-gradient(circle at 30% 28%, rgba(255,209,102,.5), rgba(255,209,102,.06));
-    border-color:rgba(255,209,102,.5);
-    box-shadow:0 0 13px rgba(255,209,102,.4);
+  .up-icon.premium{
+    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.48), rgba(0,240,255,.06));
+    border-color:rgba(0,240,255,.55);
+    box-shadow:0 0 13px rgba(0,240,255,.42);
   }
 
   .up-icon.daily{
@@ -571,14 +603,253 @@
     animation:shakeX .3s ease;
   }
 
-  .footer-note{
+  /* ================= QUESTS ================= */
+
+  .quest-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    padding:12px 14px;
+    border-radius:17px;
+    border:1px solid rgba(0,240,255,.18);
+    background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .quest-card.done{
+    border-color:rgba(125,255,176,.55);
+    box-shadow:0 0 18px rgba(125,255,176,.22), inset 0 0 22px rgba(125,255,176,.05);
+  }
+
+  .quest-icon{
     flex:0 0 auto;
-    text-align:center;
-    font-size:9.5px;
-    letter-spacing:.18em;
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    font-size:17px;
+    line-height:1;
+    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.38), rgba(0,240,255,.05));
+    border:1px solid rgba(0,240,255,.38);
+    box-shadow:0 0 13px rgba(0,240,255,.28);
+  }
+
+  .quest-icon.violet{
+    background:radial-gradient(circle at 30% 28%, rgba(140,0,255,.42), rgba(140,0,255,.06));
+    border-color:rgba(140,0,255,.45);
+    box-shadow:0 0 13px rgba(140,0,255,.35);
+  }
+
+  .quest-left{
+    flex:1 1 auto;
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .quest-info{
+    flex:1 1 auto;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .quest-name{
+    font-size:13px;
+    font-weight:800;
+    color:#ffffff;
+    letter-spacing:.01em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .quest-progress-bar{
+    width:100%;
+    height:6px;
+    border-radius:999px;
+    background:rgba(0,240,255,.1);
+    overflow:hidden;
+    position:relative;
+  }
+
+  .quest-progress-fill{
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(90deg, #00f0ff, #ff00e0);
+    box-shadow:0 0 12px rgba(0,240,255,.65);
+    transition:width .35s ease;
+  }
+
+  .quest-card.done .quest-progress-fill{
+    background:linear-gradient(90deg, #7dffb0, #00f0ff);
+    box-shadow:0 0 12px rgba(125,255,176,.7);
+  }
+
+  .quest-progress-text{
+    font-size:10.5px;
+    font-weight:800;
+    color:#8ab4d8;
+    letter-spacing:.08em;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .quest-claim{
+    flex:0 0 auto;
+    padding:9px 12px;
+    border-radius:12px;
+    border:1px solid rgba(125,255,176,.4);
+    background:linear-gradient(135deg, rgba(125,255,176,.22), rgba(0,240,255,.18));
+    color:#ffffff;
+    font-family:inherit;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.04em;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    text-shadow:0 0 10px rgba(125,255,176,.7);
+    box-shadow:0 0 14px rgba(125,255,176,.25);
+    transition:transform .08s ease, opacity .2s ease;
+    white-space:nowrap;
+  }
+
+  .quest-claim:active{
+    transform:scale(.95);
+  }
+
+  .quest-claim:disabled{
+    opacity:.32;
+    cursor:not-allowed;
+    box-shadow:none;
+    border-color:rgba(125,255,176,.15);
+  }
+
+  .quest-claim.claimed{
+    background:linear-gradient(135deg, rgba(80,110,90,.35), rgba(60,90,120,.3));
+    border-color:rgba(140,180,160,.35);
+    color:#9ed4b5;
+    text-shadow:none;
+    box-shadow:none;
+    cursor:default;
+  }
+
+  /* ================= ACHIEVEMENTS ================= */
+
+  .achievement{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    padding:12px 14px;
+    border-radius:17px;
+    border:1px solid rgba(0,240,255,.14);
+    background:linear-gradient(135deg, rgba(22,32,52,.92), rgba(12,16,28,.92));
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .achievement.unlocked{
+    border-color:rgba(255,209,102,.65);
+    box-shadow:0 0 18px rgba(255,209,102,.28), inset 0 0 20px rgba(255,209,102,.06);
+  }
+
+  .ach-icon{
+    flex:0 0 auto;
+    width:38px;
+    height:38px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    font-size:17px;
+    line-height:1;
+    background:radial-gradient(circle at 30% 28%, rgba(120,130,150,.35), rgba(120,130,150,.05));
+    border:1px solid rgba(120,130,150,.35);
+    box-shadow:0 0 10px rgba(120,130,150,.2);
+    filter:grayscale(.75);
+    transition:filter .25s ease, box-shadow .25s ease;
+  }
+
+  .achievement.unlocked .ach-icon{
+    filter:grayscale(0);
+    background:radial-gradient(circle at 30% 28%, rgba(255,209,102,.5), rgba(255,209,102,.06));
+    border-color:rgba(255,209,102,.55);
+    box-shadow:0 0 15px rgba(255,209,102,.5);
+  }
+
+  .ach-info{
+    flex:1 1 auto;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+
+  .ach-name{
+    font-size:13.5px;
+    font-weight:800;
+    color:#ffffff;
+    letter-spacing:.01em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .ach-desc{
+    font-size:11px;
+    color:#6f8dab;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .ach-status{
+    flex:0 0 auto;
+    font-size:16px;
+    line-height:1;
+    color:#4c6b8a;
+    transition:color .25s ease, text-shadow .25s ease;
+  }
+
+  .achievement.unlocked .ach-status{
+    color:#ffd166;
+    text-shadow:0 0 14px rgba(255,209,102,.9);
+  }
+
+  .ach-progress{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.08em;
+    color:#8ab4d8;
+    font-variant-numeric:tabular-nums;
+    margin-top:1px;
+  }
+
+  /* ================= YANDEX PLACEHOLDER ================= */
+
+  #yandex_rtb_placeholder{
+    width:100%;
+    height:50px;
+    flex:0 0 auto;
+    margin-top:6px;
+    border-radius:12px;
+    border:1px dashed rgba(0,240,255,.14);
+    background:rgba(0,240,255,.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    letter-spacing:.24em;
     text-transform:uppercase;
-    color:#33465c;
-    padding-bottom:2px;
+    color:#2a3b50;
+    text-indent:.24em;
   }
 
   /* ================= TOAST ================= */
@@ -612,14 +883,14 @@
     opacity:1;
   }
 
-  /* ================= PAYMENT MODAL ================= */
+  /* ================= PREMIUM MODAL ================= */
 
   .modal-overlay{
     position:fixed;
     inset:0;
-    background:rgba(2,4,10,.86);
-    -webkit-backdrop-filter:blur(10px);
-    backdrop-filter:blur(10px);
+    background:rgba(2,4,10,.88);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
     display:none;
     align-items:center;
     justify-content:center;
@@ -633,25 +904,48 @@
 
   .modal{
     width:100%;
-    max-width:320px;
-    padding:30px 22px 26px;
+    max-width:340px;
+    padding:32px 24px 28px;
     border-radius:22px;
     background:linear-gradient(150deg, rgba(22,32,52,.98), rgba(12,16,28,.98));
-    border:1px solid rgba(255,209,102,.5);
+    border:1px solid rgba(0,240,255,.55);
     box-shadow:
-      0 0 60px rgba(255,209,102,.4),
-      0 0 130px rgba(140,0,255,.3),
-      inset 0 0 32px rgba(255,209,102,.06);
+      0 0 60px rgba(0,240,255,.5),
+      0 0 140px rgba(140,0,255,.35),
+      inset 0 0 36px rgba(0,240,255,.06);
     text-align:center;
     animation:modalIn .35s cubic-bezier(.2,1.2,.4,1);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .modal::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #00f0ff, #ff00e0, transparent);
+    box-shadow:0 0 22px rgba(0,240,255,.9);
+    animation:scanLine 2.4s linear infinite;
+  }
+
+  @keyframes scanLine{
+    0%{ transform:translateX(-100%); opacity:0; }
+    25%{ opacity:1; }
+    100%{ transform:translateX(100%); opacity:0; }
   }
 
   .modal.success{
-    border-color:rgba(125,255,176,.65);
+    border-color:rgba(125,255,176,.75);
     box-shadow:
-      0 0 60px rgba(125,255,176,.5),
-      0 0 130px rgba(0,240,255,.28),
-      inset 0 0 32px rgba(125,255,176,.08);
+      0 0 60px rgba(125,255,176,.55),
+      0 0 140px rgba(0,240,255,.32),
+      inset 0 0 36px rgba(125,255,176,.08);
+  }
+
+  .modal.success::before{
+    background:linear-gradient(90deg, transparent, #7dffb0, #00f0ff, transparent);
+    box-shadow:0 0 22px rgba(125,255,176,.95);
   }
 
   @keyframes modalIn{
@@ -660,16 +954,16 @@
   }
 
   .modal-icon{
-    font-size:52px;
+    font-size:56px;
     line-height:1;
-    margin-bottom:14px;
-    filter:drop-shadow(0 0 18px rgba(255,209,102,.95));
+    margin-bottom:16px;
+    filter:drop-shadow(0 0 20px rgba(0,240,255,.95));
     animation:modalIconPulse 1.4s ease-in-out infinite;
   }
 
   @keyframes modalIconPulse{
-    0%, 100%{ transform:scale(1); }
-    50%{ transform:scale(1.12); }
+    0%, 100%{ transform:scale(1) rotate(0deg); }
+    50%{ transform:scale(1.1) rotate(-4deg); }
   }
 
   .modal.success .modal-icon{
@@ -678,12 +972,13 @@
   }
 
   .modal-title{
-    font-size:17px;
+    font-size:16px;
     font-weight:800;
     color:#ffffff;
-    letter-spacing:.04em;
-    margin-bottom:8px;
-    text-shadow:0 0 14px rgba(255,209,102,.75);
+    letter-spacing:.06em;
+    margin-bottom:10px;
+    text-transform:uppercase;
+    text-shadow:0 0 14px rgba(0,240,255,.75);
   }
 
   .modal.success .modal-title{
@@ -691,18 +986,19 @@
   }
 
   .modal-text{
-    font-size:13px;
+    font-size:12.5px;
     color:#98b4d0;
-    margin-bottom:20px;
-    line-height:1.4;
+    margin-bottom:22px;
+    line-height:1.5;
   }
 
   .modal-spinner{
-    width:42px;
-    height:42px;
+    width:44px;
+    height:44px;
     margin:0 auto;
-    border:3px solid rgba(255,209,102,.18);
-    border-top-color:#ffd166;
+    border:3px solid rgba(0,240,255,.18);
+    border-top-color:#00f0ff;
+    border-right-color:#ff00e0;
     border-radius:50%;
     animation:modalSpin .9s linear infinite;
   }
@@ -715,6 +1011,31 @@
     to{ transform:rotate(360deg); }
   }
 
+  .modal-progress{
+    width:100%;
+    height:4px;
+    border-radius:999px;
+    background:rgba(0,240,255,.12);
+    overflow:hidden;
+    margin-top:16px;
+    position:relative;
+  }
+
+  .modal-progress-fill{
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(90deg, #00f0ff, #ff00e0);
+    box-shadow:0 0 14px rgba(0,240,255,.85);
+    transition:width 2s linear;
+  }
+
+  .modal.success .modal-progress{
+    display:none;
+  }
 </style>
 </head>
 <body>
@@ -727,7 +1048,10 @@
       <span class="coin">🪙</span>
       <span id="coins">0</span>
     </div>
-    <div class="income">⚡ <span id="ips">0</span> / сек</div>
+    <div class="income-row">
+      <div class="income">⚡ <span id="ips">0</span> / сек</div>
+      <div class="prestige-badge" id="prestigeBadge">♻ Престиж <span id="prestigeBadgeLevel">0</span></div>
+    </div>
   </header>
 
   <main class="core-area">
@@ -749,6 +1073,7 @@
 
     <button id="adBtn" class="ad-btn" type="button">Смотреть рекламу (+5000 🪙)</button>
 
+    <!-- ========== УЛУЧШЕНИЯ ========== -->
     <div class="shop">
       <div class="shop-title">Улучшения</div>
 
@@ -776,19 +1101,20 @@
         </div>
       </button>
 
-      <button id="buyStars" class="upgrade stars-upgrade" type="button">
-        <div class="up-icon stars">⭐</div>
+      <button id="buyPremium" class="upgrade premium-upgrade" type="button">
+        <div class="up-icon premium">💎</div>
         <div class="up-left">
-          <div class="up-name">x10 к клику навсегда</div>
-          <div class="up-desc">Одноразовая покупка</div>
+          <div class="up-name">Премиум-Хакер аккаунт</div>
+          <div class="up-desc">×10 к силе клика навсегда</div>
         </div>
         <div class="up-right">
-          <div class="up-level">Telegram Stars</div>
-          <div class="up-price" id="starsPrice">50 ⭐</div>
+          <div class="up-level">Одноразово</div>
+          <div class="up-price" id="premiumPrice">Активировать</div>
         </div>
       </button>
     </div>
 
+    <!-- ========== ЕЖЕДНЕВНЫЙ БОНУС / РЕФЕРАЛ / ПРЕСТИЖ ========== -->
     <div class="shop">
       <div class="shop-title">Бонусы и престиж</div>
 
@@ -807,7 +1133,7 @@
         <div class="up-icon referral">👥</div>
         <div class="up-left">
           <div class="up-name">Пригласить друга</div>
-          <div class="up-desc">+50,000 монет вам и другу</div>
+          <div class="up-desc">Скопировать ссылку на игру</div>
         </div>
         <div class="up-right">
           <div class="up-level">Ссылка</div>
@@ -827,22 +1153,86 @@
       </button>
     </div>
 
-  </section>
+    <!-- ========== ЕЖЕДНЕВНЫЕ КВЕСТЫ ========== -->
+    <div class="shop">
+      <div class="shop-title">Задания на сегодня</div>
 
-  <div class="footer-note">Автосохранение активно</div>
+      <div class="quest-card" id="questClickCard">
+        <div class="quest-left">
+          <div class="quest-icon">👆</div>
+          <div class="quest-info">
+            <div class="quest-name">Сделать 200 кликов по ядру</div>
+            <div class="quest-progress-bar">
+              <div class="quest-progress-fill" id="questClickFill"></div>
+            </div>
+            <div class="quest-progress-text" id="questClickText">0 / 200</div>
+          </div>
+        </div>
+        <button class="quest-claim" id="questClickClaim" disabled>Забрать</button>
+      </div>
+
+      <div class="quest-card" id="questAdCard">
+        <div class="quest-left">
+          <div class="quest-icon violet">📺</div>
+          <div class="quest-info">
+            <div class="quest-name">Посмотреть 2 видео-рекламы</div>
+            <div class="quest-progress-bar">
+              <div class="quest-progress-fill" id="questAdFill"></div>
+            </div>
+            <div class="quest-progress-text" id="questAdText">0 / 2</div>
+          </div>
+        </div>
+        <button class="quest-claim" id="questAdClaim" disabled>Забрать</button>
+      </div>
+    </div>
+
+    <!-- ========== ДОСТИЖЕНИЯ ========== -->
+    <div class="shop">
+      <div class="shop-title">Достижения</div>
+
+      <div class="achievement" id="achMillionaire">
+        <div class="ach-icon">💰</div>
+        <div class="ach-info">
+          <div class="ach-name">Первый миллион</div>
+          <div class="ach-desc">Накопить 1,000,000 монет за всё время</div>
+          <div class="ach-progress" id="achMillionaireProgress">0 / 1,000,000</div>
+        </div>
+        <div class="ach-status" id="achMillionaireStatus">🔒</div>
+      </div>
+
+      <div class="achievement" id="achClickMaster">
+        <div class="ach-icon">⚡</div>
+        <div class="ach-info">
+          <div class="ach-name">Клик-Мастер</div>
+          <div class="ach-desc">Сделать 1,000 кликов всего</div>
+          <div class="ach-progress" id="achClickMasterProgress">0 / 1,000</div>
+        </div>
+        <div class="ach-status" id="achClickMasterStatus">🔒</div>
+      </div>
+    </div>
+
+    <div class="footer-note" id="footerNote">Автосохранение активно</div>
+
+    <!-- ========== МЕСТО ПОД ЯНДЕКС РСЯ ========== -->
+    <div id="yandex_rtb_placeholder">Реклама</div>
+
+  </section>
 
 </div>
 
 <!-- Toast уведомление -->
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<!-- Модальное окно оплаты Telegram Stars -->
-<div id="paymentModal" class="modal-overlay">
-  <div class="modal" id="paymentModalBox">
-    <div class="modal-icon" id="paymentIcon">⭐</div>
-    <div class="modal-title" id="paymentTitle">Оплата через Telegram Stars</div>
-    <div class="modal-text" id="paymentText">Обработка платежа 50 ⭐...</div>
-    <div class="modal-spinner" id="paymentSpinner"></div>
+<!-- Модальное окно Премиум-Хакер -->
+<div id="premiumModal" class="modal-overlay">
+  <div class="modal" id="premiumModalBox">
+    <div class="modal-icon" id="premiumIcon">💎</div>
+    <div class="modal-title" id="premiumTitle">Защищённый шлюз</div>
+    <div class="modal-text" id="premiumText">Инициализация защищенного шлюза оплаты картой...</div>
+    <div class="modal-spinner" id="premiumSpinner"></div>
+    <div class="modal-progress" id="premiumProgressWrap">
+      <div class="modal-progress-fill" id="premiumProgressFill"></div>
+    </div>
   </div>
 </div>
 
@@ -854,8 +1244,7 @@
      КОНСТАНТЫ
      ============================================================ */
 
-  var SAVE_KEY = 'cyber_quantum_tap_save_v1';
-  var REF_KEY = 'cyber_quantum_tap_ref_code_v1';
+  var SAVE_KEY = 'cyber_quantum_tap_save_v2';
 
   var AD_REWARD = 5000;
   var SAVE_INTERVAL = 3000;
@@ -868,10 +1257,18 @@
   var AD_BLOCK_ID = '52992';
 
   var PRESTIGE_COST = 1000000;
-  var STARS_COST = 50;
-  var STARS_CLICK_MULTIPLIER = 10;
+  var PREMIUM_CLICK_MULTIPLIER = 10;
 
   var DAILY_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
+  var QUEST_CLICK_GOAL = 200;
+  var QUEST_AD_GOAL = 2;
+  var QUEST_REWARD = 20000;
+
+  var ACH_MILLIONAIRE_GOAL = 1000000;
+  var ACH_CLICKMASTER_GOAL = 1000;
+  var ACH_MINER_BONUS = 0.15;
+
   var REFERRAL_REWARD = 50000;
 
   /* ============================================================
@@ -883,10 +1280,18 @@
     clickLevel: 0,
     minerLevel: 0,
     totalEarned: 0,
+    totalClicks: 0,
     prestigeLevel: 0,
-    starsOwned: false,
+    premiumOwned: false,
     dailyStreak: 0,
-    lastDailyClaim: 0
+    lastDailyClaim: 0,
+    questDate: '',
+    questClicks: 0,
+    questAds: 0,
+    questClicksClaimed: false,
+    questAdsClaimed: false,
+    achMillionaire: false,
+    achClickMaster: false
   };
 
   /* ============================================================
@@ -899,32 +1304,63 @@
     clickPower: document.getElementById('clickPower'),
     core: document.getElementById('core'),
     adBtn: document.getElementById('adBtn'),
+
     buyClick: document.getElementById('buyClick'),
     buyMiner: document.getElementById('buyMiner'),
-    buyStars: document.getElementById('buyStars'),
-    starsPrice: document.getElementById('starsPrice'),
+    buyPremium: document.getElementById('buyPremium'),
+    premiumPrice: document.getElementById('premiumPrice'),
+
     dailyBtn: document.getElementById('dailyBtn'),
     dailyDesc: document.getElementById('dailyDesc'),
     dailyStatus: document.getElementById('dailyStatus'),
+
     referralBtn: document.getElementById('referralBtn'),
+
     prestigeBtn: document.getElementById('prestigeBtn'),
     prestigeLevel: document.getElementById('prestigeLevel'),
     prestigeCost: document.getElementById('prestigeCost'),
+    prestigeBadge: document.getElementById('prestigeBadge'),
+    prestigeBadgeLevel: document.getElementById('prestigeBadgeLevel'),
+
     clickLevel: document.getElementById('clickLevel'),
     clickCost: document.getElementById('clickCost'),
     minerLevel: document.getElementById('minerLevel'),
     minerCost: document.getElementById('minerCost'),
+
+    questClickCard: document.getElementById('questClickCard'),
+    questClickFill: document.getElementById('questClickFill'),
+    questClickText: document.getElementById('questClickText'),
+    questClickClaim: document.getElementById('questClickClaim'),
+
+    questAdCard: document.getElementById('questAdCard'),
+    questAdFill: document.getElementById('questAdFill'),
+    questAdText: document.getElementById('questAdText'),
+    questAdClaim: document.getElementById('questAdClaim'),
+
+    achMillionaire: document.getElementById('achMillionaire'),
+    achMillionaireProgress: document.getElementById('achMillionaireProgress'),
+    achMillionaireStatus: document.getElementById('achMillionaireStatus'),
+
+    achClickMaster: document.getElementById('achClickMaster'),
+    achClickMasterProgress: document.getElementById('achClickMasterProgress'),
+    achClickMasterStatus: document.getElementById('achClickMasterStatus'),
+
+    footerNote: document.getElementById('footerNote'),
+
     toast: document.getElementById('toast'),
-    paymentModal: document.getElementById('paymentModal'),
-    paymentModalBox: document.getElementById('paymentModalBox'),
-    paymentIcon: document.getElementById('paymentIcon'),
-    paymentTitle: document.getElementById('paymentTitle'),
-    paymentText: document.getElementById('paymentText'),
-    paymentSpinner: document.getElementById('paymentSpinner')
+
+    premiumModal: document.getElementById('premiumModal'),
+    premiumModalBox: document.getElementById('premiumModalBox'),
+    premiumIcon: document.getElementById('premiumIcon'),
+    premiumTitle: document.getElementById('premiumTitle'),
+    premiumText: document.getElementById('premiumText'),
+    premiumSpinner: document.getElementById('premiumSpinner'),
+    premiumProgressWrap: document.getElementById('premiumProgressWrap'),
+    premiumProgressFill: document.getElementById('premiumProgressFill')
   };
 
   /* ============================================================
-     ФОРМАТИРОВАНИЕ ЧИСЕЛ
+     УТИЛИТЫ
      ============================================================ */
 
   var UNITS = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp'];
@@ -968,6 +1404,27 @@
     return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
   }
 
+  function todayStr() {
+    var d = new Date();
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+  }
+
+  /* ============================================================
+     ВИБРООТКЛИК
+     ============================================================ */
+
+  function haptic(type) {
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate(type === 'success' ? 24 : (type === 'error' ? 40 : 10));
+      }
+    } catch (e) {
+      /* игнорируем */
+    }
+  }
+
   /* ============================================================
      ПРОИЗВОДНЫЕ ВЕЛИЧИНЫ
      ============================================================ */
@@ -976,19 +1433,30 @@
     return 1 + state.prestigeLevel;
   }
 
-  function getClickMultiplierFromStars() {
-    return state.starsOwned ? STARS_CLICK_MULTIPLIER : 1;
+  function getPremiumMultiplier() {
+    return state.premiumOwned ? PREMIUM_CLICK_MULTIPLIER : 1;
+  }
+
+  function getUnlockedAchievementsCount() {
+    var count = 0;
+    if (state.achMillionaire) count++;
+    if (state.achClickMaster) count++;
+    return count;
+  }
+
+  function getMinerAchievementBonus() {
+    return 1 + ACH_MINER_BONUS * getUnlockedAchievementsCount();
   }
 
   function getClickPower() {
     var base = 1 + state.clickLevel;
-    var total = base * getClickMultiplierFromStars() * getPrestigeMultiplier();
-    return Math.floor(total);
+    var total = base * getPremiumMultiplier() * getPrestigeMultiplier();
+    return Math.max(1, Math.floor(total));
   }
 
   function getIncomePerSecond() {
-    var total = state.minerLevel * getPrestigeMultiplier();
-    return Math.floor(total);
+    var total = state.minerLevel * getPrestigeMultiplier() * getMinerAchievementBonus();
+    return Math.max(0, Math.floor(total));
   }
 
   function getClickCost() {
@@ -1010,6 +1478,22 @@
   function isDailyClaimable() {
     if (!state.lastDailyClaim) return true;
     return (Date.now() - state.lastDailyClaim) >= DAILY_COOLDOWN_MS;
+  }
+
+  /* ============================================================
+     ЕЖЕДНЕВНЫЕ КВЕСТЫ — СБРОС ПО ДАТЕ
+     ============================================================ */
+
+  function ensureQuestDate() {
+    var today = todayStr();
+    if (state.questDate !== today) {
+      state.questDate = today;
+      state.questClicks = 0;
+      state.questAds = 0;
+      state.questClicksClaimed = false;
+      state.questAdsClaimed = false;
+      save();
+    }
   }
 
   /* ============================================================
@@ -1039,24 +1523,27 @@
       els.buyMiner.classList.remove('affordable');
     }
 
-    renderStars();
+    if (state.prestigeLevel > 0) {
+      els.prestigeBadge.classList.add('visible');
+      els.prestigeBadgeLevel.textContent = state.prestigeLevel;
+    } else {
+      els.prestigeBadge.classList.remove('visible');
+    }
+
+    renderPremium();
     renderPrestige();
     renderDaily();
+    renderQuests();
+    renderAchievements();
   }
 
-  function renderStars() {
-    if (state.starsOwned) {
-      els.buyStars.classList.add('purchased');
-      els.buyStars.classList.remove('affordable');
-      els.buyStars.classList.remove('locked');
-      els.buyStars.disabled = true;
-      els.starsPrice.textContent = '✅ Куплено';
+  function renderPremium() {
+    if (state.premiumOwned) {
+      els.buyPremium.classList.add('hidden');
     } else {
-      els.buyStars.classList.remove('purchased');
-      els.buyStars.classList.remove('locked');
-      els.buyStars.classList.add('affordable');
-      els.buyStars.disabled = false;
-      els.starsPrice.textContent = STARS_COST + ' ⭐';
+      els.buyPremium.classList.remove('hidden');
+      els.buyPremium.classList.add('affordable');
+      els.premiumPrice.textContent = 'Активировать';
     }
   }
 
@@ -1091,6 +1578,112 @@
     }
   }
 
+  function renderQuests() {
+    /* Клики */
+    var clickProgress = Math.min(state.questClicks, QUEST_CLICK_GOAL);
+    var clickPercent = (clickProgress / QUEST_CLICK_GOAL) * 100;
+    els.questClickFill.style.width = clickPercent + '%';
+    els.questClickText.textContent = clickProgress + ' / ' + QUEST_CLICK_GOAL;
+
+    var clickDone = state.questClicks >= QUEST_CLICK_GOAL;
+
+    if (state.questClicksClaimed) {
+      els.questClickCard.classList.add('done');
+      els.questClickClaim.textContent = 'Получено';
+      els.questClickClaim.disabled = true;
+      els.questClickClaim.classList.add('claimed');
+      els.questClickClaim.classList.remove('quest-claim');
+      els.questClickClaim.classList.add('quest-claim');
+    } else if (clickDone) {
+      els.questClickCard.classList.add('done');
+      els.questClickClaim.textContent = 'Забрать +20K';
+      els.questClickClaim.disabled = false;
+      els.questClickClaim.classList.remove('claimed');
+    } else {
+      els.questClickCard.classList.remove('done');
+      els.questClickClaim.textContent = 'Забрать';
+      els.questClickClaim.disabled = true;
+      els.questClickClaim.classList.remove('claimed');
+    }
+
+    /* Рекламы */
+    var adProgress = Math.min(state.questAds, QUEST_AD_GOAL);
+    var adPercent = (adProgress / QUEST_AD_GOAL) * 100;
+    els.questAdFill.style.width = adPercent + '%';
+    els.questAdText.textContent = adProgress + ' / ' + QUEST_AD_GOAL;
+
+    var adDone = state.questAds >= QUEST_AD_GOAL;
+
+    if (state.questAdsClaimed) {
+      els.questAdCard.classList.add('done');
+      els.questAdClaim.textContent = 'Получено';
+      els.questAdClaim.disabled = true;
+      els.questAdClaim.classList.add('claimed');
+    } else if (adDone) {
+      els.questAdCard.classList.add('done');
+      els.questAdClaim.textContent = 'Забрать +20K';
+      els.questAdClaim.disabled = false;
+      els.questAdClaim.classList.remove('claimed');
+    } else {
+      els.questAdCard.classList.remove('done');
+      els.questAdClaim.textContent = 'Забрать';
+      els.questAdClaim.disabled = true;
+      els.questAdClaim.classList.remove('claimed');
+    }
+  }
+
+  function renderAchievements() {
+    /* Первый миллион */
+    var mProgress = Math.min(state.totalEarned, ACH_MILLIONAIRE_GOAL);
+    els.achMillionaireProgress.textContent = formatBig(mProgress) + ' / ' + formatBig(ACH_MILLIONAIRE_GOAL);
+
+    if (state.achMillionaire) {
+      els.achMillionaire.classList.add('unlocked');
+      els.achMillionaireStatus.textContent = '✅';
+    } else {
+      els.achMillionaire.classList.remove('unlocked');
+      els.achMillionaireStatus.textContent = '🔒';
+    }
+
+    /* Клик-Мастер */
+    var cProgress = Math.min(state.totalClicks, ACH_CLICKMASTER_GOAL);
+    els.achClickMasterProgress.textContent = formatBig(cProgress) + ' / ' + formatBig(ACH_CLICKMASTER_GOAL);
+
+    if (state.achClickMaster) {
+      els.achClickMaster.classList.add('unlocked');
+      els.achClickMasterStatus.textContent = '✅';
+    } else {
+      els.achClickMaster.classList.remove('unlocked');
+      els.achClickMasterStatus.textContent = '🔒';
+    }
+  }
+
+  /* ============================================================
+     ПРОВЕРКА И РАЗБЛОКИРОВКА ДОСТИЖЕНИЙ
+     ============================================================ */
+
+  function checkAchievements() {
+    var changed = false;
+
+    if (!state.achMillionaire && state.totalEarned >= ACH_MILLIONAIRE_GOAL) {
+      state.achMillionaire = true;
+      changed = true;
+      showToast('🏆 Достижение: «Первый миллион»! Автомайнинг +15% навсегда.', 3600);
+      haptic('success');
+    }
+
+    if (!state.achClickMaster && state.totalClicks >= ACH_CLICKMASTER_GOAL) {
+      state.achClickMaster = true;
+      changed = true;
+      showToast('⚡ Достижение: «Клик-Мастер»! Автомайнинг +15% навсегда.', 3600);
+      haptic('success');
+    }
+
+    if (changed) {
+      save();
+    }
+  }
+
   /* ============================================================
      СОХРАНЕНИЕ / ЗАГРУЗКА
      ============================================================ */
@@ -1102,10 +1695,18 @@
         clickLevel: state.clickLevel,
         minerLevel: state.minerLevel,
         totalEarned: state.totalEarned,
+        totalClicks: state.totalClicks,
         prestigeLevel: state.prestigeLevel,
-        starsOwned: state.starsOwned,
+        premiumOwned: state.premiumOwned,
         dailyStreak: state.dailyStreak,
-        lastDailyClaim: state.lastDailyClaim
+        lastDailyClaim: state.lastDailyClaim,
+        questDate: state.questDate,
+        questClicks: state.questClicks,
+        questAds: state.questAds,
+        questClicksClaimed: state.questClicksClaimed,
+        questAdsClaimed: state.questAdsClaimed,
+        achMillionaire: state.achMillionaire,
+        achClickMaster: state.achClickMaster
       }));
     } catch (e) {
       /* localStorage может быть недоступен — игнорируем */
@@ -1131,52 +1732,47 @@
 
     if (!data || typeof data !== 'object') return;
 
-    var coins = Number(data.coins);
-    var clickLevel = Number(data.clickLevel);
-    var minerLevel = Number(data.minerLevel);
-    var totalEarned = Number(data.totalEarned);
-    var prestigeLevel = Number(data.prestigeLevel);
-    var dailyStreak = Number(data.dailyStreak);
-    var lastDailyClaim = Number(data.lastDailyClaim);
+    function num(v, def) {
+      var n = Number(v);
+      return isFinite(n) && n >= 0 ? Math.floor(n) : (def || 0);
+    }
 
-    state.coins = isFinite(coins) && coins > 0 ? Math.floor(coins) : 0;
-    state.clickLevel = isFinite(clickLevel) && clickLevel > 0 ? Math.floor(clickLevel) : 0;
-    state.minerLevel = isFinite(minerLevel) && minerLevel > 0 ? Math.floor(minerLevel) : 0;
-    state.totalEarned = isFinite(totalEarned) && totalEarned > 0 ? Math.floor(totalEarned) : 0;
-    state.prestigeLevel = isFinite(prestigeLevel) && prestigeLevel > 0 ? Math.floor(prestigeLevel) : 0;
-    state.starsOwned = data.starsOwned === true;
-    state.dailyStreak = isFinite(dailyStreak) && dailyStreak > 0 ? Math.floor(dailyStreak) : 0;
-    state.lastDailyClaim = isFinite(lastDailyClaim) && lastDailyClaim > 0 ? Math.floor(lastDailyClaim) : 0;
+    state.coins = num(data.coins, 0);
+    state.clickLevel = num(data.clickLevel, 0);
+    state.minerLevel = num(data.minerLevel, 0);
+    state.totalEarned = num(data.totalEarned, 0);
+    state.totalClicks = num(data.totalClicks, 0);
+    state.prestigeLevel = num(data.prestigeLevel, 0);
+    state.premiumOwned = data.premiumOwned === true;
+    state.dailyStreak = num(data.dailyStreak, 0);
+    state.lastDailyClaim = num(data.lastDailyClaim, 0);
+    state.questDate = typeof data.questDate === 'string' ? data.questDate : '';
+    state.questClicks = num(data.questClicks, 0);
+    state.questAds = num(data.questAds, 0);
+    state.questClicksClaimed = data.questClicksClaimed === true;
+    state.questAdsClaimed = data.questAdsClaimed === true;
+    state.achMillionaire = data.achMillionaire === true;
+    state.achClickMaster = data.achClickMaster === true;
   }
 
   /* ============================================================
-     ВИБРООТКЛИК
+     TOAST
      ============================================================ */
 
-  function haptic(type) {
-    try {
-      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
-        var hf = window.Telegram.WebApp.HapticFeedback;
-        if (type === 'success') {
-          hf.notificationOccurred('success');
-        } else if (type === 'error') {
-          hf.notificationOccurred('error');
-        } else {
-          hf.impactOccurred('light');
-        }
-        return;
-      }
-    } catch (e) {
-      /* игнорируем */
+  var toastTimer = null;
+
+  function showToast(message, duration) {
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+
+    if (toastTimer) {
+      window.clearTimeout(toastTimer);
     }
 
-    try {
-      if (navigator.vibrate) {
-        navigator.vibrate(type === 'success' ? 24 : 10);
-      }
-    } catch (e) {
-      /* игнорируем */
-    }
+    toastTimer = window.setTimeout(function () {
+      els.toast.classList.remove('show');
+      toastTimer = null;
+    }, duration || 3200);
   }
 
   /* ============================================================
@@ -1199,26 +1795,6 @@
   }
 
   /* ============================================================
-     TOAST УВЕДОМЛЕНИЕ
-     ============================================================ */
-
-  var toastTimer = null;
-
-  function showToast(message, duration) {
-    els.toast.textContent = message;
-    els.toast.classList.add('show');
-
-    if (toastTimer) {
-      window.clearTimeout(toastTimer);
-    }
-
-    toastTimer = window.setTimeout(function () {
-      els.toast.classList.remove('show');
-      toastTimer = null;
-    }, duration || 3200);
-  }
-
-  /* ============================================================
      КЛИК ПО ЯДРУ
      ============================================================ */
 
@@ -1227,7 +1803,13 @@
 
     state.coins += gain;
     state.totalEarned += gain;
+    state.totalClicks += 1;
 
+    if (state.questClicks < QUEST_CLICK_GOAL) {
+      state.questClicks += 1;
+    }
+
+    checkAchievements();
     render();
 
     var x = event.clientX;
@@ -1309,7 +1891,7 @@
   });
 
   /* ============================================================
-     РЕКЛАМА — ADSGRAM REWARDED VIDEO
+     ADSGRAM — REWARDED VIDEO
      ============================================================ */
 
   var AD_DEFAULT_TEXT = 'Смотреть рекламу (+5000 🪙)';
@@ -1328,6 +1910,12 @@
       adController.addEventListener('onReward', function () {
         state.coins += AD_REWARD;
         state.totalEarned += AD_REWARD;
+
+        if (state.questAds < QUEST_AD_GOAL) {
+          state.questAds += 1;
+        }
+
+        checkAchievements();
         save();
         render();
         haptic('success');
@@ -1380,7 +1968,6 @@
     try {
       adController.show().catch(function (result) {
         console.warn('Adsgram show() rejected:', result);
-        /* Обработка уже происходит через события onSkip / onError */
       });
     } catch (e) {
       console.error('Ошибка показа рекламы:', e);
@@ -1395,21 +1982,21 @@
   els.adBtn.addEventListener('click', watchAd);
 
   /* ============================================================
-     РЕФЕРАЛЬНАЯ СИСТЕМА
+     РЕФЕРАЛЬНАЯ СИСТЕМА (БЕЗ TELEGRAM)
      ============================================================ */
 
   function getRefCode() {
     var code = null;
     try {
-      code = localStorage.getItem(REF_KEY);
+      code = localStorage.getItem('cq_ref_code');
     } catch (e) {
       code = null;
     }
 
     if (!code || typeof code !== 'string' || code.length < 6) {
-      code = 'ref_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+      code = 'r' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
       try {
-        localStorage.setItem(REF_KEY, code);
+        localStorage.setItem('cq_ref_code', code);
       } catch (e) {
         /* игнорируем */
       }
@@ -1419,7 +2006,8 @@
 
   function buildReferralLink() {
     var code = getRefCode();
-    return 'https://t.me/CyberQuantumTapBot?start=' + code;
+    var base = window.location.href.split('#')[0].split('?')[0];
+    return base + '?ref=' + encodeURIComponent(code);
   }
 
   function fallbackCopy(text) {
@@ -1458,16 +2046,52 @@
 
     copyToClipboard(link, function (success) {
       if (success) {
-        showToast('Ссылка скопирована! Поделитесь ей. При первом входе друга вы оба получите +50,000 монет.', 4200);
+        showToast('Ссылка скопирована! Поделитесь ей — за каждого друга вы получите +50,000 🪙.', 4200);
         haptic('success');
       } else {
-        showToast('Не удалось скопировать автоматически. Ссылка: ' + link, 5000);
+        showToast('Не удалось скопировать. Ссылка: ' + link, 5000);
         haptic('error');
       }
     });
   }
 
   els.referralBtn.addEventListener('click', handleReferral);
+
+  function applyReferralOnLoad() {
+    var params = null;
+    try {
+      params = new URLSearchParams(window.location.search);
+    } catch (e) {
+      params = null;
+    }
+    if (!params) return;
+
+    var ref = params.get('ref');
+    if (!ref || ref.length < 6) return;
+
+    var applied = null;
+    try {
+      applied = localStorage.getItem('cq_ref_applied');
+    } catch (e) {
+      applied = null;
+    }
+
+    if (applied === ref) return;
+
+    try {
+      localStorage.setItem('cq_ref_applied', ref);
+    } catch (e) {
+      /* игнорируем */
+    }
+
+    state.coins += REFERRAL_REWARD;
+    state.totalEarned += REFERRAL_REWARD;
+    save();
+
+    window.setTimeout(function () {
+      showToast('🎉 Добро пожаловать! Вам начислено +50,000 🪙 за приглашение.', 4200);
+    }, 800);
+  }
 
   /* ============================================================
      ЕЖЕДНЕВНЫЙ БОНУС
@@ -1489,6 +2113,7 @@
     state.dailyStreak = nextDay;
     state.lastDailyClaim = Date.now();
 
+    checkAchievements();
     save();
     render();
 
@@ -1518,76 +2143,122 @@
     save();
     render();
 
-    showToast('♻ Перерождение! Уровень престижа: ' + state.prestigeLevel + '. Множитель x' + getPrestigeMultiplier() + ' ко всему!', 4200);
+    showToast('♻ Перерождение! Уровень престижа: ' + state.prestigeLevel + '. Множитель ×' + getPrestigeMultiplier() + ' ко всему!', 4200);
     haptic('success');
   }
 
   els.prestigeBtn.addEventListener('click', doPrestige);
 
   /* ============================================================
-     ПОКУПКА x10 К КЛИКУ ЗА TELEGRAM STARS
+     ПРЕМИУМ-ХАКЕР АККАУНТ (СИМУЛЯЦИЯ ОПЛАТЫ КАРТОЙ)
      ============================================================ */
 
-  var starsBusy = false;
+  var premiumBusy = false;
+  var premiumTimers = [];
 
-  function showPaymentModal(mode) {
-    els.paymentModal.classList.add('show');
+  function clearPremiumTimers() {
+    for (var i = 0; i < premiumTimers.length; i++) {
+      window.clearTimeout(premiumTimers[i]);
+    }
+    premiumTimers = [];
+  }
+
+  function showPremiumModal(mode) {
+    els.premiumModal.classList.add('show');
 
     if (mode === 'loading') {
-      els.paymentModalBox.classList.remove('success');
-      els.paymentIcon.textContent = '⭐';
-      els.paymentTitle.textContent = 'Оплата через Telegram Stars';
-      els.paymentText.textContent = 'Обработка платежа ' + STARS_COST + ' ⭐...';
-      els.paymentSpinner.style.display = 'block';
+      els.premiumModalBox.classList.remove('success');
+      els.premiumIcon.textContent = '💎';
+      els.premiumTitle.textContent = 'Защищённый шлюз';
+      els.premiumText.textContent = 'Инициализация защищенного шлюза оплаты картой...';
+      els.premiumSpinner.style.display = 'block';
+      els.premiumProgressWrap.style.display = 'block';
+      els.premiumProgressFill.style.width = '0%';
+
+      /* Запуск прогресс-бара */
+      window.setTimeout(function () {
+        els.premiumProgressFill.style.width = '100%';
+      }, 60);
     } else if (mode === 'success') {
-      els.paymentModalBox.classList.add('success');
-      els.paymentIcon.textContent = '✅';
-      els.paymentTitle.textContent = 'Успешно!';
-      els.paymentText.textContent = 'Доход от клика увеличен в 10 раз навсегда!';
-      els.paymentSpinner.style.display = 'none';
+      els.premiumModalBox.classList.add('success');
+      els.premiumIcon.textContent = '🛡';
+      els.premiumTitle.textContent = 'Доступ разрешён';
+      els.premiumText.textContent = 'Премиум-Хакер аккаунт активирован! ×10 к силе клика навсегда.';
+      els.premiumSpinner.style.display = 'none';
+      els.premiumProgressWrap.style.display = 'none';
     }
   }
 
-  function hidePaymentModal() {
-    els.paymentModal.classList.remove('show');
+  function hidePremiumModal() {
+    els.premiumModal.classList.remove('show');
   }
 
-  function buyStars() {
-    if (starsBusy) return;
-    if (state.starsOwned) return;
+  function buyPremium() {
+    if (premiumBusy) return;
+    if (state.premiumOwned) return;
 
-    starsBusy = true;
-    els.buyStars.disabled = true;
+    premiumBusy = true;
+    els.buyPremium.disabled = true;
 
-    /* Интеграция с Telegram Stars — при наличии WebApp открываем счёт,
-       иначе показываем красивую заглушку-симуляцию. */
-    try {
-      if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openInvoice === 'function') {
-        /* Здесь можно было бы открыть реальный счёт, но у нас заглушка. */
-      }
-    } catch (e) {
-      /* игнорируем */
-    }
+    showPremiumModal('loading');
 
-    showPaymentModal('loading');
-
-    window.setTimeout(function () {
-      state.starsOwned = true;
+    var t1 = window.setTimeout(function () {
+      state.premiumOwned = true;
       save();
       render();
       haptic('success');
 
-      showPaymentModal('success');
+      showPremiumModal('success');
 
-      window.setTimeout(function () {
-        hidePaymentModal();
-        starsBusy = false;
-        showToast('⭐ Покупка успешна! Доход от клика увеличен в 10 раз навсегда!', 3600);
-      }, 1500);
-    }, 2000);
+      var t2 = window.setTimeout(function () {
+        hidePremiumModal();
+        premiumBusy = false;
+        showToast('💎 Премиум-Хакер аккаунт активирован! Доход от клика увеличен в 10 раз навсегда.', 4000);
+      }, 1700);
+
+      premiumTimers.push(t2);
+    }, 2200);
+
+    premiumTimers.push(t1);
   }
 
-  els.buyStars.addEventListener('click', buyStars);
+  els.buyPremium.addEventListener('click', buyPremium);
+
+  /* ============================================================
+     ЕЖЕДНЕВНЫЕ КВЕСТЫ — ЗАБРАТЬ НАГРАДУ
+     ============================================================ */
+
+  els.questClickClaim.addEventListener('click', function () {
+    if (state.questClicksClaimed) return;
+    if (state.questClicks < QUEST_CLICK_GOAL) return;
+
+    state.coins += QUEST_REWARD;
+    state.totalEarned += QUEST_REWARD;
+    state.questClicksClaimed = true;
+
+    checkAchievements();
+    save();
+    render();
+
+    showToast('👆 Квест выполнен! +' + formatBig(QUEST_REWARD) + ' монет.', 3200);
+    haptic('success');
+  });
+
+  els.questAdClaim.addEventListener('click', function () {
+    if (state.questAdsClaimed) return;
+    if (state.questAds < QUEST_AD_GOAL) return;
+
+    state.coins += QUEST_REWARD;
+    state.totalEarned += QUEST_REWARD;
+    state.questAdsClaimed = true;
+
+    checkAchievements();
+    save();
+    render();
+
+    showToast('📺 Квест выполнен! +' + formatBig(QUEST_REWARD) + ' монет.', 3200);
+    haptic('success');
+  });
 
   /* ============================================================
      ПАССИВНЫЙ ДОХОД
@@ -1598,16 +2269,20 @@
     if (income > 0) {
       state.coins += income;
       state.totalEarned += income;
+      checkAchievements();
       render();
     }
   }, 1000);
 
   /* ============================================================
-     ОБНОВЛЕНИЕ ТАЙМЕРА ЕЖЕДНЕВНОЙ НАГРАДЫ
+     ОБНОВЛЕНИЕ ТАЙМЕРА И КВЕСТОВ
      ============================================================ */
 
   window.setInterval(function () {
+    ensureQuestDate();
     renderDaily();
+    renderQuests();
+    renderAchievements();
   }, 1000);
 
   /* ============================================================
@@ -1622,6 +2297,9 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
       save();
+    } else {
+      ensureQuestDate();
+      render();
     }
   });
 
@@ -1634,10 +2312,12 @@
      ============================================================ */
 
   load();
+  ensureQuestDate();
+  applyReferralOnLoad();
   render();
   save();
 
-  /* Инициализация Adsgram после загрузки скрипта */
+  /* Инициализация Adsgram */
   if (window.Adsgram) {
     initAdsgram();
   } else {
