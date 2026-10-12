@@ -14,7 +14,7 @@
 
 <!-- ============================================================
      Заглушка YandexAds — оставлена ТОЛЬКО для декоративного
-     нижнего баннера. Rewarded video теперь идёт через Adsgram.
+     нижнего баннера. Rewarded video идёт через Adsgram.
      ============================================================ -->
 <script>
 (function(){
@@ -475,6 +475,59 @@
     to{ opacity:1; transform:translateY(0); }
   }
 
+  /* ================= SHOP SUBTABS ================= */
+
+  .shop-subtabs{
+    display:flex;
+    gap:5px;
+    padding:5px;
+    border-radius:13px;
+    background:rgba(12,16,28,.72);
+    border:1px solid rgba(0,240,255,.1);
+    margin-bottom:2px;
+  }
+
+  .shop-subtab{
+    flex:1 1 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    padding:9px 4px;
+    border-radius:9px;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:inherit;
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    cursor:pointer;
+    -webkit-appearance:none;
+    appearance:none;
+    transition:background .2s ease, color .2s ease, box-shadow .2s ease;
+    white-space:nowrap;
+  }
+
+  .shop-subtab.active{
+    background:linear-gradient(135deg, color-mix(in srgb, var(--neon) 22%, transparent), color-mix(in srgb, var(--neon2) 18%, transparent));
+    color:#ffffff;
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--neon) 30%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--neon) 12%, transparent);
+  }
+
+  .shop-pane{
+    display:none;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .shop-pane.active{
+    display:flex;
+  }
+
   /* ================= CARDS / BUTTONS ================= */
 
   .section-title{
@@ -518,6 +571,18 @@
       inset 0 0 22px color-mix(in srgb, var(--neon) 7%, transparent);
   }
 
+  .card.affordable-crystal{
+    border-color:rgba(255,0,224,.65);
+    box-shadow:
+      0 0 18px rgba(255,0,224,.28),
+      inset 0 0 22px rgba(255,0,224,.08);
+  }
+
+  .card.affordable-crystal .card-price{
+    color:#ff9de2;
+    text-shadow:0 0 12px rgba(255,0,224,.75);
+  }
+
   .card.disabled{
     opacity:.55;
     cursor:not-allowed;
@@ -528,6 +593,17 @@
     border-color:rgba(125,255,176,.55);
     box-shadow:0 0 16px rgba(125,255,176,.22), inset 0 0 20px rgba(125,255,176,.06);
     cursor:default;
+  }
+
+  .card.locked{
+    opacity:.62;
+    cursor:not-allowed;
+  }
+
+  .card.purchased{
+    cursor:default;
+    border-color:rgba(255,209,102,.55);
+    box-shadow:0 0 16px rgba(255,209,102,.22), inset 0 0 20px rgba(255,209,102,.06);
   }
 
   .card-icon{
@@ -567,6 +643,18 @@
     background:radial-gradient(circle at 30% 28%, rgba(140,0,255,.45), rgba(140,0,255,.06));
     border-color:rgba(140,0,255,.48);
     box-shadow:0 0 13px rgba(140,0,255,.35);
+  }
+
+  .card-icon.crystal{
+    background:radial-gradient(circle at 30% 28%, rgba(255,0,224,.45), rgba(140,0,255,.08));
+    border-color:rgba(255,0,224,.5);
+    box-shadow:0 0 14px rgba(255,0,224,.42);
+  }
+
+  .card-icon.city{
+    background:radial-gradient(circle at 30% 28%, rgba(0,240,255,.5), rgba(140,0,255,.08));
+    border-color:rgba(0,240,255,.55);
+    box-shadow:0 0 14px rgba(0,240,255,.4);
   }
 
   .card-left{
@@ -1336,44 +1424,205 @@
 
       <button id="adBtn" class="btn-primary" type="button">📺 Смотреть видео (+5000 🪙)</button>
 
-      <div class="section-title">Улучшения</div>
+      <div class="shop-subtabs">
+        <button class="shop-subtab active" data-subtab="coins" type="button">🪙 Монеты</button>
+        <button class="shop-subtab" data-subtab="crystals" type="button">💎 Кристаллы</button>
+        <button class="shop-subtab" data-subtab="locations" type="button">🌆 Локации</button>
+      </div>
 
-      <button id="buyClick" class="card" type="button">
-        <div class="card-icon">⚡</div>
-        <div class="card-left">
-          <div class="card-name">Сила клика</div>
-          <div class="card-desc">+1 монета за тап</div>
-        </div>
-        <div class="card-right">
-          <div class="card-label">Ур. <span id="clickLevel">0</span></div>
-          <div class="card-price"><span id="clickCost">50</span> 🪙</div>
-        </div>
-      </button>
+      <!-- ---------- COINS SUBPANE ---------- -->
+      <div class="shop-pane active" data-shop-pane="coins">
 
-      <button id="buyMiner" class="card" type="button">
-        <div class="card-icon pink">🛰</div>
-        <div class="card-left">
-          <div class="card-name">Авто-майнинг</div>
-          <div class="card-desc">+1 монета в секунду</div>
-        </div>
-        <div class="card-right">
-          <div class="card-label">Ур. <span id="minerLevel">0</span></div>
-          <div class="card-price"><span id="minerCost">100</span> 🪙</div>
-        </div>
-      </button>
+        <div class="section-title">Улучшения</div>
 
-      <div class="section-title">Ежедневный бонус</div>
+        <button id="buyClick" class="card" type="button">
+          <div class="card-icon">⚡</div>
+          <div class="card-left">
+            <div class="card-name">Сила клика</div>
+            <div class="card-desc">+1 монета за тап</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">Ур. <span id="clickLevel">0</span></div>
+            <div class="card-price"><span id="clickCost">50</span> 🪙</div>
+          </div>
+        </button>
 
-      <button id="dailyBtn" class="card" type="button">
-        <div class="card-icon gold">🎁</div>
-        <div class="card-left">
-          <div class="card-name">Награда за вход</div>
-          <div class="card-desc" id="dailyDesc">День 1 · награда</div>
+        <button id="buyMiner" class="card" type="button">
+          <div class="card-icon pink">🛰</div>
+          <div class="card-left">
+            <div class="card-name">Авто-майнинг</div>
+            <div class="card-desc">+1 монета в секунду</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">Ур. <span id="minerLevel">0</span></div>
+            <div class="card-price"><span id="minerCost">100</span> 🪙</div>
+          </div>
+        </button>
+
+        <div class="section-title">Майнинг-ферма</div>
+
+        <button id="buyGpu" class="card" type="button">
+          <div class="card-icon green">🎮</div>
+          <div class="card-left">
+            <div class="card-name">Б/У Видеокарта</div>
+            <div class="card-desc">+25 монет/сек за штуку</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">×<span id="gpuCount">0</span></div>
+            <div class="card-price">50K 🪙</div>
+          </div>
+        </button>
+
+        <button id="buyRack" class="card" type="button">
+          <div class="card-icon green">🗄</div>
+          <div class="card-left">
+            <div class="card-name">Серверная стойка</div>
+            <div class="card-desc">+150 монет/сек за штуку</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">×<span id="rackCount">0</span></div>
+            <div class="card-price">250K 🪙</div>
+          </div>
+        </button>
+
+        <button id="buyAsic" class="card" type="button">
+          <div class="card-icon violet">🧊</div>
+          <div class="card-left">
+            <div class="card-name">Квантовый ASIC</div>
+            <div class="card-desc">+1000 монет/сек за штуку</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">×<span id="asicCount">0</span></div>
+            <div class="card-price">1M 🪙</div>
+          </div>
+        </button>
+
+        <div class="section-title">Ежедневный бонус</div>
+
+        <button id="dailyBtn" class="card" type="button">
+          <div class="card-icon gold">🎁</div>
+          <div class="card-left">
+            <div class="card-name">Награда за вход</div>
+            <div class="card-desc" id="dailyDesc">День 1 · награда</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label" id="dailyStatus">Доступно</div>
+          </div>
+        </button>
+
+      </div>
+
+      <!-- ---------- CRYSTALS SUBPANE ---------- -->
+      <div class="shop-pane" data-shop-pane="crystals">
+
+        <div class="section-title">Технологии за кристаллы</div>
+
+        <button id="crystalBuyCase" class="card" type="button">
+          <div class="card-icon crystal">📦</div>
+          <div class="card-left">
+            <div class="card-name">Купить Квантовый Кейс</div>
+            <div class="card-desc">+1 кейс в инвентарь</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">20 💎</div>
+            <div class="card-price">Открыть</div>
+          </div>
+        </button>
+
+        <button id="crystalBuyDrone" class="card" type="button">
+          <div class="card-icon crystal">🛸</div>
+          <div class="card-left">
+            <div class="card-name">ИИ-Дрон Хакер</div>
+            <div class="card-desc">+500 монет/сек навсегда</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">100 💎</div>
+            <div class="card-price" id="droneStatus">Купить</div>
+          </div>
+        </button>
+
+        <button id="crystalBuyGoldSkin" class="card" type="button">
+          <div class="card-icon gold">👑</div>
+          <div class="card-left">
+            <div class="card-name">Скин: Золотой Оверлорд</div>
+            <div class="card-desc">Золотое неоновое свечение ядра</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">250 💎</div>
+            <div class="card-price" id="goldSkinStatus">Купить</div>
+          </div>
+        </button>
+
+        <button id="crystalBuyTimeWarp" class="card" type="button">
+          <div class="card-icon crystal">⏩</div>
+          <div class="card-left">
+            <div class="card-name">Тайм-Варп (Ускорение)</div>
+            <div class="card-desc">Мгновенно +1 час авто-майнинга</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label">50 💎</div>
+            <div class="card-price">Активировать</div>
+          </div>
+        </button>
+
+        <div class="section-title">Баланс</div>
+
+        <div class="card" style="cursor:default">
+          <div class="card-icon crystal">💎</div>
+          <div class="card-left">
+            <div class="card-name">Кристаллов в наличии</div>
+            <div class="card-desc">Зарабатывай в кейсах и квестах</div>
+          </div>
+          <div class="card-right">
+            <div class="card-price" id="crystalBalance">0</div>
+          </div>
         </div>
-        <div class="card-right">
-          <div class="card-label" id="dailyStatus">Доступно</div>
+
+      </div>
+
+      <!-- ---------- LOCATIONS SUBPANE ---------- -->
+      <div class="shop-pane" data-shop-pane="locations">
+
+        <div class="section-title">Серверные локации</div>
+
+        <button id="buyNeon" class="card" type="button">
+          <div class="card-icon city">🌃</div>
+          <div class="card-left">
+            <div class="card-name">Неоновый Сити</div>
+            <div class="card-desc">+50% к силе клика навсегда</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label" id="neonStatus">Не куплено</div>
+            <div class="card-price">500K 🪙</div>
+          </div>
+        </button>
+
+        <button id="buyTokyo" class="card" type="button">
+          <div class="card-icon city">🏙</div>
+          <div class="card-left">
+            <div class="card-name">Мега-Токио</div>
+            <div class="card-desc">+50% к силе клика навсегда</div>
+          </div>
+          <div class="card-right">
+            <div class="card-label" id="tokyoStatus">Не куплено</div>
+            <div class="card-price">5M 🪙</div>
+          </div>
+        </button>
+
+        <div class="section-title">Бонус локаций</div>
+
+        <div class="card" style="cursor:default">
+          <div class="card-icon city">📡</div>
+          <div class="card-left">
+            <div class="card-name">Суммарный бонус к клику</div>
+            <div class="card-desc">Захваченные локации</div>
+          </div>
+          <div class="card-right">
+            <div class="card-price" id="locationBonus">+0%</div>
+          </div>
         </div>
-      </button>
+
+      </div>
 
     </div>
 
@@ -1568,7 +1817,7 @@
      КОНСТАНТЫ
      ============================================================ */
 
-  var SAVE_KEY = 'cyber_quantum_overlord_v1';
+  var SAVE_KEY = 'cyber_quantum_overlord_v2';
 
   var AD_REWARD = 5000;
 
@@ -1577,6 +1826,27 @@
 
   var MINER_BASE_COST = 100;
   var MINER_COST_GROWTH = 1.5;
+
+  var GPU_COST = 50000;
+  var RACK_COST = 250000;
+  var ASIC_COST = 1000000;
+
+  var GPU_INCOME = 25;
+  var RACK_INCOME = 150;
+  var ASIC_INCOME = 1000;
+
+  var NEON_CITY_COST = 500000;
+  var TOKYO_COST = 5000000;
+
+  var LOCATION_CLICK_BONUS = 0.5;
+
+  var DRONE_CLICK_BONUS_COST = 100;
+  var DRONE_INCOME_BONUS = 500;
+
+  var GOLD_SKIN_COST = 250;
+  var CASE_PURCHASE_COST = 20;
+  var TIME_WARP_COST = 50;
+  var TIME_WARP_SECONDS = 3600;
 
   var PRESTIGE_COST = 1000000;
 
@@ -1605,6 +1875,13 @@
     { name: 'КВАНТОВЫЙ ЛОРД',color: '#ff0055', color2: '#ff00e0' },
     { name: 'КИБЕР-БОГ',     color: '#ffd700', color2: '#ff0055' }
   ];
+
+  var GOLD_THEME = {
+    color: '#ffd700',
+    color2: '#ffaa00',
+    glow: 'rgba(255,215,0,.55)',
+    soft: 'rgba(255,215,0,.12)'
+  };
 
   var PROMO_CODES = {
     'CYBER2026': { type: 'coins', amount: 100000, label: '100,000 монет' },
@@ -1649,10 +1926,14 @@
     questClicksClaimed: false,
     questContractClaimed: false,
     usedPromos: {},
-    clickBoostUntil: 0
+    clickBoostUntil: 0,
+    miningCards: { gpu: 0, rack: 0, asic: 0 },
+    locations: { neon: false, tokyo: false },
+    droneOwned: false,
+    goldSkinOwned: false
   };
 
-  var state = Object.assign({}, defaultState);
+  var state = JSON.parse(JSON.stringify(defaultState));
 
   /* ============================================================
      ADSGRAM — инициализация контроллера
@@ -1696,6 +1977,27 @@
     clickCost: document.getElementById('clickCost'),
     minerLevel: document.getElementById('minerLevel'),
     minerCost: document.getElementById('minerCost'),
+
+    buyGpu: document.getElementById('buyGpu'),
+    buyRack: document.getElementById('buyRack'),
+    buyAsic: document.getElementById('buyAsic'),
+    gpuCount: document.getElementById('gpuCount'),
+    rackCount: document.getElementById('rackCount'),
+    asicCount: document.getElementById('asicCount'),
+
+    crystalBuyCase: document.getElementById('crystalBuyCase'),
+    crystalBuyDrone: document.getElementById('crystalBuyDrone'),
+    crystalBuyGoldSkin: document.getElementById('crystalBuyGoldSkin'),
+    crystalBuyTimeWarp: document.getElementById('crystalBuyTimeWarp'),
+    droneStatus: document.getElementById('droneStatus'),
+    goldSkinStatus: document.getElementById('goldSkinStatus'),
+    crystalBalance: document.getElementById('crystalBalance'),
+
+    buyNeon: document.getElementById('buyNeon'),
+    buyTokyo: document.getElementById('buyTokyo'),
+    neonStatus: document.getElementById('neonStatus'),
+    tokyoStatus: document.getElementById('tokyoStatus'),
+    locationBonus: document.getElementById('locationBonus'),
 
     dailyBtn: document.getElementById('dailyBtn'),
     dailyDesc: document.getElementById('dailyDesc'),
@@ -1801,6 +2103,15 @@
     } catch (e) {}
   }
 
+  function hexToRgba(hex, alpha) {
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    var r = parseInt(h.substring(0, 2), 16);
+    var g = parseInt(h.substring(2, 4), 16);
+    var b = parseInt(h.substring(4, 6), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
   /* ============================================================
      ПРОИЗВОДНЫЕ ВЕЛИЧИНЫ
      ============================================================ */
@@ -1813,13 +2124,34 @@
     return Date.now() < state.clickBoostUntil ? BOOST_MULTIPLIER : 1;
   }
 
+  function getLocationClickMultiplier() {
+    var m = 1;
+    if (state.locations && state.locations.neon) m += LOCATION_CLICK_BONUS;
+    if (state.locations && state.locations.tokyo) m += LOCATION_CLICK_BONUS;
+    return m;
+  }
+
+  function getLocationBonusPercent() {
+    return Math.round((getLocationClickMultiplier() - 1) * 100);
+  }
+
   function getClickPower() {
     var base = 1 + state.clickLevel;
-    return Math.max(1, Math.floor(base * getPrestigeMultiplier() * getBoostMultiplier()));
+    return Math.max(1, Math.floor(base * getPrestigeMultiplier() * getBoostMultiplier() * getLocationClickMultiplier()));
+  }
+
+  function getMiningIncome() {
+    var m = state.miningCards || { gpu: 0, rack: 0, asic: 0 };
+    return (m.gpu || 0) * GPU_INCOME + (m.rack || 0) * RACK_INCOME + (m.asic || 0) * ASIC_INCOME;
+  }
+
+  function getDroneIncome() {
+    return state.droneOwned ? DRONE_INCOME_BONUS : 0;
   }
 
   function getIncomePerSecond() {
-    return Math.max(0, Math.floor(state.minerLevel * getPrestigeMultiplier()));
+    var base = state.minerLevel + getMiningIncome() + getDroneIncome();
+    return Math.max(0, Math.floor(base * getPrestigeMultiplier()));
   }
 
   function getClickCost() {
@@ -1860,21 +2192,20 @@
   }
 
   function applyRankTheme() {
+    if (state.goldSkinOwned) {
+      document.documentElement.style.setProperty('--neon', GOLD_THEME.color);
+      document.documentElement.style.setProperty('--neon2', GOLD_THEME.color2);
+      document.documentElement.style.setProperty('--neon-glow', GOLD_THEME.glow);
+      document.documentElement.style.setProperty('--neon-soft', GOLD_THEME.soft);
+      if (els.rankName) els.rankName.textContent = RANKS[getRankIndex()].name;
+      return;
+    }
     var rank = RANKS[getRankIndex()];
     document.documentElement.style.setProperty('--neon', rank.color);
     document.documentElement.style.setProperty('--neon2', rank.color2);
     document.documentElement.style.setProperty('--neon-glow', hexToRgba(rank.color, .55));
     document.documentElement.style.setProperty('--neon-soft', hexToRgba(rank.color, .12));
     if (els.rankName) els.rankName.textContent = rank.name;
-  }
-
-  function hexToRgba(hex, alpha) {
-    var h = hex.replace('#', '');
-    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
-    var r = parseInt(h.substring(0, 2), 16);
-    var g = parseInt(h.substring(2, 4), 16);
-    var b = parseInt(h.substring(4, 6), 16);
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   }
 
   /* ============================================================
@@ -1895,6 +2226,9 @@
     toggleAffordable(els.buyClick, state.coins >= getClickCost());
     toggleAffordable(els.buyMiner, state.coins >= getMinerCost());
 
+    renderMiningFarm();
+    renderCrystals();
+    renderLocations();
     renderDaily();
     renderCases();
     renderMissions();
@@ -1905,6 +2239,99 @@
   function toggleAffordable(el, isAffordable) {
     if (isAffordable) el.classList.add('affordable');
     else el.classList.remove('affordable');
+  }
+
+  function renderMiningFarm() {
+    var m = state.miningCards || { gpu: 0, rack: 0, asic: 0 };
+    els.gpuCount.textContent = m.gpu || 0;
+    els.rackCount.textContent = m.rack || 0;
+    els.asicCount.textContent = m.asic || 0;
+
+    toggleAffordable(els.buyGpu, state.coins >= GPU_COST);
+    toggleAffordable(els.buyRack, state.coins >= RACK_COST);
+    toggleAffordable(els.buyAsic, state.coins >= ASIC_COST);
+  }
+
+  function renderCrystals() {
+    els.crystalBalance.textContent = formatNumber(state.crystals);
+
+    if (state.crystals >= CASE_PURCHASE_COST) {
+      els.crystalBuyCase.classList.add('affordable-crystal');
+    } else {
+      els.crystalBuyCase.classList.remove('affordable-crystal');
+    }
+
+    if (state.droneOwned) {
+      els.crystalBuyDrone.classList.add('purchased');
+      els.crystalBuyDrone.classList.remove('affordable-crystal');
+      els.droneStatus.textContent = '✅ Куплено';
+    } else {
+      els.crystalBuyDrone.classList.remove('purchased');
+      if (state.crystals >= DRONE_CLICK_BONUS_COST) {
+        els.crystalBuyDrone.classList.add('affordable-crystal');
+      } else {
+        els.crystalBuyDrone.classList.remove('affordable-crystal');
+      }
+      els.droneStatus.textContent = 'Купить';
+    }
+
+    if (state.goldSkinOwned) {
+      els.crystalBuyGoldSkin.classList.add('purchased');
+      els.crystalBuyGoldSkin.classList.remove('affordable-crystal');
+      els.goldSkinStatus.textContent = '✅ Куплено';
+    } else {
+      els.crystalBuyGoldSkin.classList.remove('purchased');
+      if (state.crystals >= GOLD_SKIN_COST) {
+        els.crystalBuyGoldSkin.classList.add('affordable-crystal');
+      } else {
+        els.crystalBuyGoldSkin.classList.remove('affordable-crystal');
+      }
+      els.goldSkinStatus.textContent = 'Купить';
+    }
+
+    if (state.crystals >= TIME_WARP_COST) {
+      els.crystalBuyTimeWarp.classList.add('affordable-crystal');
+    } else {
+      els.crystalBuyTimeWarp.classList.remove('affordable-crystal');
+    }
+  }
+
+  function renderLocations() {
+    if (state.locations && state.locations.neon) {
+      els.buyNeon.classList.add('purchased');
+      els.buyNeon.classList.remove('affordable');
+      els.buyNeon.classList.remove('locked');
+      els.neonStatus.textContent = '✅ Захвачено';
+    } else {
+      els.buyNeon.classList.remove('purchased');
+      if (state.coins >= NEON_CITY_COST) {
+        els.buyNeon.classList.add('affordable');
+        els.buyNeon.classList.remove('locked');
+      } else {
+        els.buyNeon.classList.remove('affordable');
+        els.buyNeon.classList.add('locked');
+      }
+      els.neonStatus.textContent = 'Не куплено';
+    }
+
+    if (state.locations && state.locations.tokyo) {
+      els.buyTokyo.classList.add('purchased');
+      els.buyTokyo.classList.remove('affordable');
+      els.buyTokyo.classList.remove('locked');
+      els.tokyoStatus.textContent = '✅ Захвачено';
+    } else {
+      els.buyTokyo.classList.remove('purchased');
+      if (state.coins >= TOKYO_COST) {
+        els.buyTokyo.classList.add('affordable');
+        els.buyTokyo.classList.remove('locked');
+      } else {
+        els.buyTokyo.classList.remove('affordable');
+        els.buyTokyo.classList.add('locked');
+      }
+      els.tokyoStatus.textContent = 'Не куплено';
+    }
+
+    els.locationBonus.textContent = '+' + getLocationBonusPercent() + '%';
   }
 
   function renderDaily() {
@@ -2157,17 +2584,34 @@
     if (!data || typeof data !== 'object') return;
 
     Object.keys(defaultState).forEach(function (key) {
-      if (typeof data[key] !== 'undefined') {
-        if (typeof defaultState[key] === 'number') {
-          var n = Number(data[key]);
-          state[key] = isFinite(n) && n >= 0 ? Math.floor(n) : 0;
-        } else if (typeof defaultState[key] === 'boolean') {
-          state[key] = data[key] === true;
-        } else if (typeof defaultState[key] === 'string') {
-          state[key] = typeof data[key] === 'string' ? data[key] : '';
-        } else if (defaultState[key] === null) {
-          state[key] = data[key] || null;
-        } else if (typeof defaultState[key] === 'object') {
+      if (typeof data[key] === 'undefined') return;
+
+      if (typeof defaultState[key] === 'number') {
+        var n = Number(data[key]);
+        state[key] = isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+      } else if (typeof defaultState[key] === 'boolean') {
+        state[key] = data[key] === true;
+      } else if (typeof defaultState[key] === 'string') {
+        state[key] = typeof data[key] === 'string' ? data[key] : '';
+      } else if (defaultState[key] === null) {
+        state[key] = data[key] || null;
+      } else if (typeof defaultState[key] === 'object') {
+        if (key === 'miningCards') {
+          var mc = data.miningCards && typeof data.miningCards === 'object' ? data.miningCards : {};
+          state.miningCards = {
+            gpu: Math.max(0, Math.floor(Number(mc.gpu) || 0)),
+            rack: Math.max(0, Math.floor(Number(mc.rack) || 0)),
+            asic: Math.max(0, Math.floor(Number(mc.asic) || 0))
+          };
+        } else if (key === 'locations') {
+          var lo = data.locations && typeof data.locations === 'object' ? data.locations : {};
+          state.locations = {
+            neon: lo.neon === true,
+            tokyo: lo.tokyo === true
+          };
+        } else if (key === 'usedPromos') {
+          state.usedPromos = data.usedPromos && typeof data.usedPromos === 'object' ? data.usedPromos : {};
+        } else {
           state[key] = data[key] && typeof data[key] === 'object' ? data[key] : {};
         }
       }
@@ -2285,6 +2729,159 @@
     } else {
       shake(els.buyMiner);
       haptic('error');
+    }
+  });
+
+  els.buyGpu.addEventListener('click', function () {
+    if (state.coins >= GPU_COST) {
+      state.coins -= GPU_COST;
+      state.miningCards.gpu = (state.miningCards.gpu || 0) + 1;
+      save();
+      render();
+      haptic('success');
+      showToast('🎮 Б/У Видеокарта установлена! +' + GPU_INCOME + ' монет/сек', 2400);
+    } else {
+      shake(els.buyGpu);
+      haptic('error');
+    }
+  });
+
+  els.buyRack.addEventListener('click', function () {
+    if (state.coins >= RACK_COST) {
+      state.coins -= RACK_COST;
+      state.miningCards.rack = (state.miningCards.rack || 0) + 1;
+      save();
+      render();
+      haptic('success');
+      showToast('🗄 Серверная стойка установлена! +' + RACK_INCOME + ' монет/сек', 2400);
+    } else {
+      shake(els.buyRack);
+      haptic('error');
+    }
+  });
+
+  els.buyAsic.addEventListener('click', function () {
+    if (state.coins >= ASIC_COST) {
+      state.coins -= ASIC_COST;
+      state.miningCards.asic = (state.miningCards.asic || 0) + 1;
+      save();
+      render();
+      haptic('success');
+      showToast('🧊 Квантовый ASIC запущен! +' + ASIC_INCOME + ' монет/сек', 2400);
+    } else {
+      shake(els.buyAsic);
+      haptic('error');
+    }
+  });
+
+  /* ============================================================
+     КРИСТАЛЛЬНЫЕ ПОКУПКИ
+     ============================================================ */
+
+  els.crystalBuyCase.addEventListener('click', function () {
+    if (state.crystals >= CASE_PURCHASE_COST) {
+      state.crystals -= CASE_PURCHASE_COST;
+      state.casesAvailable += 1;
+      save();
+      render();
+      haptic('success');
+      showToast('📦 Куплен Квантовый Кейс за ' + CASE_PURCHASE_COST + ' 💎', 2600);
+    } else {
+      shake(els.crystalBuyCase);
+      haptic('error');
+      showToast('Недостаточно кристаллов', 2000);
+    }
+  });
+
+  els.crystalBuyDrone.addEventListener('click', function () {
+    if (state.droneOwned) return;
+    if (state.crystals >= DRONE_CLICK_BONUS_COST) {
+      state.crystals -= DRONE_CLICK_BONUS_COST;
+      state.droneOwned = true;
+      save();
+      render();
+      haptic('success');
+      showToast('🛸 ИИ-Дрон Хакер активирован! +' + DRONE_INCOME_BONUS + ' монет/сек навсегда.', 3200);
+    } else {
+      shake(els.crystalBuyDrone);
+      haptic('error');
+      showToast('Недостаточно кристаллов', 2000);
+    }
+  });
+
+  els.crystalBuyGoldSkin.addEventListener('click', function () {
+    if (state.goldSkinOwned) return;
+    if (state.crystals >= GOLD_SKIN_COST) {
+      state.crystals -= GOLD_SKIN_COST;
+      state.goldSkinOwned = true;
+      applyRankTheme();
+      save();
+      render();
+      haptic('success');
+      showToast('👑 Скин «Золотой Оверлорд» активирован!', 3200);
+    } else {
+      shake(els.crystalBuyGoldSkin);
+      haptic('error');
+      showToast('Недостаточно кристаллов', 2000);
+    }
+  });
+
+  els.crystalBuyTimeWarp.addEventListener('click', function () {
+    if (state.crystals < TIME_WARP_COST) {
+      shake(els.crystalBuyTimeWarp);
+      haptic('error');
+      showToast('Недостаточно кристаллов', 2000);
+      return;
+    }
+    var ips = getIncomePerSecond();
+    if (ips <= 0) {
+      showToast('Авто-майнинг не работает. Сначала купи улучшения.', 2400);
+      haptic('error');
+      return;
+    }
+    var gain = ips * TIME_WARP_SECONDS;
+    state.crystals -= TIME_WARP_COST;
+    state.coins += gain;
+    state.totalEarned += gain;
+    save();
+    render();
+    haptic('success');
+    showToast('⏩ Тайм-Варп: +' + formatBig(gain) + ' 🪙 за 1 час майнинга!', 3200);
+  });
+
+  /* ============================================================
+     ЛОКАЦИИ
+     ============================================================ */
+
+  els.buyNeon.addEventListener('click', function () {
+    if (state.locations && state.locations.neon) return;
+    if (state.coins >= NEON_CITY_COST) {
+      state.coins -= NEON_CITY_COST;
+      state.locations.neon = true;
+      save();
+      render();
+      haptic('success');
+      showToast('🌃 Неоновый Сити захвачен! +50% к силе клика.', 3000);
+    } else {
+      shake(els.buyNeon);
+      haptic('error');
+      showToast('Нужно ' + formatBig(NEON_CITY_COST) + ' 🪙', 2200);
+    }
+  });
+
+  els.buyTokyo.addEventListener('click', function () {
+    if (state.locations && state.locations.tokyo) return;
+    if (state.coins >= TOKYO_COST) {
+      state.coins -= TOKYO_COST;
+      state.locations.tokyo = true;
+      save();
+      render();
+      haptic('success');
+      showToast('🏙 Мега-Токио захвачен! +50% к силе клика.', 3000);
+    } else {
+      shake(els.buyTokyo);
+      haptic('error');
+      showToast('Нужно ' + formatBig(TOKYO_COST) + ' 🪙', 2200);
     }
   });
 
@@ -2460,12 +3057,6 @@
     els.adErrorModal.classList.remove('show');
   });
 
-  /**
-   * Универсальный запуск rewarded video через Adsgram.
-   * onSuccess вызывается ТОЛЬКО если промис AdController.show()
-   * успешно разрешился (пользователь досмотрел видео).
-   * onFail вызывается при любом отказе / ошибке / пропуске.
-   */
   function showAdsgramRewarded(onSuccess, onFail) {
     if (adBusy) return;
     adBusy = true;
@@ -2498,8 +3089,6 @@
       if (typeof onFail === 'function') onFail(e);
     }
 
-    /* Страховка: если SDK по какой-то причине не вызвал ни then, ни catch
-       в течение 30 секунд — разблокируем кнопку без начисления награды. */
     window.setTimeout(function () {
       if (!resolved && adBusy) {
         adBusy = false;
@@ -2543,7 +3132,6 @@
 
     showAdsgramRewarded(
       function () {
-        /* === УСПЕХ: пользователь досмотрел видео до конца === */
         state.coins += AD_REWARD;
         state.totalEarned += AD_REWARD;
         save();
@@ -2561,7 +3149,6 @@
         }, 1400);
       },
       function (err) {
-        /* === ОТКАЗ: награда НЕ начисляется === */
         els.adBtn.classList.add('error');
         els.adBtn.textContent = '❌ Реклама не просмотрена';
         showAdError(detectAdErrorReason(err));
@@ -2606,7 +3193,6 @@
 
     showAdsgramRewarded(
       function () {
-        /* Награда только после успешного просмотра */
         if (state.activeContract && state.activeContract.id === contractId) {
           state.activeContract.endsAt = Date.now();
           finalizeContract(contractId);
@@ -2744,9 +3330,9 @@
     }
   });
 
-  /* ============================================================
-     TABS
-     ============================================================ */
+    /* ==========================================================================
+     MAIN TABS
+     ========================================================================== */
 
   var tabButtons = document.querySelectorAll('.tab');
   var tabPanes = document.querySelectorAll('.tab-pane');
@@ -2766,9 +3352,31 @@
     });
   });
 
-  /* ============================================================
+  /* ==========================================================================
+     SHOP SUBTABS
+     ========================================================================== */
+
+  var shopSubtabButtons = document.querySelectorAll('.shop-subtab');
+  var shopPanes = document.querySelectorAll('.shop-pane');
+
+  shopSubtabButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var subtab = btn.getAttribute('data-subtab');
+
+      shopSubtabButtons.forEach(function (b) { b.classList.remove('active'); });
+      shopPanes.forEach(function (p) { p.classList.remove('active'); });
+
+      btn.classList.add('active');
+      var pane = document.querySelector('.shop-pane[data-shop-pane="' + subtab + '"]');
+      if (pane) pane.classList.add('active');
+
+      haptic('light');
+    });
+  });
+
+  /* ==========================================================================
      ПАССИВНЫЙ ДОХОД + ТАЙМЕРЫ
-     ============================================================ */
+     ========================================================================== */
 
   window.setInterval(function () {
     var income = getIncomePerSecond();
@@ -2793,23 +3401,27 @@
     }
   }, 1000);
 
-  /* ============================================================
+  /* ==========================================================================
      АВТОСОХРАНЕНИЕ
-     ============================================================ */
+     ========================================================================== */
 
   window.setInterval(save, 3000);
   window.addEventListener('beforeunload', save);
   window.addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) save();
-    else { ensureQuestDate(); render(); }
+    if (document.hidden) {
+      save();
+    } else {
+      ensureQuestDate();
+      render();
+    }
   });
 
   document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
-  /* ============================================================
+  /* ==========================================================================
      YANDEX BANNER (декоративный)
-     ============================================================ */
+     ========================================================================== */
 
   function initBanner() {
     if (typeof window.YandexAds === 'undefined') return;
@@ -2825,9 +3437,9 @@
     }
   }
 
-  /* ============================================================
+  /* ==========================================================================
      СТАРТ
-     ============================================================ */
+     ========================================================================== */
 
   load();
   ensureQuestDate();
@@ -2840,8 +3452,11 @@
     initBanner();
   }
 
-  if (document.readyState === 'complete') boot();
-  else window.addEventListener('load', boot);
+  if (document.readyState === 'complete') {
+    boot();
+  } else {
+    window.addEventListener('load', boot);
+  }
 
   /* Страховка: если SDK загрузился с задержкой — пробуем ещё раз */
   window.setTimeout(function () {
