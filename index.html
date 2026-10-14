@@ -3330,16 +3330,283 @@
     }
   });
 
-    /* ==========================================================================
-     MAIN TABS
-     ========================================================================== */
+     /* === MAIN TABS === */
 
+/* ---------------------------------------------------------------
+   Инжектируем стили: терминал биржи, аналитика, таймфреймы, объём
+   --------------------------------------------------------------- */
+(function injectTerminalStyles() {
+  if (document.getElementById('exchangeTerminalStyles')) return;
+
+  var css = [
+    '.tabs{gap:4px;padding:5px;}',
+    '.tab{padding:7px 2px 6px;font-size:8px;letter-spacing:.04em;}',
+    '.tab-icon{font-size:15px;}',
+
+    '.exchange-terminal{position:fixed;inset:0;z-index:850;background:linear-gradient(180deg,#04060c 0%,#0b0c10 55%,#05070c 100%);display:none;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px calc(env(safe-area-inset-bottom,0px) + 12px);overflow:hidden;}',
+    '.exchange-terminal.show{display:flex;}',
+
+    '.exchange-header{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid rgba(0,240,255,.15);flex:0 0 auto;}',
+    '.exchange-back{padding:8px 12px;border-radius:11px;border:1px solid rgba(0,240,255,.45);background:rgba(12,16,28,.85);color:#fff;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;-webkit-appearance:none;appearance:none;text-shadow:0 0 10px var(--neon-glow);box-shadow:0 0 14px rgba(0,240,255,.25);}',
+    '.exchange-back:active{transform:scale(.95);}',
+
+    '.exchange-head-info{flex:1 1 auto;min-width:0;text-align:center;}',
+    '.exchange-title{font-size:11px;font-weight:900;letter-spacing:.24em;color:var(--neon);text-shadow:0 0 12px var(--neon-glow);text-indent:.24em;}',
+    '.exchange-price{font-size:22px;font-weight:900;color:#fff;text-shadow:0 0 14px var(--neon-glow);font-variant-numeric:tabular-nums;line-height:1.15;}',
+
+    '.exchange-deltas{display:flex;gap:6px;justify-content:center;margin-top:6px;flex-wrap:wrap;flex:0 0 auto;}',
+    '.delta-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:8px;font-size:10px;font-weight:900;letter-spacing:.04em;background:rgba(12,16,28,.72);border:1px solid rgba(0,240,255,.18);color:#8ab4d8;font-variant-numeric:tabular-nums;transition:all .25s ease;}',
+    '.delta-badge .db-label{color:#5f7a99;letter-spacing:.12em;font-size:9px;text-transform:uppercase;}',
+    '.delta-badge .db-value{font-weight:900;}',
+    '.delta-badge.pos{color:#00f2c3;border-color:rgba(0,242,195,.45);box-shadow:0 0 10px rgba(0,242,195,.2);}',
+    '.delta-badge.neg{color:#ff007f;border-color:rgba(255,0,127,.45);box-shadow:0 0 10px rgba(255,0,127,.2);}',
+
+    '.exchange-hl{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:6px 12px;margin-top:8px;border-radius:10px;background:rgba(12,16,28,.72);border:1px solid rgba(0,240,255,.14);font-variant-numeric:tabular-nums;flex:0 0 auto;}',
+    '.exchange-hl span{white-space:nowrap;}',
+    '.exchange-hl .hl-high{color:#00f2c3;text-shadow:0 0 10px rgba(0,242,195,.55);}',
+    '.exchange-hl .hl-low{color:#ff007f;text-shadow:0 0 10px rgba(255,0,127,.55);}',
+    '.exchange-hl .hl-label{color:#5f7a99;letter-spacing:.18em;text-transform:uppercase;font-size:9px;}',
+
+    '.chart-toolbar{display:flex;align-items:center;gap:5px;margin-top:8px;padding:5px 8px;border-radius:10px;background:rgba(12,16,28,.72);border:1px solid rgba(0,240,255,.14);flex:0 0 auto;overflow-x:auto;scrollbar-width:none;}',
+    '.chart-toolbar::-webkit-scrollbar{display:none;}',
+    '.chart-toolbar-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#5f7a99;margin-right:auto;text-indent:.18em;flex:0 0 auto;padding-right:6px;}',
+    '.tf-btn{padding:5px 9px;border-radius:7px;border:1px solid rgba(0,240,255,.25);background:rgba(12,16,28,.9);color:#8ab4d8;font-family:inherit;font-size:10px;font-weight:900;letter-spacing:.04em;cursor:pointer;-webkit-appearance:none;appearance:none;transition:all .2s ease;flex:0 0 auto;min-width:34px;}',
+    '.tf-btn:active{transform:scale(.94);}',
+    '.tf-btn.active{background:linear-gradient(135deg,rgba(0,240,255,.25),rgba(255,0,127,.2));color:#fff;border-color:rgba(0,240,255,.65);box-shadow:0 0 12px rgba(0,240,255,.3);}',
+
+    '.chart-wrapper{flex:0 0 auto;width:100%;height:30vh;min-height:170px;max-height:260px;margin-top:8px;border-radius:14px;overflow:hidden;position:relative;background:linear-gradient(180deg,rgba(8,10,18,.98),rgba(16,20,34,.98));border:1px solid rgba(0,240,255,.22);box-shadow:inset 0 0 28px rgba(0,0,0,.6);}',
+    '#exchangeChart{display:block;width:100%;height:100%;}',
+
+    '.exchange-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:0 4px 6px 0;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(0,240,255,.3) transparent;}',
+    '.exchange-scroll::-webkit-scrollbar{width:4px;}',
+    '.exchange-scroll::-webkit-scrollbar-thumb{background:rgba(0,240,255,.3);border-radius:2px;}',
+    '.exchange-scroll::-webkit-scrollbar-track{background:transparent;}',
+
+    '.exchange-holdings{flex:0 0 auto;display:flex;gap:8px;}',
+    '.exchange-holdings .stat-box{flex:1 1 0;}',
+
+    '.portfolio-block{flex:0 0 auto;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,rgba(22,32,52,.92),rgba(12,16,28,.92));border:1px solid rgba(0,240,255,.2);box-shadow:inset 0 0 20px rgba(0,240,255,.05);}',
+    '.portfolio-title{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:#5f7a99;text-indent:.24em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}',
+    '.portfolio-title::after{content:"";flex:1 1 auto;margin-left:10px;height:1px;background:linear-gradient(90deg,rgba(0,240,255,.25),transparent);}',
+    '.portfolio-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:11.5px;font-weight:800;padding:3px 0;font-variant-numeric:tabular-nums;}',
+    '.portfolio-row .pl-label{color:#8ab4d8;letter-spacing:.02em;}',
+    '.portfolio-row .pl-value{color:#ffffff;font-weight:900;}',
+    '.portfolio-row .pl-value.positive{color:#00f2c3;text-shadow:0 0 10px rgba(0,242,195,.7);}',
+    '.portfolio-row .pl-value.negative{color:#ff007f;text-shadow:0 0 10px rgba(255,0,127,.7);}',
+    '.portfolio-row .pl-value.neutral{color:#8ab4d8;}',
+
+    '.trade-feed{flex:0 0 140px;height:140px;min-height:140px;max-height:140px;border-radius:12px;background:rgba(12,16,28,.72);border:1px solid rgba(0,240,255,.15);padding:8px 12px;display:flex;flex-direction:column;gap:4px;overflow:hidden;}',
+    '.trade-feed-title{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);text-indent:.28em;padding-bottom:4px;border-bottom:1px dashed rgba(0,240,255,.12);flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;}',
+    '.trade-feed-title .live-dot{width:6px;height:6px;border-radius:50%;background:#00f2c3;box-shadow:0 0 8px rgba(0,242,195,.9);animation:livePulse 1.5s ease-in-out infinite;}',
+    '@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.25;}}',
+    '.trade-feed-list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:3px;padding-right:4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}',
+    '.trade-feed-list::-webkit-scrollbar{width:3px;}',
+    '.trade-feed-list::-webkit-scrollbar-thumb{background:rgba(0,240,255,.25);border-radius:2px;}',
+    '.trade-feed-list::-webkit-scrollbar-track{background:transparent;}',
+    '.trade-line{font-size:11px;font-weight:700;color:#8ab4d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(6px);animation:tradeIn .4s ease forwards;font-variant-numeric:tabular-nums;flex:0 0 auto;}',
+    '.trade-line.buy{color:#00f2c3;text-shadow:0 0 8px rgba(0,242,195,.45);}',
+    '.trade-line.sell{color:#ff007f;text-shadow:0 0 8px rgba(255,0,127,.45);}',
+    '@keyframes tradeIn{to{opacity:1;transform:translateY(0);}}',
+
+    '.my-trades{flex:0 0 auto;border-radius:12px;background:rgba(12,16,28,.72);border:1px solid rgba(0,240,255,.15);padding:8px 12px;display:flex;flex-direction:column;gap:4px;}',
+    '.my-trades-title{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);text-indent:.28em;padding-bottom:4px;border-bottom:1px dashed rgba(0,240,255,.12);flex:0 0 auto;}',
+    '.my-trades-list{flex:1 1 auto;display:flex;flex-direction:column;gap:3px;}',
+    '.my-trade-line{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;opacity:0;transform:translateY(4px);animation:tradeIn .35s ease forwards;}',
+    '.my-trade-line.buy{color:#00f2c3;text-shadow:0 0 8px rgba(0,242,195,.45);}',
+    '.my-trade-line.sell{color:#ff007f;text-shadow:0 0 8px rgba(255,0,127,.45);}',
+    '.my-trade-line.empty{color:#3c5670;font-weight:700;font-style:italic;}',
+
+    '.trade-volume{display:flex;align-items:center;gap:6px;margin-top:10px;padding:5px 8px;border-radius:10px;background:rgba(12,16,28,.72);border:1px solid rgba(0,240,255,.14);flex:0 0 auto;}',
+    '.trade-volume-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#5f7a99;margin-right:auto;text-indent:.18em;}',
+    '.tv-btn{padding:5px 9px;border-radius:7px;border:1px solid rgba(0,240,255,.25);background:rgba(12,16,28,.9);color:#8ab4d8;font-family:inherit;font-size:10px;font-weight:900;letter-spacing:.04em;cursor:pointer;-webkit-appearance:none;appearance:none;transition:all .2s ease;min-width:38px;}',
+    '.tv-btn:active{transform:scale(.94);}',
+    '.tv-btn.active{background:linear-gradient(135deg,rgba(0,240,255,.25),rgba(255,0,127,.2));color:#fff;border-color:rgba(0,240,255,.65);box-shadow:0 0 12px rgba(0,240,255,.3);}',
+
+    '.exchange-actions{display:flex;gap:8px;margin-top:8px;flex:0 0 auto;}',
+    '.exchange-actions .btn-primary{flex:1 1 0;padding:14px 10px;font-size:13px;}',
+
+    'body.overclock-on .core{animation:overclockPulse .75s ease-in-out infinite !important;}',
+    '@keyframes overclockPulse{0%,100%{box-shadow:0 0 26px rgba(255,90,40,.85),0 0 68px rgba(255,60,20,.55),0 0 130px rgba(255,180,40,.4),inset 0 -14px 34px rgba(0,0,0,.55),inset 0 10px 24px rgba(255,255,255,.35);filter:brightness(1.15) saturate(1.2);}50%{box-shadow:0 0 48px rgba(255,200,40,1),0 0 120px rgba(255,90,40,.75),0 0 180px rgba(255,60,20,.55),inset 0 -14px 34px rgba(0,0,0,.55),inset 0 10px 24px rgba(255,255,255,.45);filter:brightness(1.4) saturate(1.35);}}',
+
+    'body.overclock-on .hud-income{color:#ffb347;border-color:rgba(255,150,60,.55);background:rgba(255,120,40,.14);text-shadow:0 0 12px rgba(255,180,60,.85);box-shadow:0 0 22px rgba(255,150,60,.35);}',
+
+    '.case-viewport{position:relative;width:100%;height:104px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,rgba(8,10,18,.95),rgba(16,20,34,.95));border:1px solid rgba(0,240,255,.25);box-shadow:inset 0 0 30px rgba(0,0,0,.7);margin-bottom:14px;}',
+    '.case-viewport::before,.case-viewport::after{content:"";position:absolute;top:0;bottom:0;width:56px;pointer-events:none;z-index:2;}',
+    '.case-viewport::before{left:0;background:linear-gradient(90deg,rgba(8,10,18,1) 0%,rgba(8,10,18,0) 100%);}',
+    '.case-viewport::after{right:0;background:linear-gradient(-90deg,rgba(8,10,18,1) 0%,rgba(8,10,18,0) 100%);}',
+    '.case-strip{position:absolute;top:0;left:0;height:100%;display:flex;align-items:center;gap:8px;padding:8px 0;will-change:transform;}',
+    '.case-item{flex:0 0 auto;width:96px;height:88px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:900;letter-spacing:.02em;color:#ffffff;text-align:center;padding:6px;background:rgba(20,28,44,.85);border:1px solid rgba(0,240,255,.35);box-shadow:inset 0 0 12px rgba(0,240,255,.1);}',
+    '.case-item .ci-icon{font-size:24px;line-height:1;}',
+    '.case-item.cyan{border-color:rgba(0,240,255,.55);box-shadow:inset 0 0 14px rgba(0,240,255,.2);}',
+    '.case-item.blue{border-color:rgba(90,160,255,.55);box-shadow:inset 0 0 14px rgba(90,160,255,.2);}',
+    '.case-item.purple{border-color:rgba(140,0,255,.6);box-shadow:inset 0 0 14px rgba(140,0,255,.22);}',
+    '.case-item.pink{border-color:rgba(255,0,127,.6);box-shadow:inset 0 0 14px rgba(255,0,127,.22);}',
+    '.case-item.gold{border-color:rgba(255,209,102,.75);box-shadow:inset 0 0 16px rgba(255,209,102,.28);}',
+    '.case-pointer{position:absolute;top:6px;bottom:6px;left:50%;width:3px;transform:translateX(-50%);background:linear-gradient(180deg,transparent,var(--neon),transparent);box-shadow:0 0 12px var(--neon-glow),0 0 26px rgba(0,240,255,.55);z-index:3;pointer-events:none;border-radius:2px;}',
+    '.case-pointer::before,.case-pointer::after{content:"";position:absolute;left:50%;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;transform:translateX(-50%);}',
+    '.case-pointer::before{top:-6px;border-top:8px solid var(--neon);filter:drop-shadow(0 0 6px var(--neon-glow));}',
+    '.case-pointer::after{bottom:-6px;border-bottom:8px solid var(--neon);filter:drop-shadow(0 0 6px var(--neon-glow));}',
+    '.case-result{min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-bottom:14px;}',
+    '.case-result-icon{font-size:38px;line-height:1;filter:drop-shadow(0 0 18px var(--neon-glow));animation:resultPop .5s cubic-bezier(.2,1.4,.4,1);}',
+    '.case-result-text{font-size:14px;font-weight:900;color:#ffffff;text-shadow:0 0 14px var(--neon-glow);letter-spacing:.02em;text-align:center;}',
+    '.case-result-sub{font-size:11px;color:#8ab4d8;text-align:center;}',
+    '@keyframes resultPop{from{transform:scale(.4);opacity:0;}to{transform:scale(1);opacity:1;}}',
+
+    '@media (min-width:600px){.chart-wrapper{height:34vh;max-height:300px;}.exchange-price{font-size:28px;}}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.id = 'exchangeTerminalStyles';
+  style.textContent = css;
+  document.head.appendChild(style);
+})();
+
+/* ---------------------------------------------------------------
+   Добавляем 5-ю вкладку "Биржа"
+   --------------------------------------------------------------- */
+(function ensureExchangeTab() {
+  var tabsNav = document.querySelector('.tabs');
+  if (!tabsNav) return;
+  if (document.querySelector('.tab[data-tab="exchange"]')) return;
+
+  var exchangeTab = document.createElement('button');
+  exchangeTab.className = 'tab';
+  exchangeTab.type = 'button';
+  exchangeTab.setAttribute('data-tab', 'exchange');
+  exchangeTab.innerHTML = '<span class="tab-icon">💹</span><span class="tab-label">Биржа</span>';
+  tabsNav.appendChild(exchangeTab);
+})();
+
+/* ---------------------------------------------------------------
+   Создаём полноэкранный биржевой терминал
+   Таймфреймы: 1м, 5м, 15м, 30м, 1ч
+   --------------------------------------------------------------- */
+(function ensureExchangeTerminal() {
+  if (document.getElementById('exchangeTerminal')) return;
+
+  var html = '' +
+    '<div class="exchange-header">' +
+      '<button class="exchange-back" id="exchangeBack" type="button">◀ Назад</button>' +
+      '<div class="exchange-head-info">' +
+        '<div class="exchange-title">$CYBER / 🪙</div>' +
+        '<div class="exchange-price" id="exchangePrice">12.5K 🪙</div>' +
+      '</div>' +
+      '<div style="width:70px;flex:0 0 auto;"></div>' +
+    '</div>' +
+
+    '<div class="exchange-deltas">' +
+      '<span class="delta-badge" id="delta5m"><span class="db-label">5м</span><span class="db-value">0.0%</span></span>' +
+      '<span class="delta-badge" id="delta1h"><span class="db-label">1ч</span><span class="db-value">0.0%</span></span>' +
+      '<span class="delta-badge" id="deltaSession"><span class="db-label">Сессия</span><span class="db-value">0.0%</span></span>' +
+    '</div>' +
+
+    '<div class="exchange-hl">' +
+      '<span class="hl-label">Сессия</span>' +
+      '<span class="hl-high" id="exchangeHigh">HIGH: 12.5K 🪙</span>' +
+      '<span class="hl-low" id="exchangeLow">LOW: 12.5K 🪙</span>' +
+    '</div>' +
+
+    '<div class="chart-toolbar">' +
+      '<span class="chart-toolbar-label">Таймфрейм</span>' +
+      '<button class="tf-btn active" type="button" data-tf="60000">1м</button>' +
+      '<button class="tf-btn" type="button" data-tf="300000">5м</button>' +
+      '<button class="tf-btn" type="button" data-tf="900000">15м</button>' +
+      '<button class="tf-btn" type="button" data-tf="1800000">30м</button>' +
+      '<button class="tf-btn" type="button" data-tf="3600000">1ч</button>' +
+    '</div>' +
+
+    '<div class="chart-wrapper">' +
+      '<canvas id="exchangeChart"></canvas>' +
+    '</div>' +
+
+    '<div class="exchange-scroll">' +
+
+      '<div class="exchange-holdings">' +
+        '<div class="stat-box">' +
+          '<div class="stat-label">Ваши токены</div>' +
+          '<div class="stat-value" id="exchangeTokens">0</div>' +
+        '</div>' +
+        '<div class="stat-box">' +
+          '<div class="stat-label">Стоимость</div>' +
+          '<div class="stat-value" id="exchangeValue">0 🪙</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="portfolio-block">' +
+        '<div class="portfolio-title">Аналитика портфеля</div>' +
+        '<div class="portfolio-row">' +
+          '<span class="pl-label">Средняя цена покупки</span>' +
+          '<span class="pl-value" id="portfolioAvgPrice">—</span>' +
+        '</div>' +
+        '<div class="portfolio-row">' +
+          '<span class="pl-label">Текущий доход (P&L)</span>' +
+          '<span class="pl-value neutral" id="portfolioPnl">—</span>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="my-trades">' +
+        '<div class="my-trades-title">Мои сделки</div>' +
+        '<div class="my-trades-list" id="myTradesList">' +
+          '<div class="my-trade-line empty">Пока нет сделок</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="trade-feed">' +
+        '<div class="trade-feed-title">' +
+          '<span>Лента сделок сети</span>' +
+          '<span class="live-dot"></span>' +
+        '</div>' +
+        '<div class="trade-feed-list" id="tradeFeedList"></div>' +
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="trade-volume">' +
+      '<span class="trade-volume-label">Объём</span>' +
+      '<button class="tv-btn" type="button" data-pct="25">25%</button>' +
+      '<button class="tv-btn" type="button" data-pct="50">50%</button>' +
+      '<button class="tv-btn" type="button" data-pct="75">75%</button>' +
+      '<button class="tv-btn active" type="button" data-pct="100">100%</button>' +
+    '</div>' +
+
+    '<div class="exchange-actions">' +
+      '<button class="btn-primary" id="exchangeBuy" type="button">🛒 Купить</button>' +
+      '<button class="btn-primary" id="exchangeSell" type="button">💸 Продать</button>' +
+    '</div>';
+
+  var terminal = document.createElement('div');
+  terminal.id = 'exchangeTerminal';
+  terminal.className = 'exchange-terminal';
+  terminal.innerHTML = html;
+  document.body.appendChild(terminal);
+})();
+
+/* ---------------------------------------------------------------
+   Переключение главных вкладок + открытие терминала биржи
+   --------------------------------------------------------------- */
+(function setupMainTabs() {
   var tabButtons = document.querySelectorAll('.tab');
   var tabPanes = document.querySelectorAll('.tab-pane');
+  var terminal = document.getElementById('exchangeTerminal');
 
   tabButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var tab = btn.getAttribute('data-tab');
+
+      if (tab === 'exchange') {
+        tabButtons.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        if (terminal) terminal.classList.add('show');
+        if (window.__renderCryptoChart) window.__renderCryptoChart();
+        if (window.__renderTradeFeed) window.__renderTradeFeed();
+        if (window.__renderPortfolio) window.__renderPortfolio();
+        if (window.__renderMyTrades) window.__renderMyTrades();
+        if (window.__renderDeltas) window.__renderDeltas();
+        haptic('light');
+        return;
+      }
+
+      if (terminal) terminal.classList.remove('show');
 
       tabButtons.forEach(function (b) { b.classList.remove('active'); });
       tabPanes.forEach(function (p) { p.classList.remove('active'); });
@@ -3348,23 +3615,43 @@
       var pane = document.querySelector('.tab-pane[data-pane="' + tab + '"]');
       if (pane) pane.classList.add('active');
 
+      if (tab === 'missions' && window.__renderLeaderboard) {
+        window.__renderLeaderboard();
+      }
+
       haptic('light');
     });
   });
 
-  /* ==========================================================================
-     SHOP SUBTABS
-     ========================================================================== */
+  var backBtn = document.getElementById('exchangeBack');
+  if (backBtn) {
+    backBtn.addEventListener('click', function () {
+      if (terminal) terminal.classList.remove('show');
+      tabButtons.forEach(function (b) { b.classList.remove('active'); });
+      var shopBtn = document.querySelector('.tab[data-tab="shop"]');
+      if (shopBtn) {
+        shopBtn.classList.add('active');
+        var shopPane = document.querySelector('.tab-pane[data-pane="shop"]');
+        if (shopPane) shopPane.classList.add('active');
+      }
+      haptic('light');
+    });
+  }
+})();
 
-  var shopSubtabButtons = document.querySelectorAll('.shop-subtab');
-  var shopPanes = document.querySelectorAll('.shop-pane');
+/* ---------------------------------------------------------------
+   Под-вкладки магазина (Монеты / Кристаллы / Локации)
+   --------------------------------------------------------------- */
+(function setupShopSubtabs() {
+  var subButtons = document.querySelectorAll('.shop-subtab');
+  var subPanes = document.querySelectorAll('.shop-pane');
 
-  shopSubtabButtons.forEach(function (btn) {
+  subButtons.forEach(function (btn) {
     btn.addEventListener('click', function () {
       var subtab = btn.getAttribute('data-subtab');
 
-      shopSubtabButtons.forEach(function (b) { b.classList.remove('active'); });
-      shopPanes.forEach(function (p) { p.classList.remove('active'); });
+      subButtons.forEach(function (b) { b.classList.remove('active'); });
+      subPanes.forEach(function (p) { p.classList.remove('active'); });
 
       btn.classList.add('active');
       var pane = document.querySelector('.shop-pane[data-shop-pane="' + subtab + '"]');
@@ -3373,95 +3660,1856 @@
       haptic('light');
     });
   });
+})();
 
-  /* ==========================================================================
-     ПАССИВНЫЙ ДОХОД + ТАЙМЕРЫ
-     ========================================================================== */
+/* ================================================================
+   КВАНТОВЫЙ РАЗГОН (OVERCLOCK) — x5 на 5 минут за 80 💎
+   ================================================================ */
 
-  window.setInterval(function () {
-    var income = getIncomePerSecond();
-    if (income > 0) {
-      state.coins += income;
-      state.totalEarned += income;
-      render();
-    }
-  }, 1000);
+var OVERCLOCK_COST = 80;
+var OVERCLOCK_DURATION_MS = 5 * 60 * 1000;
+var OVERCLOCK_MULTIPLIER = 5;
 
-  window.setInterval(function () {
-    ensureQuestDate();
-    renderDaily();
-    renderQuests();
-    renderBadges();
-    renderContracts();
+if (typeof state.overclockUntil !== 'number') state.overclockUntil = 0;
 
-    if (state.activeContract) {
-      if (Date.now() >= state.activeContract.endsAt) {
-        renderContracts();
-      }
-    }
-  }, 1000);
+function isOverclockActive() {
+  return state.overclockUntil && Date.now() < state.overclockUntil;
+}
 
-  /* ==========================================================================
-     АВТОСОХРАНЕНИЕ
-     ========================================================================== */
+function refreshOverclockBodyClass() {
+  if (isOverclockActive()) document.body.classList.add('overclock-on');
+  else document.body.classList.remove('overclock-on');
+}
 
-  window.setInterval(save, 3000);
-  window.addEventListener('beforeunload', save);
-  window.addEventListener('pagehide', save);
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-      save();
+(function ensureOverclockCard() {
+  var crystalsPane = document.querySelector('.shop-pane[data-shop-pane="crystals"]');
+  if (!crystalsPane) return;
+  if (document.getElementById('overclockCard')) return;
+
+  var card = document.createElement('button');
+  card.id = 'overclockCard';
+  card.className = 'card';
+  card.type = 'button';
+  card.innerHTML = '' +
+    '<div class="card-icon gold">🔥</div>' +
+    '<div class="card-left">' +
+      '<div class="card-name">Квантовый Разгон</div>' +
+      '<div class="card-desc">×5 к клику и майнингу · 5 минут</div>' +
+    '</div>' +
+    '<div class="card-right">' +
+      '<div class="card-label" id="overclockStatus">Готов</div>' +
+      '<div class="card-price">80 💎</div>' +
+    '</div>';
+
+  crystalsPane.appendChild(card);
+
+  function refreshOverclockUI() {
+    var statusEl = document.getElementById('overclockStatus');
+    if (!statusEl) return;
+
+    if (isOverclockActive()) {
+      var remaining = state.overclockUntil - Date.now();
+      statusEl.textContent = formatCountdown(remaining);
+      statusEl.style.color = '#ffb347';
+      card.classList.remove('affordable-crystal');
+      card.classList.add('purchased');
     } else {
-      ensureQuestDate();
+      statusEl.textContent = 'Готов';
+      statusEl.style.color = '';
+      card.classList.remove('purchased');
+      if (state.crystals >= OVERCLOCK_COST) card.classList.add('affordable-crystal');
+      else card.classList.remove('affordable-crystal');
+    }
+  }
+
+  card.addEventListener('click', function () {
+    if (isOverclockActive()) {
+      showToast('Квантовый Разгон уже активен', 2200);
+      haptic('error');
+      return;
+    }
+    if (state.crystals < OVERCLOCK_COST) {
+      shake(card);
+      haptic('error');
+      showToast('Нужно ' + OVERCLOCK_COST + ' 💎', 2000);
+      return;
+    }
+
+    state.crystals -= OVERCLOCK_COST;
+    state.overclockUntil = Date.now() + OVERCLOCK_DURATION_MS;
+    save();
+    render();
+    refreshOverclockUI();
+    refreshOverclockBodyClass();
+    haptic('success');
+    showToast('🔥 Квантовый Разгон активирован! ×5 ко всему на 5 минут.', 3400);
+  });
+
+  window.__refreshOverclockUI = refreshOverclockUI;
+  refreshOverclockUI();
+  refreshOverclockBodyClass();
+})();
+
+/* Клонируем ядро для поддержки оверклока */
+(function overrideCoreClick() {
+  if (!els.core || !els.core.parentNode) return;
+
+  var oldCore = els.core;
+  var newCore = oldCore.cloneNode(true);
+  oldCore.parentNode.replaceChild(newCore, oldCore);
+  els.core = newCore;
+
+  function performClick(clientX, clientY) {
+    var gain = getClickPower();
+    if (isOverclockActive()) gain = Math.floor(gain * OVERCLOCK_MULTIPLIER);
+
+    state.coins += gain;
+    state.totalEarned += gain;
+    state.totalClicks += 1;
+    state.clicksSinceLastCase += 1;
+
+    if (state.questClicks < QUEST_CLICK_GOAL) state.questClicks += 1;
+
+    if (state.clicksSinceLastCase >= CASES_PER_CLICKS) {
+      state.clicksSinceLastCase = 0;
+      state.casesAvailable += 1;
+      showToast('🎁 Квантовый кейс получен! Открой вкладку «Кейсы».', 2600);
+      haptic('success');
+    }
+
+    render();
+
+    var x = clientX;
+    var y = clientY;
+    if (typeof x !== 'number' || typeof y !== 'number' || (x === 0 && y === 0)) {
+      var rect = els.core.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+    spawnFloat(x, y, gain);
+    haptic('light');
+  }
+
+  newCore.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    newCore.classList.add('pressed');
+    performClick(e.clientX, e.clientY);
+  });
+  newCore.addEventListener('pointerup', function () { newCore.classList.remove('pressed'); });
+  newCore.addEventListener('pointercancel', function () { newCore.classList.remove('pressed'); });
+  newCore.addEventListener('pointerleave', function () { newCore.classList.remove('pressed'); });
+  newCore.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+})();
+
+window.setInterval(function () {
+  if (!isOverclockActive()) return;
+  var extra = getIncomePerSecond() * (OVERCLOCK_MULTIPLIER - 1);
+  if (extra <= 0) return;
+  state.coins += extra;
+  state.totalEarned += extra;
+  render();
+}, 1000);
+
+window.setInterval(function () {
+  if (state.overclockUntil && Date.now() >= state.overclockUntil) {
+    state.overclockUntil = 0;
+    refreshOverclockBodyClass();
+    if (window.__refreshOverclockUI) window.__refreshOverclockUI();
+    showToast('⚡ Квантовый Разгон завершён.', 2400);
+    haptic('light');
+    save();
+  } else {
+    refreshOverclockBodyClass();
+    if (window.__refreshOverclockUI) window.__refreshOverclockUI();
+  }
+}, 1000);
+
+/* ================================================================
+   ХАКЕРСКИЙ БОТНЕТ
+   ================================================================ */
+
+var BOTNET_BASE_COST = 200000;
+var BOTNET_COST_GROWTH = 1.7;
+var BOTNET_CLICKS_PER_SEC = 5;
+
+if (typeof state.botnetOwned !== 'number' || state.botnetOwned < 0) state.botnetOwned = 0;
+
+function getBotnetCost() {
+  return Math.floor(BOTNET_BASE_COST * Math.pow(BOTNET_COST_GROWTH, state.botnetOwned || 0));
+}
+
+(function ensureBotnetCard() {
+  var coinsPane = document.querySelector('.shop-pane[data-shop-pane="coins"]');
+  if (!coinsPane) return;
+  if (document.getElementById('botnetCard')) return;
+
+  var card = document.createElement('button');
+  card.id = 'botnetCard';
+  card.className = 'card';
+  card.type = 'button';
+  card.innerHTML = '' +
+    '<div class="card-icon pink">🤖</div>' +
+    '<div class="card-left">' +
+      '<div class="card-name">Хакерский Ботнет</div>' +
+      '<div class="card-desc">+5 авто-кликов в секунду</div>' +
+    '</div>' +
+    '<div class="card-right">' +
+      '<div class="card-label">Ур. <span id="botnetLevel">0</span></div>' +
+      '<div class="card-price"><span id="botnetCost">200K</span> 🪙</div>' +
+    '</div>';
+
+  var firstSection = coinsPane.querySelector('.section-title');
+  if (firstSection) coinsPane.insertBefore(card, firstSection.nextSibling);
+  else coinsPane.appendChild(card);
+
+  function refreshBotnetUI() {
+    var costEl = document.getElementById('botnetCost');
+    var levelEl = document.getElementById('botnetLevel');
+    if (costEl) costEl.textContent = formatNumber(getBotnetCost());
+    if (levelEl) levelEl.textContent = state.botnetOwned || 0;
+    if (state.coins >= getBotnetCost()) card.classList.add('affordable');
+    else card.classList.remove('affordable');
+  }
+
+  card.addEventListener('click', function () {
+    var cost = getBotnetCost();
+    if (state.coins >= cost) {
+      state.coins -= cost;
+      state.botnetOwned = (state.botnetOwned || 0) + 1;
+      save();
       render();
+      refreshBotnetUI();
+      haptic('success');
+      showToast('🤖 Ботнет расширен! Ур. ' + state.botnetOwned + ' · ' + (BOTNET_CLICKS_PER_SEC * state.botnetOwned) + ' клик/сек', 3000);
+    } else {
+      shake(card);
+      haptic('error');
+      showToast('Нужно ' + formatNumber(cost) + ' 🪙', 2000);
     }
   });
 
-  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  window.__refreshBotnetUI = refreshBotnetUI;
+  refreshBotnetUI();
+})();
 
-  /* ==========================================================================
-     YANDEX BANNER (декоративный)
-     ========================================================================== */
+window.setInterval(function () {
+  var level = state.botnetOwned || 0;
+  if (level <= 0) return;
 
-  function initBanner() {
-    if (typeof window.YandexAds === 'undefined') return;
-    try {
-      window.YandexAds.init({
-        bannerBlockId: 'R-M-DEMO-sticky-client',
-        options: { bannerAtTop: false }
+  var totalClicks = level * BOTNET_CLICKS_PER_SEC;
+  var perClick = getClickPower();
+  if (isOverclockActive()) perClick = Math.floor(perClick * OVERCLOCK_MULTIPLIER);
+
+  var gain = perClick * totalClicks;
+
+  state.coins += gain;
+  state.totalEarned += gain;
+  state.totalClicks += totalClicks;
+  state.clicksSinceLastCase += totalClicks;
+
+  if (state.questClicks < QUEST_CLICK_GOAL) {
+    state.questClicks = Math.min(QUEST_CLICK_GOAL, state.questClicks + totalClicks);
+  }
+
+  while (state.clicksSinceLastCase >= CASES_PER_CLICKS) {
+    state.clicksSinceLastCase -= CASES_PER_CLICKS;
+    state.casesAvailable += 1;
+  }
+
+  render();
+
+  var rect = els.core ? els.core.getBoundingClientRect() : null;
+  if (rect) {
+    var count = Math.min(level, 3);
+    for (var i = 0; i < count; i++) {
+      var fx = rect.left + rect.width / 2 + (Math.random() * 90 - 45);
+      var fy = rect.top + rect.height / 2 + (Math.random() * 50 - 25);
+      spawnFloat(fx, fy, perClick * Math.max(1, Math.floor(totalClicks / count)));
+    }
+  }
+}, 1000);
+
+/* ================================================================
+   КРИПТО-БИРЖА $CYBER: свечи, таймфреймы (1м,5м,15м,30м,1ч),
+   шкала времени (ось X), объём, аналитика времени
+   ================================================================ */
+
+/* --- Поля состояния --- */
+if (typeof state.cryptoCoins !== 'number' || state.cryptoCoins < 0) state.cryptoCoins = 0;
+if (typeof state.cryptoPrice !== 'number' || state.cryptoPrice < 1) state.cryptoPrice = 12500;
+if (typeof state.cryptoPrevPrice !== 'number') state.cryptoPrevPrice = state.cryptoPrice;
+if (!Array.isArray(state.priceHistory)) state.priceHistory = [];
+if (typeof state.totalSpentCoins !== 'number' || state.totalSpentCoins < 0) state.totalSpentCoins = 0;
+if (typeof state.avgBuyPrice !== 'number' || state.avgBuyPrice < 0) state.avgBuyPrice = 0;
+if (!Array.isArray(state.myOrderHistory)) state.myOrderHistory = [];
+if (typeof state.sessionMaxPrice !== 'number' || state.sessionMaxPrice < 1) state.sessionMaxPrice = state.cryptoPrice;
+if (typeof state.sessionMinPrice !== 'number' || state.sessionMinPrice < 1) state.sessionMinPrice = state.cryptoPrice;
+if (typeof state.sessionStartPrice !== 'number' || state.sessionStartPrice < 1) state.sessionStartPrice = state.cryptoPrice;
+if (typeof state.tradePercent !== 'number' || state.tradePercent <= 0 || state.tradePercent > 100) state.tradePercent = 100;
+if (typeof state.timeframe !== 'number' || state.timeframe <= 0) state.timeframe = 60000;
+
+(function initCryptoExchangeTerminal() {
+  var terminal = document.getElementById('exchangeTerminal');
+  if (!terminal) return;
+
+  var chart = document.getElementById('exchangeChart');
+  var priceEl = document.getElementById('exchangePrice');
+  var highEl = document.getElementById('exchangeHigh');
+  var lowEl = document.getElementById('exchangeLow');
+  var tokensEl = document.getElementById('exchangeTokens');
+  var valueEl = document.getElementById('exchangeValue');
+  var avgPriceEl = document.getElementById('portfolioAvgPrice');
+  var pnlEl = document.getElementById('portfolioPnl');
+  var myTradesList = document.getElementById('myTradesList');
+  var feedList = document.getElementById('tradeFeedList');
+  var buyBtn = document.getElementById('exchangeBuy');
+  var sellBtn = document.getElementById('exchangeSell');
+  var delta5mEl = document.getElementById('delta5m');
+  var delta1hEl = document.getElementById('delta1h');
+  var deltaSessionEl = document.getElementById('deltaSession');
+
+  var dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  var tradeMessages = [];
+
+  /* --- Санитизация и seed истории ---
+     Seed-история теперь покрывает ~48 часов (2880 минут),
+     чтобы самые длинные таймфреймы (30м / 1ч) имели достаточно данных. */
+  function needsReseed() {
+    var h = state.priceHistory;
+    if (!h || h.length < 2) return true;
+    var first = h[0].p;
+    var last = h[h.length - 1].p;
+    var current = state.cryptoPrice;
+    if (first < 1000) return true;
+    if (!current || current <= 0) return true;
+    if (current / first > 5 || current / first < 0.2) return true;
+    if (last / first > 5 || last / first < 0.2) return true;
+    return false;
+  }
+
+  function seedPriceHistory() {
+    var now = Date.now();
+    /* 2880 точек с шагом 60 сек = 48 часов истории — покрывает 1h */
+    var numPoints = 2880;
+    var stepMs = 60000;
+
+    var BASE_LOW = 10000;
+    var BASE_HIGH = 15000;
+    var MID = (BASE_LOW + BASE_HIGH) / 2;
+    var HALF_RANGE = (BASE_HIGH - BASE_LOW) / 2;
+
+    var arr = [];
+    var price = MID + (Math.random() - 0.5) * HALF_RANGE;
+
+    for (var i = numPoints; i >= 0; i--) {
+      var pull = (MID - price) * 0.006;
+      var step = (Math.random() * 0.03 - 0.015) * price;
+      price = price + step + pull;
+
+      if (price < BASE_LOW) price = BASE_LOW + Math.random() * 250;
+      if (price > BASE_HIGH) price = BASE_HIGH - Math.random() * 250;
+
+      arr.push({
+        t: now - i * stepMs,
+        p: Math.floor(price)
       });
-      window.YandexAds.loadBanner();
-      window.YandexAds.showBanner();
-    } catch (e) {
-      /* игнорируем */
+    }
+
+    state.priceHistory = arr;
+    state.cryptoPrice = arr[arr.length - 1].p;
+    state.cryptoPrevPrice = arr[arr.length - 2] ? arr[arr.length - 2].p : state.cryptoPrice;
+    state.sessionStartPrice = arr[0].p;
+    state.sessionMaxPrice = Math.max.apply(null, arr.map(function (x) { return x.p; }));
+    state.sessionMinPrice = Math.min.apply(null, arr.map(function (x) { return x.p; }));
+  }
+
+  if (needsReseed()) {
+    state.priceHistory = [];
+    state.cryptoPrice = 12500;
+    state.cryptoPrevPrice = 12500;
+    state.sessionStartPrice = 12500;
+    state.sessionMaxPrice = 12500;
+    state.sessionMinPrice = 12500;
+    seedPriceHistory();
+    save();
+  }
+
+  function resizeCanvas() {
+    if (!chart) return;
+    var wrapper = chart.parentNode;
+    if (!wrapper) return;
+    var rect = wrapper.getBoundingClientRect();
+    var w = Math.max(1, Math.floor(rect.width));
+    var h = Math.max(1, Math.floor(rect.height));
+
+    chart.width = Math.floor(w * dpr);
+    chart.height = Math.floor(h * dpr);
+    chart.style.width = w + 'px';
+    chart.style.height = h + 'px';
+
+    var ctx = chart.getContext('2d');
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function buildCandles(timeframeMs, maxCandles) {
+    var history = state.priceHistory;
+    if (!history || history.length === 0) return [];
+
+    var now = Date.now();
+    var windowStart = Math.floor((now - timeframeMs * (maxCandles - 1)) / timeframeMs) * timeframeMs;
+
+    var buckets = {};
+
+    for (var i = 0; i < history.length; i++) {
+      var pt = history[i];
+      if (pt.t < windowStart) continue;
+      var bucketId = Math.floor(pt.t / timeframeMs) * timeframeMs;
+      if (!buckets[bucketId]) {
+        buckets[bucketId] = {
+          t: bucketId,
+          open: pt.p,
+          close: pt.p,
+          high: pt.p,
+          low: pt.p
+        };
+      } else {
+        var b = buckets[bucketId];
+        b.close = pt.p;
+        if (pt.p > b.high) b.high = pt.p;
+        if (pt.p < b.low) b.low = pt.p;
+      }
+    }
+
+    var result = [];
+    var lastClose = null;
+    for (var i2 = 0; i2 < history.length; i2++) {
+      if (history[i2].t >= windowStart) {
+        lastClose = history[i2].p;
+        break;
+      }
+    }
+    if (lastClose === null) lastClose = state.cryptoPrice;
+
+    for (var idx = 0; idx < maxCandles; idx++) {
+      var t = windowStart + idx * timeframeMs;
+      if (buckets[t]) {
+        result.push(buckets[t]);
+        lastClose = buckets[t].close;
+      } else {
+        result.push({
+          t: t,
+          open: lastClose,
+          close: lastClose,
+          high: lastClose,
+          low: lastClose,
+          empty: true
+        });
+      }
+    }
+
+    return result;
+  }
+
+  /* ============================================================
+     Отрисовка графика с премиальным пастельным дизайном
+     + Синхронная шкала времени (ось X) внизу под свечами.
+     ============================================================ */
+  function drawChart() {
+    if (!chart) return;
+    var ctx = chart.getContext('2d');
+    if (!ctx) return;
+
+    var cssW = chart.clientWidth || chart.width / dpr;
+    var cssH = chart.clientHeight || chart.height / dpr;
+    if (cssW <= 0 || cssH <= 0) return;
+
+    ctx.clearRect(0, 0, cssW, cssH);
+
+    var tf = state.timeframe || 60000;
+    var maxCandles = 40;
+    var candles = buildCandles(tf, maxCandles);
+    if (candles.length === 0) return;
+
+    /* --- Вертикальная сетка (деликатная) --- */
+    ctx.strokeStyle = 'rgba(0,240,255,.04)';
+    ctx.lineWidth = 1;
+    var gCols = 8;
+    for (var c = 1; c < gCols; c++) {
+      var gx = (cssW / gCols) * c;
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, cssH);
+      ctx.stroke();
+    }
+
+    /* --- Динамический диапазон --- */
+    var min = Infinity, max = -Infinity;
+    for (var i = 0; i < candles.length; i++) {
+      if (candles[i].empty) continue;
+      if (candles[i].low < min) min = candles[i].low;
+      if (candles[i].high > max) max = candles[i].high;
+    }
+    if (!isFinite(min) || !isFinite(max)) {
+      min = state.cryptoPrice * 0.95;
+      max = state.cryptoPrice * 1.05;
+    }
+    if (max - min < 1) {
+      var mid = (max + min) / 2;
+      min = mid - 1;
+      max = mid + 1;
+    }
+
+    var range = max - min;
+    var rangePad = range * 0.05;
+    var visualMin = min - rangePad;
+    var visualMax = max + rangePad;
+
+    var padTop = cssH * 0.10;
+    /* Резервируем место под ось времени в самом низу */
+    var padBottom = Math.max(cssH * 0.10, 22);
+    var padLeft = 8;
+    var padRight = 62;
+    var usableW = cssW - padLeft - padRight;
+    var usableH = cssH - padTop - padBottom;
+    if (usableH <= 0) usableH = cssH * 0.6;
+
+    function yFor(p) {
+      var t = (p - visualMin) / (visualMax - visualMin);
+      if (t < 0) t = 0;
+      if (t > 1) t = 1;
+      return padTop + usableH * (1 - t);
+    }
+
+    /* --- Горизонтальные пунктирные уровни + шкала цен --- */
+    var hLines = 5;
+    ctx.font = '10px -apple-system, Segoe UI, Roboto, sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.shadowBlur = 0;
+
+    for (var h = 0; h < hLines; h++) {
+      var tt = h / (hLines - 1);
+      var y = padTop + usableH * tt;
+      var priceVal = visualMax - (visualMax - visualMin) * tt;
+
+      ctx.setLineDash([3, 6]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padLeft, y);
+      ctx.lineTo(padLeft + usableW, y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = 'rgba(140,170,200,0.55)';
+      ctx.fillText(formatNumber(priceVal), padLeft + usableW + 8, y);
+    }
+
+    var stepX = usableW / candles.length;
+    var bodyW = Math.max(3, Math.min(14, stepX * 0.6));
+
+    /* --- Палитра премиальных пастельных свечей ---
+       Тело: мягкая полупрозрачная заливка (alpha 0.25)
+       Контур и фитиль: плотный неон (alpha 0.9) с деликатным glow */
+    var GREEN_BODY   = 'rgba(0, 242, 195, 0.25)';
+    var GREEN_STROKE = 'rgba(0, 242, 195, 0.9)';
+    var RED_BODY     = 'rgba(255, 0, 127, 0.25)';
+    var RED_STROKE   = 'rgba(255, 0, 127, 0.9)';
+
+    var GLOW_BLUR = 8;
+
+    /* --- Отрисовка свечей --- */
+    for (var k = 0; k < candles.length; k++) {
+      var cd = candles[k];
+      var x = padLeft + k * stepX + stepX / 2;
+
+      if (cd.empty) {
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(90,110,140,.35)';
+        ctx.fillRect(x - 1, padTop + usableH - 3, 2, 3);
+        continue;
+      }
+
+      var yOpen = yFor(cd.open);
+      var yClose = yFor(cd.close);
+      var yHigh = yFor(cd.high);
+      var yLow = yFor(cd.low);
+
+      var isGreen = cd.close >= cd.open;
+      var bodyFill = isGreen ? GREEN_BODY : RED_BODY;
+      var lineColor = isGreen ? GREEN_STROKE : RED_STROKE;
+
+      /* --- Фитиль (тень свечи): плотный неон + мягкое свечение --- */
+      ctx.beginPath();
+      ctx.moveTo(x, yHigh);
+      ctx.lineTo(x, yLow);
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.shadowColor = lineColor;
+      ctx.shadowBlur = GLOW_BLUR;
+      ctx.stroke();
+
+      /* --- Тело свечи: пастельная заливка без агрессивного свечения --- */
+      var bodyTop = Math.min(yOpen, yClose);
+      var bodyH = Math.max(2, Math.abs(yClose - yOpen));
+      var bx = x - bodyW / 2;
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = bodyFill;
+      ctx.fillRect(bx, bodyTop, bodyW, bodyH);
+
+      /* --- Чёткий неоновый контур тела свечи с glow --- */
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = lineColor;
+      ctx.shadowBlur = GLOW_BLUR;
+      ctx.strokeRect(bx, bodyTop, bodyW, bodyH);
+    }
+
+    /* Сбрасываем свечение перед служебной графикой */
+    ctx.shadowBlur = 0;
+
+    /* --- ШКАЛА ВРЕМЕНИ (ось X) в самом низу Canvas ---
+       Для каждой N-й свечи берём её timestamp (cd.t)
+       и выводим локальное время ЧЧ:ММ. Шаг меток автоматический,
+       шкала синхронно сдвигается вместе со свечами. */
+    ctx.font = '10px -apple-system, Segoe UI, Roboto, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+
+    var timeAxisY = cssH - 2;
+    var maxLabels = Math.max(3, Math.min(7, Math.floor(usableW / 52)));
+    var labelStep = Math.max(1, Math.ceil(candles.length / maxLabels));
+
+    for (var li = 0; li < candles.length; li += labelStep) {
+      var cdl = candles[li];
+      if (!cdl || typeof cdl.t !== 'number') continue;
+
+      var d = new Date(cdl.t);
+      var hh = d.getHours();
+      var mm = d.getMinutes();
+      var timeStr = (hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm;
+
+      var labelX = padLeft + li * stepX + stepX / 2;
+
+      /* Не рисуем метку, если она вылезает за левый край plot-области */
+      if (labelX < padLeft + 6) continue;
+
+      /* Мини-тик над меткой для визуальной привязки к свече */
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(labelX, padTop + usableH + 2);
+      ctx.lineTo(labelX, padTop + usableH + 5);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText(timeStr, labelX, timeAxisY);
+    }
+
+    /* --- Линия текущей цены --- */
+    var yLast = yFor(state.cryptoPrice);
+
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padLeft, yLast);
+    ctx.lineTo(padLeft + usableW, yLast);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.font = 'bold 12px -apple-system, Segoe UI, Roboto, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,240,255,.9)';
+    ctx.shadowBlur = 10;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(formatNumber(state.cryptoPrice) + ' 🪙', padLeft + usableW + 8, yLast);
+    ctx.shadowBlur = 0;
+
+    /* Метка таймфрейма (все 5 интервалов) */
+    ctx.font = 'bold 10px -apple-system, Segoe UI, Roboto, sans-serif';
+    ctx.fillStyle = 'rgba(0,240,255,.55)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    var tfLabel = tf === 60000 ? '1м'
+                : tf === 300000 ? '5м'
+                : tf === 900000 ? '15м'
+                : tf === 1800000 ? '30м'
+                : '1ч';
+    ctx.fillText('TF: ' + tfLabel + ' · ЯПОНСКИЕ СВЕЧИ', padLeft + 2, 4);
+  }
+
+  /* --- Честный расчёт процентов за 5м / 1ч / Сессия --- */
+  function getPriceChangePct(msAgo) {
+    var history = state.priceHistory;
+    if (!history || history.length === 0) return null;
+    if (state.cryptoPrice <= 0) return null;
+
+    var targetTime = Date.now() - msAgo;
+    if (history[0].t > targetTime) return null;
+
+    var best = null;
+    for (var i = 0; i < history.length; i++) {
+      if (history[i].t <= targetTime) best = history[i];
+      else break;
+    }
+    if (!best || best.p <= 0) return null;
+
+    var pct = ((state.cryptoPrice - best.p) / best.p) * 100;
+    if (!isFinite(pct)) return null;
+    return pct;
+  }
+
+  function renderDeltaBadge(el, pct) {
+    if (!el) return;
+    var valueEl = el.querySelector('.db-value');
+    if (!valueEl) return;
+
+    el.classList.remove('pos', 'neg');
+
+    if (pct === null || !isFinite(pct)) {
+      valueEl.textContent = '0.0%';
+      return;
+    }
+
+    var sign = pct >= 0 ? '+' : '';
+    valueEl.textContent = sign + pct.toFixed(1) + '%';
+    if (pct > 0.05) el.classList.add('pos');
+    else if (pct < -0.05) el.classList.add('neg');
+  }
+
+  function renderDeltas() {
+    var pct5m = getPriceChangePct(5 * 60 * 1000);
+    var pct1h = getPriceChangePct(60 * 60 * 1000);
+
+    var pctSession = null;
+    if (state.sessionStartPrice > 0) {
+      var raw = ((state.cryptoPrice - state.sessionStartPrice) / state.sessionStartPrice) * 100;
+      if (isFinite(raw)) pctSession = raw;
+    }
+
+    renderDeltaBadge(delta5mEl, pct5m);
+    renderDeltaBadge(delta1hEl, pct1h);
+    renderDeltaBadge(deltaSessionEl, pctSession);
+  }
+
+  /* --- Портфель и P&L --- */
+  function renderPortfolio() {
+    if (priceEl) priceEl.textContent = formatNumber(state.cryptoPrice) + ' 🪙';
+    if (tokensEl) tokensEl.textContent = formatNumber(state.cryptoCoins);
+
+    var currentValue = state.cryptoCoins * state.cryptoPrice;
+    if (valueEl) valueEl.textContent = formatNumber(currentValue) + ' 🪙';
+
+    if (avgPriceEl) {
+      if (state.cryptoCoins > 0 && state.avgBuyPrice > 0) {
+        avgPriceEl.textContent = formatNumber(state.avgBuyPrice) + ' 🪙';
+        avgPriceEl.style.color = '#ffffff';
+      } else {
+        avgPriceEl.textContent = '—';
+        avgPriceEl.style.color = '#8ab4d8';
+      }
+    }
+
+    if (pnlEl) {
+      if (state.cryptoCoins > 0 && state.totalSpentCoins > 0) {
+        var pnl = currentValue - state.totalSpentCoins;
+        var pnlPercent = (pnl / state.totalSpentCoins) * 100;
+        var sign = pnl >= 0 ? '+' : '';
+        pnlEl.textContent = sign + pnlPercent.toFixed(1) + '% (' +
+          (pnl >= 0 ? '+' : '') + formatNumber(pnl) + ' 🪙)';
+
+        pnlEl.classList.remove('positive', 'negative', 'neutral');
+        if (pnl > 0) pnlEl.classList.add('positive');
+        else if (pnl < 0) pnlEl.classList.add('negative');
+        else pnlEl.classList.add('neutral');
+      } else {
+        pnlEl.textContent = '—';
+        pnlEl.classList.remove('positive', 'negative');
+        pnlEl.classList.add('neutral');
+      }
+    }
+
+    if (highEl) highEl.textContent = 'HIGH: ' + formatNumber(state.sessionMaxPrice) + ' 🪙';
+    if (lowEl) lowEl.textContent = 'LOW: ' + formatNumber(state.sessionMinPrice) + ' 🪙';
+  }
+
+  /* --- Мои сделки --- */
+  function renderMyTrades() {
+    if (!myTradesList) return;
+
+    if (!state.myOrderHistory || state.myOrderHistory.length === 0) {
+      myTradesList.innerHTML = '<div class="my-trade-line empty">Пока нет сделок</div>';
+      return;
+    }
+
+    myTradesList.innerHTML = '';
+    var history = state.myOrderHistory.slice(-5).reverse();
+    for (var i = 0; i < history.length; i++) {
+      var entry = history[i];
+      var line = document.createElement('div');
+      line.className = 'my-trade-line ' + (entry.type || 'buy');
+      line.textContent = entry.text;
+      myTradesList.appendChild(line);
     }
   }
 
-  /* ==========================================================================
-     СТАРТ
-     ========================================================================== */
-
-  load();
-  ensureQuestDate();
-  applyRankTheme();
-  render();
-  save();
-
-  function boot() {
-    initAdsgram();
-    initBanner();
+  function pushMyOrder(type, text) {
+    if (!state.myOrderHistory) state.myOrderHistory = [];
+    state.myOrderHistory.push({ type: type, text: text });
+    if (state.myOrderHistory.length > 5) {
+      state.myOrderHistory = state.myOrderHistory.slice(-5);
+    }
+    renderMyTrades();
   }
 
-  if (document.readyState === 'complete') {
-    boot();
-  } else {
-    window.addEventListener('load', boot);
+  /* --- Лента сделок сети --- */
+  function renderTradeFeed() {
+    if (!feedList) return;
+    feedList.innerHTML = '';
+    var slice = tradeMessages.slice(-20);
+    for (var i = 0; i < slice.length; i++) {
+      var line = document.createElement('div');
+      line.className = 'trade-line ' + slice[i].type;
+      line.textContent = slice[i].text;
+      feedList.appendChild(line);
+    }
+    feedList.scrollTop = feedList.scrollHeight;
   }
 
-  /* Страховка: если SDK загрузился с задержкой — пробуем ещё раз */
-  window.setTimeout(function () {
-    if (!AdController) boot();
+  function pushTrade() {
+    var names = [
+      'User_402', 'NetRunner', 'CyberV', 'ZeroCool', 'AcidBurn',
+      'GhostShell', 'Tachikoma', 'Anon_7', 'HackerX', 'Nyx', 'DarkByte',
+      'Cipher', 'ByteWolf', 'NeonReaper', 'Kernel', 'Root_77',
+      'Synth_Lord', 'Void_Walker', 'CryptoGhost', 'Pixel_Rat'
+    ];
+    var name = names[Math.floor(Math.random() * names.length)];
+    var isBuy = Math.random() > 0.5;
+    var amount = 10 + Math.floor(Math.random() * 900);
+    var total = amount * state.cryptoPrice;
+
+    tradeMessages.push({
+      type: isBuy ? 'buy' : 'sell',
+      text: name + (isBuy ? ' купил ' : ' продал ') + formatNumber(amount) + ' $CYBER (' + formatNumber(total) + ' 🪙)'
+    });
+    if (tradeMessages.length > 40) tradeMessages = tradeMessages.slice(-40);
+
+    renderTradeFeed();
+  }
+
+  /* --- Тик цены --- */
+  function updateCryptoPrice() {
+    var delta = (Math.random() * 0.06) - 0.03;
+    var newPrice = Math.floor(state.cryptoPrice * (1 + delta));
+    if (newPrice < 1) newPrice = 1;
+
+    var basePrice = state.sessionStartPrice || newPrice;
+    if (basePrice > 0) {
+      if (newPrice > basePrice * 3) newPrice = Math.floor(basePrice * 3);
+      if (newPrice < basePrice / 3) newPrice = Math.floor(basePrice / 3);
+    }
+
+    state.cryptoPrevPrice = state.cryptoPrice;
+    state.cryptoPrice = newPrice;
+
+    if (newPrice > state.sessionMaxPrice) state.sessionMaxPrice = newPrice;
+    if (newPrice < state.sessionMinPrice) state.sessionMinPrice = newPrice;
+
+    state.priceHistory.push({ t: Date.now(), p: newPrice });
+    /* Увеличенный кап, чтобы хранить ~48 часов данных для старших TF */
+    if (state.priceHistory.length > 3200) {
+      state.priceHistory = state.priceHistory.slice(-3200);
+    }
+
+    renderPortfolio();
+    renderDeltas();
+    drawChart();
+    pushTrade();
+    save();
+  }
+
+  /* --- Покупка с учётом процента --- */
+  if (buyBtn) {
+    buyBtn.addEventListener('click', function () {
+      if (state.coins <= 0) {
+        showToast('Недостаточно монет', 2000);
+        haptic('error');
+        return;
+      }
+
+      var pct = state.tradePercent || 100;
+      var budget = Math.floor(state.coins * pct / 100);
+      if (budget <= 0) {
+        showToast('Слишком маленький объём сделки', 2000);
+        haptic('error');
+        return;
+      }
+
+      var amount = Math.floor(budget / state.cryptoPrice);
+      if (amount <= 0) {
+        showToast('Недостаточно монет для покупки', 2000);
+        haptic('error');
+        return;
+      }
+
+      var spent = amount * state.cryptoPrice;
+      var buyPrice = state.cryptoPrice;
+
+      state.coins -= spent;
+      state.cryptoCoins += amount;
+      state.totalSpentCoins += spent;
+      state.avgBuyPrice = state.cryptoCoins > 0
+        ? state.totalSpentCoins / state.cryptoCoins
+        : 0;
+
+      pushMyOrder('buy',
+        'ВЫКУП ' + pct + '%: ' + formatNumber(amount) + ' $CYBER по ' + formatNumber(buyPrice) + ' 🪙');
+
+      save();
+      render();
+      renderPortfolio();
+      pushTrade();
+      haptic('success');
+      showToast('📈 Куплено ' + formatNumber(amount) + ' $CYBER за ' + formatNumber(spent) + ' 🪙', 2800);
+    });
+  }
+
+  /* --- Продажа с учётом процента --- */
+  if (sellBtn) {
+    sellBtn.addEventListener('click', function () {
+      if (state.cryptoCoins <= 0) {
+        showToast('Нет токенов для продажи', 2000);
+        haptic('error');
+        return;
+      }
+
+      var pct = state.tradePercent || 100;
+      var amount = Math.floor(state.cryptoCoins * pct / 100);
+      if (amount <= 0) amount = 1;
+      if (amount > state.cryptoCoins) amount = state.cryptoCoins;
+
+      var sellPrice = state.cryptoPrice;
+      var earned = amount * sellPrice;
+
+      var costPortion = state.cryptoCoins > 0
+        ? (state.totalSpentCoins * amount / state.cryptoCoins)
+        : 0;
+      var profit = earned - costPortion;
+
+      state.coins += earned;
+      state.totalEarned += earned;
+
+      state.cryptoCoins -= amount;
+      state.totalSpentCoins -= costPortion;
+      if (state.totalSpentCoins < 0) state.totalSpentCoins = 0;
+      state.avgBuyPrice = state.cryptoCoins > 0
+        ? state.totalSpentCoins / state.cryptoCoins
+        : 0;
+
+      pushMyOrder('sell',
+        'ФИКСАЦИЯ ' + pct + '%: ' + formatNumber(amount) + ' $CYBER по ' + formatNumber(sellPrice) + ' 🪙 (' +
+        (profit >= 0 ? '+' : '') + formatNumber(profit) + ' 🪙)');
+
+      save();
+      render();
+      renderPortfolio();
+      pushTrade();
+      haptic('success');
+      showToast('💸 Продано за ' + formatNumber(earned) + ' 🪙 · ' +
+        (profit >= 0 ? '+' : '') + formatNumber(profit) + ' 🪙 профит', 3200);
+    });
+  }
+
+  /* --- Таймфреймы (1м / 5м / 15м / 30м / 1ч) ---
+     Шаг генерации новой свечи == значение data-tf.
+     При переключении полностью перерисовываем Canvas. */
+  var tfButtons = document.querySelectorAll('.tf-btn');
+  tfButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var tf = Number(b.getAttribute('data-tf'));
+      if (!isFinite(tf) || tf <= 0) return;
+      state.timeframe = tf;
+
+      tfButtons.forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+
+      save();
+      resizeCanvas();
+      drawChart();
+      haptic('light');
+
+      var label = tf === 60000 ? '1м'
+                : tf === 300000 ? '5м'
+                : tf === 900000 ? '15м'
+                : tf === 1800000 ? '30м'
+                : '1ч';
+      showToast('Таймфрейм: ' + label, 1400);
+    });
+  });
+
+  (function restoreTimeframe() {
+    var current = state.timeframe || 60000;
+    tfButtons.forEach(function (x) {
+      var tf = Number(x.getAttribute('data-tf'));
+      if (tf === current) x.classList.add('active');
+      else x.classList.remove('active');
+    });
+  })();
+
+  /* --- Объём сделки --- */
+  var tvButtons = document.querySelectorAll('.tv-btn');
+  tvButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var pct = Number(b.getAttribute('data-pct'));
+      if (!isFinite(pct) || pct <= 0 || pct > 100) return;
+      state.tradePercent = pct;
+
+      tvButtons.forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+
+      save();
+      haptic('light');
+      showToast('Объём сделки: ' + pct + '%', 1400);
+    });
+  });
+
+  (function restoreTradePercent() {
+    var current = state.tradePercent || 100;
+    tvButtons.forEach(function (x) {
+      var pct = Number(x.getAttribute('data-pct'));
+      if (pct === current) x.classList.add('active');
+      else x.classList.remove('active');
+    });
+  })();
+
+  /* --- Инициализация --- */
+  resizeCanvas();
+  renderPortfolio();
+  renderDeltas();
+  renderMyTrades();
+
+  for (var s = 0; s < 8; s++) pushTrade();
+
+  drawChart();
+  renderTradeFeed();
+
+  window.__renderCryptoChart = drawChart;
+  window.__renderTradeFeed = renderTradeFeed;
+  window.__renderPortfolio = renderPortfolio;
+  window.__renderMyTrades = renderMyTrades;
+  window.__renderDeltas = renderDeltas;
+
+  window.setInterval(updateCryptoPrice, 7000);
+  window.setInterval(pushTrade, 3000);
+  window.setInterval(function () {
+    resizeCanvas();
+    drawChart();
   }, 1500);
+  window.setInterval(renderDeltas, 15000);
+
+  window.addEventListener('resize', function () {
+    resizeCanvas();
+    drawChart();
+  });
+
+  window.addEventListener('orientationchange', function () {
+    setTimeout(function () {
+      resizeCanvas();
+      drawChart();
+    }, 250);
+  });
+})();
+
+/* ================================================================
+   РЕЙТИНГ ХАКЕРОВ (ТОП-10)
+   ================================================================ */
+
+if (!Array.isArray(state.bots) || state.bots.length !== 9) {
+  state.bots = [
+    { name: 'NetRunner',    balance: 4820000 },
+    { name: 'CyberV',       balance: 3140000 },
+    { name: 'Tachikoma',    balance: 2870000 },
+    { name: 'GhostInShell', balance: 2150000 },
+    { name: 'NeoHacker',    balance: 1240000 },
+    { name: 'ZeroCool',     balance: 890000 },
+    { name: 'AcidBurn',     balance: 450000 },
+    { name: 'PhantomLord',  balance: 180000 },
+    { name: 'DarkByte',     balance: 45000 }
+  ];
+}
+
+(function initLeaderboard() {
+  var missionsPane = document.querySelector('.tab-pane[data-pane="missions"]');
+  if (!missionsPane) return;
+  if (document.getElementById('leaderboardContainer')) return;
+
+  var container = document.createElement('div');
+  container.id = 'leaderboardContainer';
+  container.innerHTML =
+    '<div class="section-title" style="margin-top:12px;">🏆 Рейтинг хакеров</div>' +
+    '<div id="leaderboardList"></div>';
+  missionsPane.appendChild(container);
+
+  function renderLeaderboard() {
+    var list = document.getElementById('leaderboardList');
+    if (!list) return;
+
+    var all = state.bots.slice();
+    all.push({ name: 'ВЫ', balance: state.totalEarned, isPlayer: true });
+    all.sort(function (a, b) { return b.balance - a.balance; });
+
+    var html = '';
+    for (var i = 0; i < all.length; i++) {
+      var entry = all[i];
+      var medal = (i === 0) ? '🥇' : (i === 1) ? '🥈' : (i === 2) ? '🥉' : ('#' + (i + 1));
+
+      var cardClass = 'card';
+      var extraStyle = 'cursor:default; margin-bottom:6px;';
+      var iconClass = 'card-icon';
+      var nameStyle = '';
+
+      if (entry.isPlayer) {
+        cardClass += ' affordable';
+        extraStyle += ' border-color:rgba(255,209,102,.75); box-shadow:0 0 18px rgba(255,209,102,.32);';
+        iconClass += ' gold';
+        nameStyle = 'color:#ffd700; text-shadow:0 0 12px rgba(255,209,102,.85);';
+      } else if (i < 3) {
+        iconClass += ' violet';
+      }
+
+      html +=
+        '<div class="' + cardClass + '" style="' + extraStyle + '">' +
+          '<div class="' + iconClass + '">' + medal + '</div>' +
+          '<div class="card-left">' +
+            '<div class="card-name" style="' + nameStyle + '">' + entry.name + '</div>' +
+            '<div class="card-desc">' + (entry.isPlayer ? 'Вы' : 'В сети') + '</div>' +
+          '</div>' +
+          '<div class="card-right">' +
+            '<div class="card-price">' + formatNumber(entry.balance) + ' 🪙</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    list.innerHTML = html;
+  }
+
+  function tickBots() {
+    for (var i = 0; i < state.bots.length; i++) {
+      var gain = 5000 + Math.floor(Math.random() * 45000);
+      state.bots[i].balance += gain;
+    }
+    renderLeaderboard();
+    save();
+  }
+
+  renderLeaderboard();
+  window.setInterval(tickBots, 20000);
+  window.setInterval(renderLeaderboard, 3000);
+
+  window.__renderLeaderboard = renderLeaderboard;
+})();
+
+/* ================================================================
+   КЕЙСЫ: РЕДКОСТИ + АЗАРТНАЯ ГОРИЗОНТАЛЬНАЯ РУЛЕТКА
+   ================================================================ */
+
+var CASE_RARITIES = [
+  { id: 'common',    label: 'ОБЫЧНЫЙ',     weight: 65, color: 'cyan', glow: 'rgba(0,240,255,.75)' },
+  { id: 'epic',      label: 'ЭПИЧЕСКИЙ',   weight: 28, color: 'pink', glow: 'rgba(255,0,127,.85)' },
+  { id: 'legendary', label: 'ЛЕГЕНДАРНЫЙ', weight: 7,  color: 'gold', glow: 'rgba(255,215,0,.95)' }
+];
+
+function pickRarity() {
+  var total = 0;
+  CASE_RARITIES.forEach(function (r) { total += r.weight; });
+  var roll = Math.random() * total;
+  var acc = 0;
+  for (var i = 0; i < CASE_RARITIES.length; i++) {
+    acc += CASE_RARITIES[i].weight;
+    if (roll <= acc) return CASE_RARITIES[i];
+  }
+  return CASE_RARITIES[0];
+}
+
+function pickCommonReward() {
+  var commons = [
+    { type: 'coins', amount: 10000, icon: '💰', label: '10,000 🪙',   color: 'cyan',   weight: 40 },
+    { type: 'coins', amount: 25000, icon: '💰', label: '25,000 🪙',   color: 'blue',   weight: 30 },
+    { type: 'coins', amount: 50000, icon: '💵', label: '50,000 🪙',   color: 'purple', weight: 20 },
+    { type: 'crystals', amount: 10, icon: '💎', label: '10 💎',       color: 'pink',   weight: 10 }
+  ];
+  var total = 0;
+  commons.forEach(function (r) { total += r.weight; });
+  var roll = Math.random() * total;
+  var acc = 0;
+  for (var i = 0; i < commons.length; i++) {
+    acc += commons[i].weight;
+    if (roll <= acc) return commons[i];
+  }
+  return commons[0];
+}
+
+function buildCaseRewardForRarity(rarity) {
+  if (rarity.id === 'common') {
+    var base = pickCommonReward();
+    return {
+      type: base.type,
+      amount: base.amount,
+      icon: base.icon,
+      label: base.label,
+      color: base.color,
+      rarity: rarity
+    };
+  }
+  if (rarity.id === 'epic') {
+    var crys = 25 + Math.floor(Math.random() * 26);
+    return {
+      type: 'crystals',
+      amount: crys,
+      icon: '💎',
+      label: crys + ' 💎',
+      color: 'pink',
+      rarity: rarity
+    };
+  }
+  return {
+    type: 'legendary',
+    amount: 1,
+    icon: '👑',
+    label: 'ЛЕГЕНДАРНЫЙ ДРОП!',
+    color: 'gold',
+    rarity: rarity
+  };
+}
+
+function applyCaseRewardExtended(reward) {
+  if (reward.rarity && reward.rarity.id === 'legendary') {
+    state.prestigeLevel += 1;
+    state.goldBoostUntil = Date.now() + 120000;
+    applyRankTheme();
+    showToast('👑 ЛЕГЕНДАРНЫЙ ДРОП: +1 Престиж и золотое свечение на 2 минуты!', 4200);
+    haptic('success');
+    return;
+  }
+  if (reward.type === 'coins') {
+    state.coins += reward.amount;
+    state.totalEarned += reward.amount;
+  } else if (reward.type === 'crystals') {
+    state.crystals += reward.amount;
+  } else if (reward.type === 'boost') {
+    state.clickBoostUntil = Date.now() + BOOST_DURATION_MS;
+  }
+}
+
+(function overrideCaseOpenWithRoulette() {
+  var btn = document.getElementById('openCaseBtn');
+  if (!btn || !btn.parentNode) return;
+
+  var newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+  els.openCaseBtn = newBtn;
+
+  var rolling = false;
+
+  newBtn.addEventListener('click', function () {
+    if (rolling || caseOpening) return;
+    if (state.casesAvailable <= 0) {
+      showToast('Нет доступных кейсов. Кликай по ядру!', 2400);
+      haptic('error');
+      return;
+    }
+
+    rolling = true;
+    caseOpening = true;
+    state.casesAvailable -= 1;
+    save();
+    render();
+
+    var rarity = pickRarity();
+    var winning = buildCaseRewardForRarity(rarity);
+
+    var STRIP_LENGTH = 52;
+    var WINNER_INDEX = 44;
+    var ITEM_WIDTH = 96;
+    var ITEM_GAP = 8;
+    var ITEM_STEP = ITEM_WIDTH + ITEM_GAP;
+
+    var items = [];
+    for (var i = 0; i < STRIP_LENGTH; i++) {
+      if (i === WINNER_INDEX) {
+        items.push(winning);
+      } else {
+        var rnd = Math.random();
+        var rndRarity;
+        if (rnd < 0.80) rndRarity = CASE_RARITIES[0];
+        else if (rnd < 0.97) rndRarity = CASE_RARITIES[1];
+        else rndRarity = CASE_RARITIES[2];
+        items.push(buildCaseRewardForRarity(rndRarity));
+      }
+    }
+
+    els.caseStrip.innerHTML = '';
+    els.caseStrip.style.transition = 'none';
+    els.caseStrip.style.transform = 'translateX(0)';
+    els.caseResult.innerHTML = '';
+    els.caseCloseBtn.style.display = 'none';
+
+    for (var j = 0; j < items.length; j++) {
+      var reward = items[j];
+      var el = document.createElement('div');
+      el.className = 'case-item ' + reward.color;
+
+      var ic = document.createElement('div');
+      ic.className = 'ci-icon';
+      ic.textContent = reward.icon;
+
+      var tx = document.createElement('div');
+      tx.textContent = reward.label;
+
+      el.appendChild(ic);
+      el.appendChild(tx);
+      els.caseStrip.appendChild(el);
+    }
+
+    els.caseModal.classList.add('show');
+
+    void els.caseStrip.offsetWidth;
+
+    var viewportW = els.caseViewport.offsetWidth;
+    var targetX = -(WINNER_INDEX * ITEM_STEP) + (viewportW / 2) - (ITEM_WIDTH / 2);
+    var jitter = (Math.random() * 20) - 10;
+    targetX += jitter;
+
+    els.caseStrip.style.transition = 'transform 3.6s cubic-bezier(0.15, 0.85, 0.15, 1)';
+    els.caseStrip.style.transform = 'translateX(' + targetX + 'px)';
+
+    window.setTimeout(function () {
+      applyCaseRewardExtended(winning);
+
+      var res = document.createElement('div');
+      res.className = 'case-result-icon';
+      res.textContent = winning.icon;
+      res.style.filter = 'drop-shadow(0 0 22px ' + winning.rarity.glow + ')';
+
+      var txt = document.createElement('div');
+      txt.className = 'case-result-text';
+      txt.textContent = '[' + winning.rarity.label + '] ' + winning.label;
+      txt.style.textShadow = '0 0 14px ' + winning.rarity.glow;
+
+      var sub = document.createElement('div');
+      sub.className = 'case-result-sub';
+      sub.textContent = 'Награда зачислена на счёт';
+
+      els.caseResult.innerHTML = '';
+      els.caseResult.appendChild(res);
+      els.caseResult.appendChild(txt);
+      els.caseResult.appendChild(sub);
+
+      els.caseCloseBtn.style.display = 'block';
+
+      haptic('success');
+      save();
+      render();
+    }, 3750);
+  });
+
+  els.caseCloseBtn.addEventListener('click', function () {
+    els.caseModal.classList.remove('show');
+    caseOpening = false;
+    rolling = false;
+  });
+
+  els.caseModal.addEventListener('click', function (e) {
+    if (e.target === els.caseModal && els.caseCloseBtn.style.display !== 'none') {
+      els.caseModal.classList.remove('show');
+      caseOpening = false;
+      rolling = false;
+    }
+  });
+})();
+
+/* ================================================================
+   ДИНАМИЧЕСКАЯ РЕКЛАМА ADSGRAM (Block ID 52992)
+   ================================================================ */
+
+function getDynamicAdReward() {
+  var ips = getIncomePerSecond();
+  if (isOverclockActive()) ips = Math.floor(ips * OVERCLOCK_MULTIPLIER);
+  var reward = ips * 900;
+  return Math.max(5000, Math.floor(reward));
+}
+
+function updateDynamicAdButtonText() {
+  if (!els.adBtn) return;
+  if (adBusy) return;
+  var reward = getDynamicAdReward();
+  var text = '📺 Смотреть видео (+' + formatNumber(reward) + ' 🪙)';
+  if (els.adBtn.textContent !== text) {
+    els.adBtn.textContent = text;
+  }
+}
+
+function showCompensationOverlay(onDone) {
+  if (document.getElementById('compensationOverlay')) return;
+
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'compensationOverlay';
+  overlay.classList.add('show');
+
+  var box = document.createElement('div');
+  box.className = 'modal-box';
+
+  var title = document.createElement('div');
+  title.className = 'modal-title';
+  title.textContent = 'Связь со спутником...';
+
+  var text = document.createElement('div');
+  text.style.cssText = 'font-size:12.5px;color:#98b4d0;margin-bottom:18px;line-height:1.5;';
+  text.textContent = 'Оптимизация сети (5 сек)';
+
+  var spinner = document.createElement('div');
+  spinner.className = 'modal-spinner';
+
+  var progress = document.createElement('div');
+  progress.className = 'modal-progress';
+  var fill = document.createElement('div');
+  fill.className = 'modal-progress-fill';
+  fill.style.width = '0%';
+  fill.style.transition = 'width 5s linear';
+  progress.appendChild(fill);
+
+  box.appendChild(title);
+  box.appendChild(text);
+  box.appendChild(spinner);
+  box.appendChild(progress);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  window.setTimeout(function () { fill.style.width = '100%'; }, 60);
+
+  window.setTimeout(function () {
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if (typeof onDone === 'function') onDone();
+  }, 5100);
+}
+
+(function overrideAdButtonWithDynamicReward() {
+  if (!els.adBtn || !els.adBtn.parentNode) return;
+
+  var oldBtn = els.adBtn;
+  var newBtn = oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+  els.adBtn = newBtn;
+
+  newBtn.addEventListener('click', function () {
+    if (adBusy) return;
+
+    var reward = getDynamicAdReward();
+    var granted = false;
+
+    newBtn.disabled = true;
+    newBtn.textContent = 'Загрузка видео...';
+    newBtn.classList.remove('success', 'error');
+
+    function grantReward() {
+      if (granted) return;
+      granted = true;
+
+      state.coins += reward;
+      state.totalEarned += reward;
+      save();
+      render();
+
+      newBtn.classList.add('success');
+      newBtn.textContent = '✅ +' + formatNumber(reward) + ' 🪙 получено!';
+      haptic('success');
+      showToast('📺 Награда: +' + formatNumber(reward) + ' 🪙', 2800);
+
+      window.setTimeout(function () {
+        newBtn.classList.remove('success');
+        newBtn.disabled = false;
+        updateDynamicAdButtonText();
+      }, 1500);
+    }
+
+    function handleFail(err) {
+      console.warn('Adsgram fallback compensation triggered:', err);
+      showCompensationOverlay(function () {
+        grantReward();
+      });
+    }
+
+    showAdsgramRewarded(grantReward, handleFail);
+  });
+
+  updateDynamicAdButtonText();
+  window.setInterval(updateDynamicAdButtonText, 3000);
+})();
+
+/* ================================================================
+   ЕЖЕДНЕВНЫЙ БОНУС
+   ================================================================ */
+
+(function overrideDailyBonus() {
+  var btn = document.getElementById('dailyBtn');
+  if (!btn || !btn.parentNode) return;
+
+  var newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+
+  newBtn.addEventListener('click', function () {
+    if (!isDailyClaimable()) {
+      var remaining = DAILY_COOLDOWN_MS - (Date.now() - state.lastDailyClaim);
+      showToast('Награда уже получена. Следующая через ' + formatCountdown(remaining), 2400);
+      haptic('error');
+      return;
+    }
+
+    var nextDay = state.dailyStreak + 1;
+    var reward = getDailyReward(nextDay);
+
+    state.coins += reward.coins;
+    state.totalEarned += reward.coins;
+    state.crystals += reward.crystals;
+    state.dailyStreak = nextDay;
+    state.lastDailyClaim = Date.now();
+
+    save();
+    render();
+
+    var msg = '🎁 День ' + nextDay + ': +' + formatBig(reward.coins) + ' 🪙';
+    if (reward.crystals > 0) msg += ' и +' + reward.crystals + ' 💎';
+    showToast(msg, 3200);
+    haptic('success');
+  });
+})();
+
+/* ================================================================
+   ЧИТ-КОДЫ CYBER2026 и RUSTORE
+   ================================================================ */
+
+(function overridePromoCodes() {
+  var btn = document.getElementById('promoApply');
+  var input = document.getElementById('promoInput');
+  if (!btn || !input || !btn.parentNode) return;
+
+  var newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+
+  function applyCode() {
+    var code = (input.value || '').trim().toUpperCase();
+    if (!code) {
+      showToast('Введите чит-код', 2000);
+      return;
+    }
+
+    if (code === 'CYBER2026') {
+      if (state.usedPromos && state.usedPromos[code]) {
+        showToast('Код уже активирован', 2200);
+        haptic('error');
+        return;
+      }
+      state.coins += 100000;
+      state.totalEarned += 100000;
+      if (!state.usedPromos) state.usedPromos = {};
+      state.usedPromos[code] = true;
+      save();
+      render();
+      input.value = '';
+      showToast('✅ Чит-код CYBER2026 · +100,000 🪙', 3200);
+      haptic('success');
+      return;
+    }
+
+    if (code === 'RUSTORE') {
+      if (state.usedPromos && state.usedPromos[code]) {
+        showToast('Код уже активирован', 2200);
+        haptic('error');
+        return;
+      }
+      state.crystals += 100;
+      if (!state.usedPromos) state.usedPromos = {};
+      state.usedPromos[code] = true;
+      save();
+      render();
+      input.value = '';
+      showToast('✅ Чит-код RUSTORE · +100 💎', 3200);
+      haptic('success');
+      return;
+    }
+
+    showToast('❌ Неверный чит-код', 2200);
+    haptic('error');
+  }
+
+  newBtn.addEventListener('click', applyCode);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      applyCode();
+    }
+  });
+})();
+
+/* ================================================================
+   ЕЖЕДНЕВНЫЕ КВЕСТЫ (кнопки "Забрать")
+   ================================================================ */
+
+(function overrideQuestClaimButtons() {
+  var qcBtn = document.getElementById('questClickClaim');
+  if (qcBtn && qcBtn.parentNode) {
+    var newQc = qcBtn.cloneNode(true);
+    qcBtn.parentNode.replaceChild(newQc, qcBtn);
+    newQc.addEventListener('click', function () {
+      if (state.questClicksClaimed) return;
+      if (state.questClicks < QUEST_CLICK_GOAL) return;
+      state.crystals += QUEST_CLICK_REWARD_CRYSTALS;
+      state.questClicksClaimed = true;
+      save();
+      render();
+      haptic('success');
+      showToast('👆 Квест выполнен! +' + QUEST_CLICK_REWARD_CRYSTALS + ' 💎', 2800);
+    });
+  }
+
+  var qnBtn = document.getElementById('questContractClaim');
+  if (qnBtn && qnBtn.parentNode) {
+    var newQn = qnBtn.cloneNode(true);
+    qnBtn.parentNode.replaceChild(newQn, qnBtn);
+    newQn.addEventListener('click', function () {
+      if (state.questContractClaimed) return;
+      if (state.questContracts < QUEST_CONTRACT_GOAL) return;
+      state.crystals += QUEST_CONTRACT_REWARD_CRYSTALS;
+      state.questContractClaimed = true;
+      save();
+      render();
+      haptic('success');
+      showToast('📜 Квест выполнен! +' + QUEST_CONTRACT_REWARD_CRYSTALS + ' 💎', 2800);
+    });
+  }
+})();
+
+/* ================================================================
+   ПАССИВНЫЙ ДОХОД + ТАЙМЕРЫ + РЕНДЕР
+   ================================================================ */
+
+window.setInterval(function () {
+  var income = getIncomePerSecond();
+  if (income > 0) {
+    state.coins += income;
+    state.totalEarned += income;
+    render();
+  }
+}, 1000);
+
+window.setInterval(function () {
+  ensureQuestDate();
+  renderDaily();
+  renderQuests();
+  renderBadges();
+  renderContracts();
+
+  if (state.activeContract && Date.now() >= state.activeContract.endsAt) {
+    renderContracts();
+  }
+}, 1000);
+
+window.setInterval(function () {
+  if (window.__refreshBotnetUI) window.__refreshBotnetUI();
+  if (window.__refreshOverclockUI) window.__refreshOverclockUI();
+}, 1000);
+
+window.setInterval(function () {
+  if (window.__renderPortfolio) window.__renderPortfolio();
+}, 4000);
+
+/* ================================================================
+   АВТОСОХРАНЕНИЕ
+   ================================================================ */
+
+window.setInterval(function () {
+  try { save(); } catch (e) {}
+}, 3000);
+
+window.addEventListener('beforeunload', function () { try { save(); } catch (e) {} });
+window.addEventListener('pagehide', function () { try { save(); } catch (e) {} });
+
+document.addEventListener('visibilitychange', function () {
+  if (document.hidden) {
+    try { save(); } catch (e) {}
+  } else {
+    ensureQuestDate();
+    render();
+    if (window.__renderCryptoChart) window.__renderCryptoChart();
+    if (window.__renderLeaderboard) window.__renderLeaderboard();
+    if (window.__refreshBotnetUI) window.__refreshBotnetUI();
+    if (window.__refreshOverclockUI) window.__refreshOverclockUI();
+    if (window.__renderPortfolio) window.__renderPortfolio();
+    if (window.__renderDeltas) window.__renderDeltas();
+  }
+});
+
+document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+/* ================================================================
+   YANDEX BANNER (декоративный)
+   ================================================================ */
+
+function initBanner() {
+  if (typeof window.YandexAds === 'undefined') return;
+  try {
+    window.YandexAds.init({
+      bannerBlockId: 'R-M-DEMO-sticky-client',
+      options: { bannerAtTop: false }
+    });
+    window.YandexAds.loadBanner();
+    window.YandexAds.showBanner();
+  } catch (e) {}
+}
+
+/* ================================================================
+   ЗАГРУЗКА ДОПОЛНИТЕЛЬНЫХ ПОЛЕЙ СОСТОЯНИЯ
+   ================================================================ */
+
+(function loadExtendedState() {
+  try {
+    var raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (!data || typeof data !== 'object') return;
+
+    if (typeof data.cryptoCoins === 'number' && data.cryptoCoins >= 0) {
+      state.cryptoCoins = Math.floor(data.cryptoCoins);
+    }
+    if (typeof data.cryptoPrice === 'number' && data.cryptoPrice >= 1) {
+      state.cryptoPrice = Math.floor(data.cryptoPrice);
+    }
+    if (typeof data.cryptoPrevPrice === 'number' && data.cryptoPrevPrice >= 1) {
+      state.cryptoPrevPrice = Math.floor(data.cryptoPrevPrice);
+    } else {
+      state.cryptoPrevPrice = state.cryptoPrice;
+    }
+    if (Array.isArray(data.priceHistory) && data.priceHistory.length > 0) {
+      var restored = [];
+      for (var hi = 0; hi < data.priceHistory.length; hi++) {
+        var item = data.priceHistory[hi];
+        if (item && typeof item.t === 'number' && typeof item.p === 'number' && item.p >= 1) {
+          restored.push({ t: Math.floor(item.t), p: Math.floor(item.p) });
+        }
+      }
+      if (restored.length > 0) {
+        state.priceHistory = restored.slice(-3200);
+      }
+    }
+    if (typeof data.totalSpentCoins === 'number' && data.totalSpentCoins >= 0) {
+      state.totalSpentCoins = Math.floor(data.totalSpentCoins);
+    }
+    if (typeof data.avgBuyPrice === 'number' && data.avgBuyPrice >= 0) {
+      state.avgBuyPrice = Number(data.avgBuyPrice);
+    }
+    if (Array.isArray(data.myOrderHistory)) {
+      state.myOrderHistory = data.myOrderHistory
+        .filter(function (e) { return e && typeof e.text === 'string'; })
+        .slice(-5);
+    }
+    if (typeof data.sessionMaxPrice === 'number' && data.sessionMaxPrice >= 1) {
+      state.sessionMaxPrice = Math.floor(data.sessionMaxPrice);
+    }
+    if (typeof data.sessionMinPrice === 'number' && data.sessionMinPrice >= 1) {
+      state.sessionMinPrice = Math.floor(data.sessionMinPrice);
+    }
+    if (typeof data.sessionStartPrice === 'number' && data.sessionStartPrice >= 1) {
+      state.sessionStartPrice = Math.floor(data.sessionStartPrice);
+    }
+    if (typeof data.tradePercent === 'number' && data.tradePercent > 0 && data.tradePercent <= 100) {
+      state.tradePercent = Math.floor(data.tradePercent);
+    }
+    if (typeof data.timeframe === 'number' && data.timeframe > 0) {
+      state.timeframe = Math.floor(data.timeframe);
+    }
+    if (Array.isArray(data.bots) && data.bots.length === 9) {
+      state.bots = data.bots.map(function (b) {
+        return {
+          name: String(b.name || 'Bot'),
+          balance: Math.max(0, Math.floor(Number(b.balance) || 0))
+        };
+      });
+    }
+    if (typeof data.botnetOwned === 'number' && data.botnetOwned >= 0) {
+      state.botnetOwned = Math.floor(data.botnetOwned);
+    }
+    if (typeof data.overclockUntil === 'number' && data.overclockUntil >= 0) {
+      state.overclockUntil = Math.floor(data.overclockUntil);
+    }
+    if (typeof data.goldBoostUntil === 'number' && data.goldBoostUntil >= 0) {
+      state.goldBoostUntil = Math.floor(data.goldBoostUntil);
+    }
+  } catch (e) {}
+})();
+
+/* Страховки */
+if (typeof state.cryptoCoins !== 'number' || state.cryptoCoins < 0) state.cryptoCoins = 0;
+if (typeof state.cryptoPrice !== 'number' || state.cryptoPrice < 1) state.cryptoPrice = 12500;
+if (typeof state.cryptoPrevPrice !== 'number') state.cryptoPrevPrice = state.cryptoPrice;
+if (!Array.isArray(state.priceHistory)) state.priceHistory = [];
+if (typeof state.totalSpentCoins !== 'number' || state.totalSpentCoins < 0) state.totalSpentCoins = 0;
+if (typeof state.avgBuyPrice !== 'number' || state.avgBuyPrice < 0) state.avgBuyPrice = 0;
+if (!Array.isArray(state.myOrderHistory)) state.myOrderHistory = [];
+if (typeof state.sessionMaxPrice !== 'number' || state.sessionMaxPrice < 1) state.sessionMaxPrice = state.cryptoPrice;
+if (typeof state.sessionMinPrice !== 'number' || state.sessionMinPrice < 1) state.sessionMinPrice = state.cryptoPrice;
+if (typeof state.sessionStartPrice !== 'number' || state.sessionStartPrice < 1) state.sessionStartPrice = state.cryptoPrice;
+if (typeof state.tradePercent !== 'number' || state.tradePercent <= 0 || state.tradePercent > 100) state.tradePercent = 100;
+if (typeof state.timeframe !== 'number' || state.timeframe <= 0) state.timeframe = 60000;
+if (typeof state.botnetOwned !== 'number') state.botnetOwned = 0;
+if (typeof state.overclockUntil !== 'number') state.overclockUntil = 0;
+if (typeof state.goldBoostUntil !== 'number') state.goldBoostUntil = 0;
+
+if (state.cryptoCoins === 0) {
+  state.totalSpentCoins = 0;
+  state.avgBuyPrice = 0;
+} else if (state.totalSpentCoins > 0) {
+  state.avgBuyPrice = state.totalSpentCoins / state.cryptoCoins;
+} else {
+  state.totalSpentCoins = state.cryptoCoins * state.cryptoPrice;
+  state.avgBuyPrice = state.cryptoPrice;
+}
+
+/* Финальная перерисовка */
+applyRankTheme();
+render();
+refreshOverclockBodyClass();
+if (window.__renderCryptoChart) window.__renderCryptoChart();
+if (window.__renderLeaderboard) window.__renderLeaderboard();
+if (window.__refreshBotnetUI) window.__refreshBotnetUI();
+if (window.__refreshOverclockUI) window.__refreshOverclockUI();
+if (window.__renderPortfolio) window.__renderPortfolio();
+if (window.__renderMyTrades) window.__renderMyTrades();
+if (window.__renderDeltas) window.__renderDeltas();
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+
+function boot() {
+  initAdsgram();
+  initBanner();
+}
+
+if (document.readyState === 'complete') {
+  boot();
+} else {
+  window.addEventListener('load', boot);
+}
+
+window.setTimeout(function () {
+  if (!AdController) boot();
+}, 1500);
 
 })();
 </script>
